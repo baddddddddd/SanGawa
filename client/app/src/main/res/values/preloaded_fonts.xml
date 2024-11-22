@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="preloaded_fonts" translatable="false">
+        <item>@font/alexandria</item>
+        <item>@font/alexandria_semibold</item>
+        <item>@font/konkhmer_sleokchher</item>
+    </array>
+</resources>
