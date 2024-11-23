@@ -1,6 +1,7 @@
 package com.themabajogroup.sangawa;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
@@ -12,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.themabajogroup.sangawa.Controllers.AuthController;
 
 import java.util.Objects;
 
@@ -22,11 +24,14 @@ public class AuthActivity extends AppCompatActivity {
     private Button actionButton;
     private TextView swapTextView;
     private boolean isLogin = true;
+    private AuthController authController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
+
+        authController = AuthController.getInstance();
 
         titleTextView = findViewById(R.id.title);
         usernameEditText = findViewById(R.id.username);
@@ -56,6 +61,18 @@ public class AuthActivity extends AppCompatActivity {
                 String password = Objects.requireNonNull(passwordEditText.getText()).toString();
 
                 if (validateLogin(email, password)) {
+                    // TK: Add UI feedback while waiting for response
+                    authController.verifyCredentials(email, password)
+                            .thenAccept(isSuccess -> {
+                                if (isSuccess) {
+                                    Intent intent = new Intent(AuthActivity.this, MapViewActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    // TK: Add UI feedback for unsuccessful login
+
+                                }
+                            });
                 } else {
                 }
             } else {
@@ -65,6 +82,18 @@ public class AuthActivity extends AppCompatActivity {
                 String confirmPassword = Objects.requireNonNull(confirmPasswordEditText.getText()).toString();
 
                 if (validateSignup(username, email, password, confirmPassword)) {
+                    // TK: Add UI feedback while waiting for response
+                    authController.registerCredentials(username, email, password)
+                            .thenAccept(isSuccess -> {
+
+                                if (isSuccess) {
+                                    Intent intent = new Intent(AuthActivity.this, MapViewActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    // TK: Add UI feedback for unsuccessful registration
+                                }
+                            });
                 } else {
                 }
             }
