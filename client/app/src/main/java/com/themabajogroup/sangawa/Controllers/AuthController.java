@@ -1,17 +1,25 @@
 package com.themabajogroup.sangawa.Controllers;
 
+import android.util.Log;
+
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class AuthController {
     private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
     private static AuthController instance;
+
 
     private AuthController() {
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
     }
 
     public static AuthController getInstance() {
@@ -36,7 +44,25 @@ public class AuthController {
         CompletableFuture<Boolean> result = new CompletableFuture<>();
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task ->  {
-                    result.complete(task.isSuccessful());
+                    if (task.isSuccessful()) {
+                        String userId = mAuth.getCurrentUser().getUid();
+
+                        Map<String, Object> user = new HashMap<>();
+                        user.put("email", email);
+                        user.put("username", username);
+
+                        db.collection("users")
+                                .document(userId)
+                                .set(user)
+                                .addOnSuccessListener(unused -> {
+                                    result.complete(true);
+                                });
+
+                    } else {
+                        result.complete(false);
+                    }
+
+
                 });
 
         return result;
