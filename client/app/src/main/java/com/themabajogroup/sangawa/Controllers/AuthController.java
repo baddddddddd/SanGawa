@@ -1,10 +1,6 @@
 package com.themabajogroup.sangawa.Controllers;
 
-import android.util.Log;
-
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -12,8 +8,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class AuthController {
-    private FirebaseAuth mAuth;
-    private FirebaseFirestore db;
+    private final FirebaseAuth mAuth;
+    private final FirebaseFirestore db;
     private static AuthController instance;
 
 
