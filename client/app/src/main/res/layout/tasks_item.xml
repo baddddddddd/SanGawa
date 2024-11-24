@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <!-- Task Title and Description -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textViewTaskTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Task Title"
+                android:fontFamily="@font/alexandria_semibold"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="#26353B"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:id="@+id/textViewTaskDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Task description preview goes here..."
+                android:textSize="14sp"
+                android:textColor="#757575"
+                android:ellipsize="end"
+                android:maxLines="2"
+                tools:ignore="HardcodedText" />
+        </LinearLayout>
+
+        <!-- Action Icons (Edit/Delete) -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <ImageButton
+                android:id="@+id/buttonEditTask"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_edit_24"
+                android:contentDescription="Edit Task"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_marginHorizontal="10dp"
+                android:padding="10dp"
+                tools:ignore="HardcodedText" />
+
+            <ImageButton
+                android:id="@+id/buttonDeleteTask"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_delete_24"
+                android:padding="10dp"
+                android:contentDescription="Delete Task"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                tools:ignore="HardcodedText" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
