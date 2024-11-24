@@ -61,7 +61,7 @@ public class AuthActivity extends AppCompatActivity {
                 String email = Objects.requireNonNull(emailEditText.getText()).toString();
                 String password = Objects.requireNonNull(passwordEditText.getText()).toString();
 
-                if (validateLogin(email, password)) {
+                if (validateLogin(AuthActivity.this, email, password)) {
                     // TK: Add UI feedback while waiting for response
                     authController.verifyCredentials(email, password)
                             .thenAccept(isSuccess -> {
@@ -123,9 +123,26 @@ public class AuthActivity extends AppCompatActivity {
         confirmPasswordLayout.setVisibility(View.VISIBLE);
     }
 
-    private boolean validateLogin(String email, String password) {
-        return !email.isEmpty() && !password.isEmpty();
+    private boolean validateLogin(Context context, String email, String password) {
+        if (email.isEmpty()) {
+            showToast(context, "Email cannot be empty");
+            return false;
+        }
+        if (!isValidEmail(email)) {
+            showToast(context, "Please enter a valid email address");
+            return false;
+        }
+        if (password.isEmpty()) {
+            showToast(context, "Password cannot be empty");
+            return false;
+        }
+        if (password.length() < 6) {
+            showToast(context, "Password must be at least 6 characters long");
+            return false;
+        }
+        return true;
     }
+
 
     private boolean validateSignup(Context context, String username, String email, String password, String confirmPassword) {
         if (username.isEmpty()) {
