@@ -6,6 +6,6 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MapViewActivity">
+    tools:context=".Activities.MapViewActivity">
 
   </androidx.constraintlayout.widget.ConstraintLayout>

@@ -13,13 +13,13 @@
         android:theme="@style/Theme.SanGawa"
         tools:targetApi="31" >
         <activity
-            android:name=".MapViewActivity"
+            android:name=".Activities.MapViewActivity"
             android:exported="false" />
         <activity
-            android:name=".AuthActivity"
+            android:name=".Activities.AuthActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".Activities.MainActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

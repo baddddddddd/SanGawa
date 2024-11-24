@@ -1,4 +1,4 @@
-package com.themabajogroup.sangawa;
+package com.themabajogroup.sangawa.Activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.themabajogroup.sangawa.Controllers.AuthController;
+import com.themabajogroup.sangawa.R;
 
 import java.util.Objects;
 
