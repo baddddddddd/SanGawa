@@ -128,7 +128,7 @@ public class AuthActivity extends AppCompatActivity {
             showToast(context, "Email cannot be empty");
             return false;
         }
-        if (!isValidEmail(email)) {
+        if (isNotValidEmail(email)) {
             showToast(context, "Please enter a valid email address");
             return false;
         }
@@ -149,7 +149,11 @@ public class AuthActivity extends AppCompatActivity {
             showToast(context, "Username cannot be empty");
             return false;
         }
-        if (email.isEmpty() || !isValidEmail(email)) {
+        if (email.isEmpty()) {
+            showToast(context, "Email cannot be empty");
+            return false;
+        }
+        if (isNotValidEmail(email)) {
             showToast(context, "Enter a valid email address");
             return false;
         }
@@ -168,8 +172,8 @@ public class AuthActivity extends AppCompatActivity {
         return true;
     }
 
-    private boolean isValidEmail(String email) {
-        return email.matches("[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}");
+    private boolean isNotValidEmail(String email) {
+        return !email.matches("[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}");
     }
 
     private void showToast(Context context, String message) {
