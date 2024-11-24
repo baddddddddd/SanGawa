@@ -1,6 +1,6 @@
 package com.themabajogroup.sangawa.Models;
 
-import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,8 +8,8 @@ public class TaskDetails {
     private String userId;
     private String title;
     private String description;
-    private ZonedDateTime deadline;
-    private ZonedDateTime dateCreated;
+    private Date deadline;
+    private Date dateCreated;
     private double locationLat;
     private double locationLon;
     private TaskVisibility visibility;
@@ -39,21 +39,6 @@ public class TaskDetails {
         this.description = description;
     }
 
-    public ZonedDateTime getDeadline() {
-        return deadline;
-    }
-
-    public void setDeadline(ZonedDateTime deadline) {
-        this.deadline = deadline;
-    }
-
-    public ZonedDateTime getDateCreated() {
-        return dateCreated;
-    }
-
-    public void setDateCreated(ZonedDateTime dateCreated) {
-        this.dateCreated = dateCreated;
-    }
 
     public double getLocationLat() {
         return locationLat;
@@ -87,6 +72,22 @@ public class TaskDetails {
         this.status = status;
     }
 
+    public Date getDeadline() {
+        return deadline;
+    }
+
+    public void setDeadline(Date deadline) {
+        this.deadline = deadline;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", getUserId());
@@ -96,8 +97,8 @@ public class TaskDetails {
         map.put("dateCreated", getDateCreated());
         map.put("locationLat", getLocationLat());
         map.put("locationLon", getLocationLon());
-        map.put("visibility", getVisibility());
-        map.put("status", getStatus());
+        map.put("visibility", getVisibility().name());
+        map.put("status", getStatus().name());
         return map;
     }
 }
