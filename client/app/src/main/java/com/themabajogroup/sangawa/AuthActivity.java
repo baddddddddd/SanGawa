@@ -2,7 +2,9 @@ package com.themabajogroup.sangawa;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -15,8 +17,8 @@ import java.util.Objects;
 
 public class AuthActivity extends AppCompatActivity {
     private TextView titleTextView;
-    private TextInputEditText usernameEditText, emailEditText, passwordEditText;
-    private TextInputLayout usernameLayout;
+    private TextInputEditText usernameEditText, emailEditText, passwordEditText, confirmPasswordEditText;
+    private TextInputLayout usernameLayout, confirmPasswordLayout;
     private Button actionButton;
     private TextView swapTextView;
     private boolean isLogin = true;
@@ -30,7 +32,9 @@ public class AuthActivity extends AppCompatActivity {
         usernameEditText = findViewById(R.id.username);
         emailEditText = findViewById(R.id.email);
         passwordEditText = findViewById(R.id.password);
+        confirmPasswordEditText = findViewById(R.id.confirm_password);
         usernameLayout = findViewById(R.id.username_layout);
+        confirmPasswordLayout = findViewById(R.id.confirm_password_layout);
         TextInputLayout emailLayout = findViewById(R.id.email_layout);
         TextInputLayout passwordLayout = findViewById(R.id.password_layout);
         actionButton = findViewById(R.id.action_button);
@@ -52,9 +56,7 @@ public class AuthActivity extends AppCompatActivity {
                 String password = Objects.requireNonNull(passwordEditText.getText()).toString();
 
                 if (validateLogin(email, password)) {
-                    // TODO: Implement login logic then proceed to next activity
                 } else {
-                    // TODO: Show error message
                 }
             } else {
                 String username = Objects.requireNonNull(usernameEditText.getText()).toString();
@@ -62,12 +64,12 @@ public class AuthActivity extends AppCompatActivity {
                 String password = Objects.requireNonNull(passwordEditText.getText()).toString();
 
                 if (validateSignup(username, email, password)) {
-                    // TODO: Implement signup logic then save user data
                 } else {
-                    // TODO: Show error message
                 }
             }
         });
+
+        findViewById(R.id.main).setOnTouchListener(this::onTouch);
     }
 
     @SuppressLint("SetTextI18n")
@@ -77,6 +79,7 @@ public class AuthActivity extends AppCompatActivity {
         actionButton.setText("LOG IN");
         swapTextView.setText("Don't have an account? Sign up now!");
         usernameLayout.setVisibility(View.GONE);
+        confirmPasswordLayout.setVisibility(View.GONE);
     }
 
     @SuppressLint("SetTextI18n")
@@ -86,15 +89,25 @@ public class AuthActivity extends AppCompatActivity {
         actionButton.setText("SIGN UP");
         swapTextView.setText("Already have an account? Log in now!");
         usernameLayout.setVisibility(View.VISIBLE);
+        confirmPasswordLayout.setVisibility(View.VISIBLE);
     }
 
     private boolean validateLogin(String email, String password) {
-        // TODO: Implement login validation
         return !email.isEmpty() && !password.isEmpty();
     }
 
     private boolean validateSignup(String username, String email, String password) {
-        // TODO: Implement signup validation
         return !username.isEmpty() && !email.isEmpty() && !password.isEmpty();
+    }
+
+    private boolean onTouch(View v, MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            View focusedView = getCurrentFocus();
+            if (focusedView != null) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(focusedView.getWindowToken(), 0);
+            }
+        }
+        return false;
     }
 }
