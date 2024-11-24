@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.content.Context;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -41,8 +43,6 @@ public class AuthActivity extends AppCompatActivity {
         confirmPasswordEditText = findViewById(R.id.confirm_password);
         usernameLayout = findViewById(R.id.username_layout);
         confirmPasswordLayout = findViewById(R.id.confirm_password_layout);
-        TextInputLayout emailLayout = findViewById(R.id.email_layout);
-        TextInputLayout passwordLayout = findViewById(R.id.password_layout);
         actionButton = findViewById(R.id.action_button);
         swapTextView = findViewById(R.id.swap);
 
@@ -82,7 +82,7 @@ public class AuthActivity extends AppCompatActivity {
                 String password = Objects.requireNonNull(passwordEditText.getText()).toString();
                 String confirmPassword = Objects.requireNonNull(confirmPasswordEditText.getText()).toString();
 
-                if (validateSignup(username, email, password, confirmPassword)) {
+                if (validateSignup(AuthActivity.this, username, email, password, confirmPassword)) {
                     // TK: Add UI feedback while waiting for response
                     authController.registerCredentials(username, email, password)
                             .thenAccept(isSuccess -> {
@@ -127,8 +127,36 @@ public class AuthActivity extends AppCompatActivity {
         return !email.isEmpty() && !password.isEmpty();
     }
 
-    private boolean validateSignup(String username, String email, String password, String confirmPassword) {
-        return !username.isEmpty() && !email.isEmpty() && !password.isEmpty() && !confirmPassword.isEmpty();
+    private boolean validateSignup(Context context, String username, String email, String password, String confirmPassword) {
+        if (username.isEmpty()) {
+            showToast(context, "Username cannot be empty");
+            return false;
+        }
+        if (email.isEmpty() || !isValidEmail(email)) {
+            showToast(context, "Enter a valid email address");
+            return false;
+        }
+        if (password.isEmpty()) {
+            showToast(context, "Password cannot be empty");
+            return false;
+        }
+        if (!password.equals(confirmPassword)) {
+            showToast(context, "Passwords do not match");
+            return false;
+        }
+        if (password.length() < 6) {
+            showToast(context, "Password must be at least 6 characters");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isValidEmail(String email) {
+        return email.matches("[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}");
+    }
+
+    private void showToast(Context context, String message) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
     private boolean onTouch(View v, MotionEvent event) {
