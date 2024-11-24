@@ -66,7 +66,7 @@ public class AuthActivity extends AppCompatActivity {
                     authController.verifyCredentials(email, password)
                             .thenAccept(isSuccess -> {
                                 if (isSuccess) {
-                                    Intent intent = new Intent(AuthActivity.this, MapViewActivity.class);
+                                    Intent intent = new Intent(AuthActivity.this, TasksActivity.class);
                                     startActivity(intent);
                                     finish();
                                 } else {
@@ -88,7 +88,7 @@ public class AuthActivity extends AppCompatActivity {
                             .thenAccept(isSuccess -> {
 
                                 if (isSuccess) {
-                                    Intent intent = new Intent(AuthActivity.this, MapViewActivity.class);
+                                    Intent intent = new Intent(AuthActivity.this, TasksActivity.class);
                                     startActivity(intent);
                                     finish();
                                 } else {
