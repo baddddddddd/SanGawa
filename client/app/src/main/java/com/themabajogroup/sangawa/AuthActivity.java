@@ -62,8 +62,9 @@ public class AuthActivity extends AppCompatActivity {
                 String username = Objects.requireNonNull(usernameEditText.getText()).toString();
                 String email = Objects.requireNonNull(emailEditText.getText()).toString();
                 String password = Objects.requireNonNull(passwordEditText.getText()).toString();
+                String confirmPassword = Objects.requireNonNull(confirmPasswordEditText.getText()).toString();
 
-                if (validateSignup(username, email, password)) {
+                if (validateSignup(username, email, password, confirmPassword)) {
                 } else {
                 }
             }
@@ -96,8 +97,8 @@ public class AuthActivity extends AppCompatActivity {
         return !email.isEmpty() && !password.isEmpty();
     }
 
-    private boolean validateSignup(String username, String email, String password) {
-        return !username.isEmpty() && !email.isEmpty() && !password.isEmpty();
+    private boolean validateSignup(String username, String email, String password, String confirmPassword) {
+        return !username.isEmpty() && !email.isEmpty() && !password.isEmpty() && !confirmPassword.isEmpty();
     }
 
     private boolean onTouch(View v, MotionEvent event) {
