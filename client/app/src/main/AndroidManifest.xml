@@ -12,11 +12,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SanGawa"
         tools:targetApi="31">
-        <activity
-            android:name=".Activities.TasksActivity"
-            android:exported="false" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
+
         <activity
             android:name=".Activities.MapViewActivity"
+            android:exported="false"
+            android:label="@string/title_activity_map_view" />
+        <activity
+            android:name=".Activities.TasksActivity"
             android:exported="false" />
         <activity
             android:name=".Activities.AuthActivity"
