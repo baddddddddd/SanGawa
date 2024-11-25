@@ -1,5 +1,7 @@
 package com.themabajogroup.sangawa.Activities;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -31,5 +33,21 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        createNotificationChannel();
+    }
+
+    private void createNotificationChannel() {
+        NotificationChannel channel = new NotificationChannel(
+                "GeofenceChannel",
+                "Geofence Notifications",
+                NotificationManager.IMPORTANCE_HIGH
+        );
+        channel.setDescription("Notifications for geofence transitions");
+
+        NotificationManager manager = getSystemService(NotificationManager.class);
+        if (manager != null) {
+            manager.createNotificationChannel(channel);
+        }
     }
 }

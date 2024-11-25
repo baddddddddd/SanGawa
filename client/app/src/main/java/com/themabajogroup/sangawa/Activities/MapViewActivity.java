@@ -4,11 +4,16 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -20,6 +25,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.themabajogroup.sangawa.R;
+import com.themabajogroup.sangawa.Utils.GeofenceBroadcastReceiver;
 import com.themabajogroup.sangawa.databinding.ActivityMapViewBinding;
 
 public class MapViewActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -32,6 +38,9 @@ public class MapViewActivity extends FragmentActivity implements OnMapReadyCallb
     private LocationCallback locationCallback;
     private Marker currentMarker;
     private LatLng currentLocation;
+    private GeofencingClient geofencingClient;
+    private Geofence geofence;
+    private PendingIntent geofencePendingIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +54,7 @@ public class MapViewActivity extends FragmentActivity implements OnMapReadyCallb
         mapFragment.getMapAsync(this);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        geofencingClient = LocationServices.getGeofencingClient(this);
 
         checkLocationPermissions();
     }
@@ -98,6 +108,39 @@ public class MapViewActivity extends FragmentActivity implements OnMapReadyCallb
         }
     }
 
+    private void setupGeofence(String id, LatLng latLng, float radius) {
+        geofence = new Geofence.Builder()
+                .setRequestId(id)
+                .setCircularRegion(latLng.latitude, latLng.longitude, radius)
+                .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                .build();
+    }
+
+    private PendingIntent getGeofencePendingIntent() {
+        Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
+        return PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+    }
+
+    private void addGeofence() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            checkLocationPermissions();
+            return;
+        }
+
+        geofencingClient.addGeofences(
+                new GeofencingRequest.Builder()
+                        .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+                        .addGeofence(geofence)
+                        .build(),
+                getGeofencePendingIntent()
+        ).addOnSuccessListener(aVoid ->
+                Toast.makeText(this, "Geofence added successfully!", Toast.LENGTH_SHORT).show()
+        ).addOnFailureListener(e ->
+                Toast.makeText(this, "Failed to add task geofence: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+        );
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -144,5 +187,11 @@ public class MapViewActivity extends FragmentActivity implements OnMapReadyCallb
 
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
+
+        // TODO: Add geofences based on the coordinates of the tasks
+        // TODO: Add markers based on the coordinates of the tasks
+        LatLng geofenceCenter = new LatLng(13.7839623, 121.0740536); // Example center
+        setupGeofence("test", geofenceCenter, 200000); // Radius: 200 meters
+        addGeofence();
     }
 }
