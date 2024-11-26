@@ -51,19 +51,20 @@ public class AddTaskDialog {
         descInput = dialog.findViewById(R.id.description);
         deadlineInput = dialog.findViewById(R.id.deadline);
         ImageButton deadlinePicker = dialog.findViewById(R.id.deadline_picker);
+        ImageButton locationPicker = dialog.findViewById(R.id.location_picker);
         locationInput = dialog.findViewById(R.id.location);
         privacyGroup = dialog.findViewById(R.id.privacy_group);
 
         deadlinePicker.setOnClickListener(v -> showDatePicker());
         deadlineInput.setOnClickListener(v -> showDatePicker());
 
-        btnAdd.setOnClickListener(view -> dialog.show());
+        View.OnClickListener showPinLocationDialog = v -> {
+            new PinLocationDialog(locationInput).show(fragmentManager, "PinLocationDialog");
+        };
 
-        ImageButton locationPicker = dialog.findViewById(R.id.location_picker);
-        locationPicker.setOnClickListener(v -> {
-            PinLocationDialog pinLocationDialog = new PinLocationDialog();
-            pinLocationDialog.show(fragmentManager, "PinLocationDialog");
-        });
+        locationPicker.setOnClickListener(showPinLocationDialog);
+        locationInput.setOnClickListener(showPinLocationDialog);
+
 
         btnAdd.setOnClickListener(view -> {
             String title = titleInput.getText().toString().trim();

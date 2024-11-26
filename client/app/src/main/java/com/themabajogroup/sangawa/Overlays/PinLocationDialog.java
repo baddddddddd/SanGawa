@@ -1,6 +1,8 @@
 package com.themabajogroup.sangawa.Overlays;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,11 +16,17 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.textfield.TextInputEditText;
 import com.themabajogroup.sangawa.R;
 
 public class PinLocationDialog extends DialogFragment implements OnMapReadyCallback {
 
+    private final TextInputEditText locationInput;
     private GoogleMap mMap;
+
+    public PinLocationDialog(TextInputEditText locationInput) {
+        this.locationInput = locationInput;
+    }
 
     @Nullable
     @Override
@@ -26,6 +34,7 @@ public class PinLocationDialog extends DialogFragment implements OnMapReadyCallb
         return inflater.inflate(R.layout.dialog_pin_location, container, false);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -43,8 +52,12 @@ public class PinLocationDialog extends DialogFragment implements OnMapReadyCallb
         }
 
         view.findViewById(R.id.confirm_location_button).setOnClickListener(v -> {
-            // TODO: Implement action for confirming location (e.g., pass selected lat/lng)
-            dismiss();
+            if (mMap != null) {
+                LatLng currentCenter = mMap.getCameraPosition().target;
+                locationInput.setText(String.format("%.7f, %.7f", currentCenter.latitude, currentCenter.longitude));
+
+                dismiss();
+            }
         });
     }
 
@@ -53,8 +66,7 @@ public class PinLocationDialog extends DialogFragment implements OnMapReadyCallb
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        LatLng defaultLocation = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(defaultLocation).title("Default Location"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(defaultLocation));
+        LatLng defaultLocation = new LatLng(34.3850155, 132.4541501);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 10));
     }
 }
