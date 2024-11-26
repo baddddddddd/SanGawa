@@ -5,11 +5,15 @@ import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -30,6 +34,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.themabajogroup.sangawa.R;
 import com.themabajogroup.sangawa.Utils.GeofenceBroadcastReceiver;
 import com.themabajogroup.sangawa.databinding.ActivityMapViewBinding;
+
+import java.util.Objects;
 
 public class MapViewActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -55,6 +61,37 @@ public class MapViewActivity extends FragmentActivity implements OnMapReadyCallb
         NestedScrollView bottomSheet = findViewById(R.id.bottom_sheet);
         BottomSheetBehavior<NestedScrollView> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+        Dialog dialog = new Dialog(MapViewActivity.this);
+        dialog.setContentView(R.layout.dialog_add_task);
+        Objects.requireNonNull(dialog.getWindow()).setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.setCancelable(false);
+
+        Button btnAdd = dialog.findViewById(R.id.add_button);
+        Button btnCancel = dialog.findViewById(R.id.cancel_button);
+        ImageButton btnAddTask = findViewById(R.id.add_task_button);
+
+        btnAddTask.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.show();
+            }
+        });
+
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Tk: Add task logic here
+            }
+        });
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
