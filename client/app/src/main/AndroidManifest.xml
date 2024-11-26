@@ -27,9 +27,6 @@
             android:exported="false"
             android:label="@string/title_activity_map_view" />
         <activity
-            android:name=".Activities.TasksActivity"
-            android:exported="false" />
-        <activity
             android:name=".Activities.AuthActivity"
             android:exported="false" />
         <activity

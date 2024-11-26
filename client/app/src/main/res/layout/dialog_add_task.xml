@@ -194,7 +194,8 @@
                     android:layout_height="wrap_content"
                     android:text="Public"
                     android:textColor="#26353B"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    tools:ignore="HardcodedText" />
 
                 <Space
                     android:layout_width="16dp"
@@ -207,7 +208,8 @@
                     android:layout_height="wrap_content"
                     android:text="Private"
                     android:textColor="#26353B"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    tools:ignore="HardcodedText" />
 
                 <Space
                     android:layout_width="16dp"
@@ -219,7 +221,8 @@
                     android:layout_height="wrap_content"
                     android:text="Invite Only"
                     android:textColor="#26353B"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    tools:ignore="HardcodedText" />
 
             </RadioGroup>
 
