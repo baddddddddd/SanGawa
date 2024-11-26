@@ -1,6 +1,9 @@
 package com.themabajogroup.sangawa.Overlays;
 
+import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.text.TextUtils;
 import android.widget.Button;
@@ -15,6 +18,7 @@ import com.themabajogroup.sangawa.Models.TaskVisibility;
 import com.themabajogroup.sangawa.R;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
@@ -22,11 +26,11 @@ import java.util.Objects;
 public class AddTaskDialog {
 
     private final Dialog dialog;
+    private final TextInputEditText titleInput, descInput, deadlineInput, locationInput;
+    private final RadioGroup privacyGroup;
+    private int selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute;
 
     public AddTaskDialog(Context context, ImageButton btnAddTask) {
-        final TextInputEditText titleInput, descInput, deadlineInput, locationInput;
-        final RadioGroup privacyGroup;
-
         dialog = new Dialog(context);
         dialog.setContentView(R.layout.dialog_add_task);
         Objects.requireNonNull(dialog.getWindow()).setLayout(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -39,9 +43,11 @@ public class AddTaskDialog {
         titleInput = dialog.findViewById(R.id.title);
         descInput = dialog.findViewById(R.id.description);
         deadlineInput = dialog.findViewById(R.id.deadline);
+        ImageButton deadlinePicker = dialog.findViewById(R.id.deadline_picker);
         locationInput = dialog.findViewById(R.id.location);
         privacyGroup = dialog.findViewById(R.id.privacy_group);
 
+        deadlinePicker.setOnClickListener(v -> showDatePicker());
         btnAddTask.setOnClickListener(view -> dialog.show());
 
         btnAdd.setOnClickListener(view -> {
@@ -51,7 +57,7 @@ public class AddTaskDialog {
             String location = locationInput.getText().toString().trim();
             int selectedPrivacyId = privacyGroup.getCheckedRadioButtonId();
 
-            if (TextUtils.isEmpty(title) || TextUtils.isEmpty(description) || TextUtils.isEmpty(deadlineStr) || TextUtils.isEmpty(location) || !(selectedPrivacyId == -1)) {
+            if (TextUtils.isEmpty(title) || TextUtils.isEmpty(description) || TextUtils.isEmpty(deadlineStr) || TextUtils.isEmpty(location) || selectedPrivacyId == -1) {
                 Toast.makeText(view.getContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -87,7 +93,30 @@ public class AddTaskDialog {
             }
         });
 
-
         btnCancel.setOnClickListener(view -> dialog.dismiss());
+    }
+
+    private void showDatePicker() {
+        Calendar calendar = Calendar.getInstance();
+        new DatePickerDialog(dialog.getContext(), (view, year, month, dayOfMonth) -> {
+            selectedYear = year;
+            selectedMonth = month;
+            selectedDay = dayOfMonth;
+            showTimePicker();
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
+    private void showTimePicker() {
+        Calendar calendar = Calendar.getInstance();
+        new TimePickerDialog(dialog.getContext(), (view, hourOfDay, minute) -> {
+            selectedHour = hourOfDay;
+            selectedMinute = minute;
+            updateDeadline();
+        }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false).show();
+    }
+
+    @SuppressLint("DefaultLocale")
+    private void updateDeadline() {
+        deadlineInput.setText(String.format("%02d/%02d/%d %02d:%02d", selectedDay, selectedMonth + 1, selectedYear, selectedHour, selectedMinute));
     }
 }
