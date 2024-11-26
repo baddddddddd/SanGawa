@@ -31,6 +31,10 @@ public class AuthController {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task ->  {
                     result.complete(task.isSuccessful());
+
+                    // TODO: Potentially bad coupling
+                    UserController userController = UserController.getInstance();
+                    userController.setCurrentUser(mAuth.getCurrentUser());
                 });
 
         return result;
@@ -52,6 +56,10 @@ public class AuthController {
                                 .set(user)
                                 .addOnSuccessListener(unused -> {
                                     result.complete(true);
+
+                                    // TODO: Potentially bad coupling
+                                    UserController userController = UserController.getInstance();
+                                    userController.setCurrentUser(mAuth.getCurrentUser());
                                 });
 
                     } else {
