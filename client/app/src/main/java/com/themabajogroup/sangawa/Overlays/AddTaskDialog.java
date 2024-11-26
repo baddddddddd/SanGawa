@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.text.TextUtils;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
@@ -48,7 +49,11 @@ public class AddTaskDialog {
         privacyGroup = dialog.findViewById(R.id.privacy_group);
 
         deadlinePicker.setOnClickListener(v -> showDatePicker());
+        deadlineInput.setOnClickListener(v -> showDatePicker());
         btnAddTask.setOnClickListener(view -> dialog.show());
+        ImageButton locationPicker = dialog.findViewById(R.id.location_picker);
+        PinMapDialog locationPickerDialog = new PinMapDialog(dialog.getContext(), locationPicker, locationInput);
+
 
         btnAdd.setOnClickListener(view -> {
             String title = titleInput.getText().toString().trim();
@@ -119,4 +124,15 @@ public class AddTaskDialog {
     private void updateDeadline() {
         deadlineInput.setText(String.format("%02d/%02d/%d %02d:%02d", selectedDay, selectedMonth + 1, selectedYear, selectedHour, selectedMinute));
     }
+
+    private void openPinMapDialog() {
+        Dialog pinMapDialog = new Dialog(dialog.getContext());
+        pinMapDialog.setContentView(R.layout.dialog_pin_map);
+        pinMapDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        pinMapDialog.show();
+
+        Button closeButton = pinMapDialog.findViewById(R.id.confirm_location_button);
+        closeButton.setOnClickListener(v -> pinMapDialog.dismiss());
+    }
+
 }

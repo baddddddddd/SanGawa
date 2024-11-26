@@ -84,7 +84,6 @@
                 tools:ignore="HardcodedText,TextContrastCheck" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Deadline with DatePicker Icon -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -130,7 +129,6 @@
                 tools:ignore="HardcodedText" />
         </LinearLayout>
 
-        <!-- Location with LocationPin Icon -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
