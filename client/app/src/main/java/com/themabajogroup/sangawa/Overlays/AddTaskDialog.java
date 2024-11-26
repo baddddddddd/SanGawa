@@ -1,4 +1,4 @@
-package com.themabajogroup.sangawa.Dialogs;
+package com.themabajogroup.sangawa.Overlays;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -19,11 +19,11 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
-public class TaskDialog {
+public class AddTaskDialog {
 
     private final Dialog dialog;
 
-    public TaskDialog(Context context, ImageButton btnAddTask) {
+    public AddTaskDialog(Context context, ImageButton btnAddTask) {
         final TextInputEditText titleInput, descInput, deadlineInput, locationInput;
         final RadioGroup privacyGroup;
 
@@ -49,19 +49,14 @@ public class TaskDialog {
             String description = descInput.getText().toString().trim();
             String deadlineStr = deadlineInput.getText().toString().trim();
             String location = locationInput.getText().toString().trim();
-
             int selectedPrivacyId = privacyGroup.getCheckedRadioButtonId();
-            if (selectedPrivacyId == -1) {
-                Toast.makeText(view.getContext(), "Please select a privacy option", Toast.LENGTH_SHORT).show();
+
+            if (TextUtils.isEmpty(title) || TextUtils.isEmpty(description) || TextUtils.isEmpty(deadlineStr) || TextUtils.isEmpty(location) || !(selectedPrivacyId == -1)) {
+                Toast.makeText(view.getContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             String privacy = ((RadioButton) dialog.findViewById(selectedPrivacyId)).getText().toString();
-
-            if (TextUtils.isEmpty(title) || TextUtils.isEmpty(description) || TextUtils.isEmpty(deadlineStr) || TextUtils.isEmpty(location) || TextUtils.isEmpty(privacy)) {
-                Toast.makeText(view.getContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
-                return;
-            }
 
             try {
                 String[] locationParts = location.split(",");

@@ -51,7 +51,7 @@
                 android:id="@+id/title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Tite"
+                android:hint="Title"
                 android:inputType="textPersonName"
                 android:textColor="#26353B"
                 android:textSize="16sp"
@@ -74,7 +74,7 @@
             app:boxBackgroundMode="outline">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/email"
+                android:id="@+id/description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Description"
@@ -191,7 +191,7 @@
                 tools:ignore="UselessParent">
 
                 <RadioButton
-                    android:id="@+id/public_radio"
+                    android:id="@+id/OPEN_TO_ALL"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Public"
@@ -204,7 +204,7 @@
 
 
                 <RadioButton
-                    android:id="@+id/private_radio"
+                    android:id="@+id/PRIVATE"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Private"
@@ -216,7 +216,7 @@
                     android:layout_height="match_parent" />
 
                 <RadioButton
-                    android:id="@+id/invite_radio"
+                    android:id="@+id/REQUEST_TO_JOIN"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Invite Only"

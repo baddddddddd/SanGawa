@@ -1,4 +1,4 @@
-package com.themabajogroup.sangawa.Adapters;
+package com.themabajogroup.sangawa.Overlays;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,7 +15,7 @@ import com.themabajogroup.sangawa.Models.Task;
 import com.themabajogroup.sangawa.R;
 
 import java.util.ArrayList;
-// NOTE: This might be a redundancy of TaskController and will be later removed
+
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
 
     private final Context context;
@@ -40,13 +41,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         holder.taskDescription.setText(task.getDescription());
 
         holder.editButton.setOnClickListener(v -> {
-            // TODO: Add edit logic
+            // TODO: Add edit logic, for example launch an activity to edit the task.
+            Toast.makeText(context, "Edit task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
         });
 
+        // Delete task action
         holder.deleteButton.setOnClickListener(v -> {
             taskList.remove(position);
             notifyItemRemoved(position);
             notifyItemRangeChanged(position, taskList.size());
+            Toast.makeText(context, "Task deleted: " + task.getTitle(), Toast.LENGTH_SHORT).show();
         });
     }
 

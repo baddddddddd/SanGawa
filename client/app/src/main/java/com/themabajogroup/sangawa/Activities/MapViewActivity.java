@@ -5,14 +5,10 @@ import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
-import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -32,11 +28,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.themabajogroup.sangawa.R;
-import com.themabajogroup.sangawa.Dialogs.TaskDialog;
+import com.themabajogroup.sangawa.Overlays.AddTaskDialog;
 import com.themabajogroup.sangawa.Utils.GeofenceBroadcastReceiver;
 import com.themabajogroup.sangawa.databinding.ActivityMapViewBinding;
-
-import java.util.Objects;
 
 public class MapViewActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -64,7 +58,7 @@ public class MapViewActivity extends FragmentActivity implements OnMapReadyCallb
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         ImageButton btnAddTask = findViewById(R.id.add_task_button);
-        TaskDialog taskDialog = new TaskDialog(this, btnAddTask);
+        AddTaskDialog taskDialog = new AddTaskDialog(this, btnAddTask);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
