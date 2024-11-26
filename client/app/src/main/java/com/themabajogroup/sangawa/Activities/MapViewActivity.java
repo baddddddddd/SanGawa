@@ -32,6 +32,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.themabajogroup.sangawa.R;
+import com.themabajogroup.sangawa.Dialogs.TaskDialog;
 import com.themabajogroup.sangawa.Utils.GeofenceBroadcastReceiver;
 import com.themabajogroup.sangawa.databinding.ActivityMapViewBinding;
 
@@ -62,36 +63,8 @@ public class MapViewActivity extends FragmentActivity implements OnMapReadyCallb
         BottomSheetBehavior<NestedScrollView> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
-        Dialog dialog = new Dialog(MapViewActivity.this);
-        dialog.setContentView(R.layout.dialog_add_task);
-        Objects.requireNonNull(dialog.getWindow()).setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
-        dialog.setCancelable(false);
-
-        Button btnAdd = dialog.findViewById(R.id.add_button);
-        Button btnCancel = dialog.findViewById(R.id.cancel_button);
         ImageButton btnAddTask = findViewById(R.id.add_task_button);
-
-        btnAddTask.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.show();
-            }
-        });
-
-        btnAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Tk: Add task logic here
-            }
-        });
-
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
+        TaskDialog taskDialog = new TaskDialog(this, btnAddTask);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
