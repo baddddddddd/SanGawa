@@ -1,8 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Base.Theme.SanGawa" parent="Theme.Material3.Light.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:colorControlActivated">#26353B</item>
+        <item name="android:navigationBarColor">#26353B</item>
+        <item name="android:statusBarColor">#26353B</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
     <style name="Theme.SanGawa" parent="Base.Theme.SanGawa" />
