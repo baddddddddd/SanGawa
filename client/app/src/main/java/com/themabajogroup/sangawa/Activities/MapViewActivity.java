@@ -63,7 +63,7 @@ public class MapViewActivity extends FragmentActivity implements OnMapReadyCallb
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         ImageButton btnAddTask = findViewById(R.id.add_task_button);
-        AddTaskDialog taskDialog = new AddTaskDialog(this, btnAddTask);
+        AddTaskDialog addTaskDialog = new AddTaskDialog(this, btnAddTask, getSupportFragmentManager());
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);

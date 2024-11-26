@@ -5,13 +5,18 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.media.Image;
 import android.text.TextUtils;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
 import android.widget.RadioButton;
 import android.widget.Toast;
+
+import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.themabajogroup.sangawa.Models.TaskDetails;
@@ -31,12 +36,13 @@ public class AddTaskDialog {
     private final RadioGroup privacyGroup;
     private int selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute;
 
-    public AddTaskDialog(Context context, ImageButton btnAddTask) {
+    public AddTaskDialog(Context context, ImageButton btnAddTask, FragmentManager fragmentManager) {
         dialog = new Dialog(context);
         dialog.setContentView(R.layout.dialog_add_task);
-        Objects.requireNonNull(dialog.getWindow()).setLayout(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        Objects.requireNonNull(dialog.getWindow()).setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         dialog.setCancelable(false);
+        btnAddTask.setOnClickListener(view -> dialog.show());
 
         Button btnAdd = dialog.findViewById(R.id.add_button);
         Button btnCancel = dialog.findViewById(R.id.cancel_button);
@@ -50,10 +56,14 @@ public class AddTaskDialog {
 
         deadlinePicker.setOnClickListener(v -> showDatePicker());
         deadlineInput.setOnClickListener(v -> showDatePicker());
-        btnAddTask.setOnClickListener(view -> dialog.show());
-        ImageButton locationPicker = dialog.findViewById(R.id.location_picker);
-        PinMapDialog locationPickerDialog = new PinMapDialog(dialog.getContext(), locationPicker, locationInput);
 
+        btnAdd.setOnClickListener(view -> dialog.show());
+
+        ImageButton locationPicker = dialog.findViewById(R.id.location_picker);
+        locationPicker.setOnClickListener(v -> {
+            PinLocationDialog pinLocationDialog = new PinLocationDialog();
+            pinLocationDialog.show(fragmentManager, "PinLocationDialog");
+        });
 
         btnAdd.setOnClickListener(view -> {
             String title = titleInput.getText().toString().trim();
@@ -124,15 +134,4 @@ public class AddTaskDialog {
     private void updateDeadline() {
         deadlineInput.setText(String.format("%02d/%02d/%d %02d:%02d", selectedDay, selectedMonth + 1, selectedYear, selectedHour, selectedMinute));
     }
-
-    private void openPinMapDialog() {
-        Dialog pinMapDialog = new Dialog(dialog.getContext());
-        pinMapDialog.setContentView(R.layout.dialog_pin_map);
-        pinMapDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        pinMapDialog.show();
-
-        Button closeButton = pinMapDialog.findViewById(R.id.confirm_location_button);
-        closeButton.setOnClickListener(v -> pinMapDialog.dismiss());
-    }
-
 }

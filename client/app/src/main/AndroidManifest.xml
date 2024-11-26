@@ -22,6 +22,8 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
 
+        <activity android:name=".Activities.PinLocationActivity"
+            android:exported="false" />
         <activity
             android:name=".Activities.MapViewActivity"
             android:exported="false"
