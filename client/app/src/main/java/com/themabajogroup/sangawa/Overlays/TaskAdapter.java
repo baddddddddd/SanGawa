@@ -1,76 +1,65 @@
 package com.themabajogroup.sangawa.Overlays;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.themabajogroup.sangawa.Models.Task;
+import com.themabajogroup.sangawa.Models.TaskDetails;
 import com.themabajogroup.sangawa.R;
-
-import java.util.ArrayList;
+import java.util.List;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
 
-    private final Context context;
-    private final ArrayList<Task> taskList;
+    private final List<TaskDetails> tasks;
+    private final TaskItemClickListener taskItemClickListener;
 
-    public TaskAdapter(Context context, ArrayList<Task> taskList) {
-        this.context = context;
-        this.taskList = taskList;
-    }
-
-    @NonNull
-    @Override
-    public TaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.tasks_item, parent, false);
-        return new TaskViewHolder(view);
+    public TaskAdapter(List<TaskDetails> tasks, TaskItemClickListener listener) {
+        this.tasks = tasks;
+        this.taskItemClickListener = listener;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
-        Task task = taskList.get(position);
+    public TaskViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View itemView = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.task_item, parent, false);
+        return new TaskViewHolder(itemView);
+    }
 
-        holder.taskTitle.setText(task.getTitle());
-        holder.taskDescription.setText(task.getDescription());
+    @Override
+    public void onBindViewHolder(TaskViewHolder holder, int position) {
+        TaskDetails task = tasks.get(position);
+        holder.textViewTaskTitle.setText(task.getTitle());
+        holder.textViewTaskDescription.setText(task.getDescription());
 
-        holder.editButton.setOnClickListener(v -> {
-            // TODO: Add edit logic, for example launch an activity to edit the task.
-            Toast.makeText(context, "Edit task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
-        });
-
-        // Delete task action
-        holder.deleteButton.setOnClickListener(v -> {
-            taskList.remove(position);
-            notifyItemRemoved(position);
-            notifyItemRangeChanged(position, taskList.size());
-            Toast.makeText(context, "Task deleted: " + task.getTitle(), Toast.LENGTH_SHORT).show();
-        });
+        holder.buttonEditTask.setOnClickListener(v -> taskItemClickListener.onEditTaskClick(task));
+        holder.buttonDeleteTask.setOnClickListener(v -> taskItemClickListener.onDeleteTaskClick(task));
     }
 
     @Override
     public int getItemCount() {
-        return taskList.size();
+        return tasks.size();
     }
 
-    static class TaskViewHolder extends RecyclerView.ViewHolder {
-        TextView taskTitle;
-        TextView taskDescription;
-        ImageButton editButton;
-        ImageButton deleteButton;
+    public static class TaskViewHolder extends RecyclerView.ViewHolder {
 
-        public TaskViewHolder(@NonNull View itemView) {
-            super(itemView);
-            taskTitle = itemView.findViewById(R.id.textViewTaskTitle);
-            taskDescription = itemView.findViewById(R.id.textViewTaskDescription);
-            editButton = itemView.findViewById(R.id.buttonEditTask);
-            deleteButton = itemView.findViewById(R.id.buttonDeleteTask);
+        public TextView textViewTaskTitle;
+        public TextView textViewTaskDescription;
+        public ImageButton buttonEditTask;
+        public ImageButton buttonDeleteTask;
+
+        public TaskViewHolder(View view) {
+            super(view);
+            textViewTaskTitle = view.findViewById(R.id.textViewTaskTitle);
+            textViewTaskDescription = view.findViewById(R.id.textViewTaskDescription);
+            buttonEditTask = view.findViewById(R.id.buttonEditTask);
+            buttonDeleteTask = view.findViewById(R.id.buttonDeleteTask);
         }
+    }
+
+    public interface TaskItemClickListener {
+        void onEditTaskClick(TaskDetails task);
+        void onDeleteTaskClick(TaskDetails task);
     }
 }

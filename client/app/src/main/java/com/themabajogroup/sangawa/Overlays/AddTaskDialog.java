@@ -5,8 +5,6 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
-import android.content.Intent;
-import android.media.Image;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -14,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
-import android.widget.RadioButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,8 +20,8 @@ import androidx.fragment.app.FragmentManager;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.themabajogroup.sangawa.Activities.MapViewActivity;
 import com.themabajogroup.sangawa.Controllers.TaskController;
-import com.themabajogroup.sangawa.Controllers.UserController;
 import com.themabajogroup.sangawa.Models.TaskDetails;
 import com.themabajogroup.sangawa.Models.TaskVisibility;
 import com.themabajogroup.sangawa.R;
@@ -39,10 +36,9 @@ public class AddTaskDialog {
 
     private final Dialog dialog;
     private final TextInputEditText titleInput, descInput, deadlineInput, locationInput;
-    private final RadioGroup privacyGroup;
     private int selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute;
 
-    public AddTaskDialog(Context context, ImageButton btnAddTask, FragmentManager fragmentManager) {
+    public AddTaskDialog(Context context, ImageButton btnAddTask, FragmentManager fragmentManager, MapViewActivity mapViewActivity) {
         dialog = new Dialog(context);
         dialog.setContentView(R.layout.dialog_add_task);
         Objects.requireNonNull(dialog.getWindow()).setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -59,14 +55,11 @@ public class AddTaskDialog {
         ImageButton deadlinePicker = dialog.findViewById(R.id.deadline_picker);
         ImageButton locationPicker = dialog.findViewById(R.id.location_picker);
         locationInput = dialog.findViewById(R.id.location);
-        privacyGroup = dialog.findViewById(R.id.privacy_group);
 
         deadlinePicker.setOnClickListener(v -> showDatePicker());
         deadlineInput.setOnClickListener(v -> showDatePicker());
 
-        View.OnClickListener showPinLocationDialog = v -> {
-            new PinLocationDialog(locationInput).show(fragmentManager, "PinLocationDialog");
-        };
+        View.OnClickListener showPinLocationDialog = v -> new PinLocationDialog(locationInput).show(fragmentManager, "PinLocationDialog");
 
         locationPicker.setOnClickListener(showPinLocationDialog);
         locationInput.setOnClickListener(showPinLocationDialog);
@@ -114,6 +107,9 @@ public class AddTaskDialog {
                 TaskController.getInstance().createUserTask(task)
                         .thenAccept(success -> {
                             if (success) {
+                                if (mapViewActivity != null) {
+                                    mapViewActivity.refreshTaskList();
+                                }
                                 Toast.makeText(context, "Task added successfully!", Toast.LENGTH_SHORT).show();
                                 dialog.dismiss();
                             } else {

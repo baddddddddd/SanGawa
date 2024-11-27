@@ -3,6 +3,8 @@ package com.themabajogroup.sangawa.Activities;
 import androidx.core.app.ActivityCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.app.PendingIntent;
@@ -28,15 +30,15 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.firebase.auth.FirebaseAuth;
 import com.themabajogroup.sangawa.Controllers.UserController;
 import com.themabajogroup.sangawa.Models.TaskDetails;
+import com.themabajogroup.sangawa.Overlays.TaskAdapter;
 import com.themabajogroup.sangawa.R;
 import com.themabajogroup.sangawa.Overlays.AddTaskDialog;
 import com.themabajogroup.sangawa.Utils.GeofenceBroadcastReceiver;
 import com.themabajogroup.sangawa.databinding.ActivityMapViewBinding;
 
-public class MapViewActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapViewActivity extends FragmentActivity implements OnMapReadyCallback, TaskAdapter.TaskItemClickListener {
 
     private static final int FINE_LOCATION_PERMISSION_REQUEST_CODE = 1;
     private static final int BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE = 2;
@@ -49,6 +51,7 @@ public class MapViewActivity extends FragmentActivity implements OnMapReadyCallb
     private GeofencingClient geofencingClient;
     private PendingIntent geofencePendingIntent;
     private UserController userController;
+    private RecyclerView recyclerViewTasks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,12 +61,13 @@ public class MapViewActivity extends FragmentActivity implements OnMapReadyCallb
         setContentView(binding.getRoot());
 
         userController = UserController.getInstance();
+
         NestedScrollView bottomSheet = findViewById(R.id.bottom_sheet);
         BottomSheetBehavior<NestedScrollView> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         ImageButton btnAddTask = findViewById(R.id.add_task_button);
-        AddTaskDialog addTaskDialog = new AddTaskDialog(this, btnAddTask, getSupportFragmentManager());
+        new AddTaskDialog(this, btnAddTask, getSupportFragmentManager(), MapViewActivity.this);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -74,7 +78,7 @@ public class MapViewActivity extends FragmentActivity implements OnMapReadyCallb
 
         checkLocationPermissions();
 
-
+        refreshTaskList();
     }
 
     private void checkLocationPermissions() {
@@ -220,5 +224,41 @@ public class MapViewActivity extends FragmentActivity implements OnMapReadyCallb
                         Marker marker = mMap.addMarker(markerOptions);
                     }
                 });
+    }
+
+    @Override
+    public void onEditTaskClick(TaskDetails task) {
+        Toast.makeText(this, "Edit Task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+        // TODO: Create ui for this
+    }
+
+    @Override
+    public void onDeleteTaskClick(TaskDetails task) {
+        Toast.makeText(this, "Delete Task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+//        UserController.getInstance().getTaskController().deleteUserTask(task.getId())
+//                .thenAccept(success -> {
+//                    if (success) {
+//                        Toast.makeText(this, "Task deleted", Toast.LENGTH_SHORT).show();
+//                        ArrayAdapter<Object> taskAdapter = null;
+//                        taskAdapter.notifyDataSetChanged();
+//                    } else {
+//                        Toast.makeText(this, "Failed to delete task", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//        TODO: Lacking getId() method and taskId in TaskDetails
+    }
+
+    public void refreshTaskList() {
+        recyclerViewTasks = findViewById(R.id.recyclerViewTasks);
+        recyclerViewTasks.setLayoutManager(new LinearLayoutManager(this));
+
+        userController.fetchUserTasks().thenAccept(tasks -> {
+            if (tasks != null && !tasks.isEmpty()) {
+                TaskAdapter taskAdapter = new TaskAdapter(tasks, this);
+                recyclerViewTasks.setAdapter(taskAdapter);
+            } else {
+                Toast.makeText(this, "No tasks found", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
