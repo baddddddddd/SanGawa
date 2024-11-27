@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.Image;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -16,9 +17,14 @@ import android.widget.RadioGroup;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.themabajogroup.sangawa.Controllers.TaskController;
+import com.themabajogroup.sangawa.Controllers.UserController;
 import com.themabajogroup.sangawa.Models.TaskDetails;
 import com.themabajogroup.sangawa.Models.TaskVisibility;
 import com.themabajogroup.sangawa.R;
@@ -71,45 +77,71 @@ public class AddTaskDialog {
             String description = descInput.getText().toString().trim();
             String deadlineStr = deadlineInput.getText().toString().trim();
             String location = locationInput.getText().toString().trim();
-            int selectedPrivacyId = privacyGroup.getCheckedRadioButtonId();
+            int selectedPrivacyId = ((RadioGroup) dialog.findViewById(R.id.privacy_group)).getCheckedRadioButtonId();
 
-            if (TextUtils.isEmpty(title) || TextUtils.isEmpty(description) || TextUtils.isEmpty(deadlineStr) || TextUtils.isEmpty(location) || selectedPrivacyId == -1) {
+            if (TextUtils.isEmpty(title) || TextUtils.isEmpty(description) ||
+                    TextUtils.isEmpty(deadlineStr) || TextUtils.isEmpty(location) || selectedPrivacyId == -1) {
                 Toast.makeText(view.getContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            String privacy = ((RadioButton) dialog.findViewById(selectedPrivacyId)).getText().toString();
-
             try {
                 String[] locationParts = location.split(",");
+                if (locationParts.length != 2) {
+                    throw new IllegalArgumentException("Location must have two parts: latitude and longitude");
+                }
                 double locationLat = Double.parseDouble(locationParts[0].trim());
                 double locationLon = Double.parseDouble(locationParts[1].trim());
 
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+                sdf.setLenient(false);
                 Date deadline = sdf.parse(deadlineStr);
 
-                TaskVisibility visibility = TaskVisibility.valueOf(privacy);
+                TaskVisibility visibility = getTaskVisibility(selectedPrivacyId);
+
+                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                if (currentUser == null) {
+                    Toast.makeText(view.getContext(), "User is not logged in.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                String userId = currentUser.getUid();
 
                 TaskDetails task = new TaskDetails(
-                        "userIdPlaceholder",
-                        title,
-                        description,
-                        locationLat,
-                        locationLon,
-                        visibility,
-                        deadline
+                        userId, title, description, locationLat, locationLon, visibility, deadline
                 );
 
-                // TODO: Save the task object to your database
-                Toast.makeText(context, "Task added successfully!", Toast.LENGTH_SHORT).show();
-                dialog.dismiss();
-
+                TaskController.getInstance().createUserTask(task)
+                        .thenAccept(success -> {
+                            if (success) {
+                                Toast.makeText(context, "Task added successfully!", Toast.LENGTH_SHORT).show();
+                                dialog.dismiss();
+                            } else {
+                                Toast.makeText(context, "Failed to add task. Please try again.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
             } catch (Exception e) {
                 Toast.makeText(view.getContext(), "Invalid input. Please check your values.", Toast.LENGTH_SHORT).show();
+                Log.e("TaskInputDebug", "Error: " + e.getMessage(), e);
             }
         });
 
         btnCancel.setOnClickListener(view -> dialog.dismiss());
+    }
+
+    @NonNull
+    private static TaskVisibility getTaskVisibility(int selectedPrivacyId) {
+        TaskVisibility visibility;
+        if (selectedPrivacyId == R.id.OPEN_TO_ALL) {
+            visibility = TaskVisibility.OPEN_TO_ALL;
+        } else if (selectedPrivacyId == R.id.PRIVATE) {
+            visibility = TaskVisibility.PRIVATE;
+        } else if (selectedPrivacyId == R.id.REQUEST_TO_JOIN) {
+            visibility = TaskVisibility.REQUEST_TO_JOIN;
+        } else {
+            throw new IllegalArgumentException("Invalid privacy option selected");
+        }
+        return visibility;
     }
 
     private void showDatePicker() {
