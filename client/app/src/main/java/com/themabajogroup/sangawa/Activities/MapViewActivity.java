@@ -37,9 +37,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.themabajogroup.sangawa.Controllers.UserController;
 import com.themabajogroup.sangawa.Models.TaskDetails;
+import com.themabajogroup.sangawa.Overlays.AddTaskDialog;
 import com.themabajogroup.sangawa.Overlays.TaskAdapter;
 import com.themabajogroup.sangawa.R;
-import com.themabajogroup.sangawa.Overlays.AddTaskDialog;
 import com.themabajogroup.sangawa.Utils.GeofenceBroadcastReceiver;
 import com.themabajogroup.sangawa.databinding.ActivityMapViewBinding;
 
@@ -72,7 +72,8 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         ImageButton btnAddTask = findViewById(R.id.add_task_button);
-        new AddTaskDialog(this, btnAddTask, getSupportFragmentManager(), MapViewActivity.this);
+        AddTaskDialog pinMapFragment = new AddTaskDialog(this);
+        btnAddTask.setOnClickListener(view -> pinMapFragment.show(getSupportFragmentManager(), "MapFragment"));
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
