@@ -48,32 +48,14 @@
                 tools:ignore="HardcodedText" />
         </LinearLayout>
 
-        <LinearLayout
+        <ImageButton
+            android:id="@+id/buttonMoreOptions"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end">
-
-            <ImageButton
-                android:id="@+id/buttonEditTask"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/baseline_edit_24"
-                android:contentDescription="Edit Task"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:layout_marginHorizontal="10dp"
-                android:padding="10dp"
-                tools:ignore="HardcodedText" />
-
-            <ImageButton
-                android:id="@+id/buttonDeleteTask"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/baseline_delete_24"
-                android:padding="10dp"
-                android:contentDescription="Delete Task"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                tools:ignore="HardcodedText" />
-        </LinearLayout>
+            android:src="@drawable/baseline_more_horiz_24"
+            android:contentDescription="More Options"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="10dp"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

@@ -2,17 +2,21 @@ package com.themabajogroup.sangawa.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.ContextThemeWrapper;
+import android.view.MenuInflater;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -227,27 +231,37 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                 });
     }
 
-    @Override
-    public void onEditTaskClick(TaskDetails task) {
-        Toast.makeText(this, "Edit Task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
-        // TODO: Create ui for this
-    }
 
     @Override
-    public void onDeleteTaskClick(TaskDetails task) {
-        Toast.makeText(this, "Delete Task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
-//        UserController.getInstance().getTaskController().deleteUserTask(task.getId())
-//                .thenAccept(success -> {
-//                    if (success) {
-//                        Toast.makeText(this, "Task deleted", Toast.LENGTH_SHORT).show();
-//                        ArrayAdapter<Object> taskAdapter = null;
-//                        taskAdapter.notifyDataSetChanged();
-//                    } else {
-//                        Toast.makeText(this, "Failed to delete task", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-//        TODO: Lacking getId() method and taskId in TaskDetails
+    public void onMoreOptionClick(View view, TaskDetails task) {
+        Context wrapper = new ContextThemeWrapper(this, R.style.popupMenuStyle);
+        PopupMenu popupMenu = new PopupMenu(wrapper, view);
+        MenuInflater inflater = popupMenu.getMenuInflater();
+        inflater.inflate(R.menu.menu_task_options, popupMenu.getMenu());
+        popupMenu.setForceShowIcon(true);
+
+//        popupMenu.setOnMenuItemClickListener(item -> {
+//            switch (item.getItemId()) {
+//                case R.id.menu_view_task:
+//                    Toast.makeText(this, "View task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+//                    return true;
+//                case R.id.menu_done_task:
+//                    Toast.makeText(this, "Finished task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+//                    return true;
+//                case R.id.menu_edit_task:
+//                    Toast.makeText(this, "Edit task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+//                    return true;
+//                case R.id.menu_delete_task:
+//                    Toast.makeText(this, "Delete task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+//                    return true;
+//                default:
+//                    return false;
+//            }
+//        });
+
+        popupMenu.show();
     }
+
 
     public void refreshTaskList() {
         recyclerViewTasks = findViewById(R.id.recyclerViewTasks);
