@@ -1,5 +1,6 @@
 package com.themabajogroup.sangawa.Activities;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -38,7 +39,7 @@ import com.themabajogroup.sangawa.Overlays.AddTaskDialog;
 import com.themabajogroup.sangawa.Utils.GeofenceBroadcastReceiver;
 import com.themabajogroup.sangawa.databinding.ActivityMapViewBinding;
 
-public class MapViewActivity extends FragmentActivity implements OnMapReadyCallback, TaskAdapter.TaskItemClickListener {
+public class MapViewActivity extends AppCompatActivity implements OnMapReadyCallback, TaskAdapter.TaskItemClickListener {
 
     private static final int FINE_LOCATION_PERMISSION_REQUEST_CODE = 1;
     private static final int BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE = 2;
