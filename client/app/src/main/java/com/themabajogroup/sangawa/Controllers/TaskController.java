@@ -50,6 +50,7 @@ public class TaskController {
 
                         if (document.exists()) {
                             TaskDetails taskDetails = TaskDetails.fromDocumentSnapshot(document);
+                            taskDetails.setTaskId(taskId);
                             result.complete(taskDetails);
                         } else {
                             // TK: handle case when task doesn't exist
@@ -101,6 +102,8 @@ public class TaskController {
 
                        for (DocumentSnapshot document : documents) {
                            TaskDetails taskDetails = TaskDetails.fromDocumentSnapshot(document);
+                           String taskId = document.getId();
+                           taskDetails.setTaskId(taskId);
                            tasks.add(taskDetails);
                        }
 

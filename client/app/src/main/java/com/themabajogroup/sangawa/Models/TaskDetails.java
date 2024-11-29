@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TaskDetails {
+    private String taskId;
     private String userId;
     private String title;
     private String description;
@@ -46,6 +47,14 @@ public class TaskDetails {
         taskDetails.setStatus(TaskStatus.valueOf((String) data.get("status")));
 
         return taskDetails;
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
     public String getUserId() {
