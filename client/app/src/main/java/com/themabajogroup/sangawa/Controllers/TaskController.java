@@ -1,14 +1,15 @@
 package com.themabajogroup.sangawa.Controllers;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.themabajogroup.sangawa.Models.TaskDetails;
+import com.themabajogroup.sangawa.Utils.Converter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
-import kotlin.NotImplementedError;
 
 public class TaskController {
     private static TaskController instance;
@@ -53,10 +54,10 @@ public class TaskController {
                             taskDetails.setTaskId(taskId);
                             result.complete(taskDetails);
                         } else {
-                            // TK: handle case when task doesn't exist
+                            // TODO: handle case when task doesn't exist
                         }
                     } else {
-                        // TK: handle case when task failed
+                        // TODO: handle case when task failed
                     }
                 });
 
@@ -109,14 +110,55 @@ public class TaskController {
 
                        result.complete(tasks);
                    } else {
-                       // TK: handle case when task failed
+                       // TODO: handle case when task failed
                    }
                 });
 
         return result;
     }
 
-    public List<TaskDetails> getNearbyTasks(double lat, double lon) {
-        throw new NotImplementedError();
+    public CompletableFuture<List<TaskDetails>> getNearbyTasks(String userId, double centerLat, double centerLon, double radius) {
+        CompletableFuture<List<TaskDetails>> result = new CompletableFuture<>();
+
+        double latitudeDistance = Converter.metersToLatitude(radius);
+        double longitudeDistance = Converter.metersToLongitude(radius, centerLat);
+
+        LatLng upperLeftBound = new LatLng(
+                centerLat - latitudeDistance,
+                centerLon - longitudeDistance
+        );
+
+        LatLng lowerRightBound = new LatLng(
+                centerLat + latitudeDistance,
+                centerLon + longitudeDistance
+        );
+
+        db.collection("tasks")
+                .whereGreaterThanOrEqualTo("locationLat", upperLeftBound.latitude)
+                .whereLessThanOrEqualTo("locationLat", lowerRightBound.latitude)
+                .whereGreaterThanOrEqualTo("locationLon", upperLeftBound.longitude)
+                .whereLessThanOrEqualTo("locationLon", lowerRightBound.longitude)
+                .whereIn("visibility", Arrays.asList("OPEN_TO_ALL", "REQUEST_TO_JOIN"))
+                .whereNotEqualTo("userId", userId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<DocumentSnapshot> documents = task.getResult().getDocuments();
+                        ArrayList<TaskDetails> tasks = new ArrayList<>();
+
+                        for (DocumentSnapshot document : documents) {
+                            TaskDetails taskDetails = TaskDetails.fromDocumentSnapshot(document);
+                            String taskId = document.getId();
+                            taskDetails.setTaskId(taskId);
+                            tasks.add(taskDetails);
+                        }
+
+                        result.complete(tasks);
+                    } else {
+                        // TODO: Handle when fetching nearby collaborative tasks failed
+                    }
+                });
+
+        return result;
     }
 }

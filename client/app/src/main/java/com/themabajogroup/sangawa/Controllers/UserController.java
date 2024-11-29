@@ -28,6 +28,10 @@ public class UserController {
         return instance;
     }
 
+    public FirebaseUser getCurrentUser() {
+        return currentUser;
+    }
+
     public void setCurrentUser(FirebaseUser user) {
         this.currentUser = user;
     }
@@ -38,6 +42,22 @@ public class UserController {
         String userId = currentUser.getUid();
         CompletableFuture<List<TaskDetails>> result = new CompletableFuture<>();
         taskController.getAllUserTasks(userId)
+                .thenAccept(result::complete);
+
+        return result;
+    }
+
+    public CompletableFuture<List<TaskDetails>> fetchNearbyTasks() {
+        // TODO: Potentially bad coupling again, but whatever
+
+        String userId = currentUser.getUid();
+        LatLng currentLocation = getCurrentLocation();
+
+        // TODO: Radius should be adjustable by user
+        double radius = 3000;
+
+        CompletableFuture<List<TaskDetails>> result = new CompletableFuture<>();
+        taskController.getNearbyTasks(userId, currentLocation.latitude, currentLocation.longitude, radius)
                 .thenAccept(result::complete);
 
         return result;

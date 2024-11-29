@@ -32,7 +32,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.themabajogroup.sangawa.Controllers.UserController;
@@ -213,7 +212,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
 
-        refreshTaskMarkers();
+        refreshUserTaskMarkers();
     }
 
 
@@ -262,11 +261,37 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         });
     }
 
-    public void refreshTaskMarkers() {
+    public void refreshUserTaskMarkers() {
         userController.fetchUserTasks()
                 .thenAccept(taskDetailsList -> {
                     for (TaskDetails taskDetails : taskDetailsList) {
                         LatLng location = new LatLng(taskDetails.getLocationLat(), taskDetails.getLocationLon());
+
+                        // TODO: Radius must be adjustable by users for own tasks
+                        setupGeofence(taskDetails.getTitle(), location, 1000);
+
+                        MarkerOptions markerOptions = new MarkerOptions()
+                                .position(location)
+                                .title(taskDetails.getTitle())
+                                .snippet(taskDetails.getDescription());
+
+                        mMap.addMarker(markerOptions);
+                    }
+                });
+
+        // TODO: Only call this function when user has moved a certain amount of distance to conserve resources
+        refreshNearbyTaskMarkers();
+    }
+
+    public void refreshNearbyTaskMarkers() {
+        // TODO: Remove existing nearby task markers, then proceed to add new ones
+        // TODO: Remove existing geofence for nearby tasks, then proceed to add new ones
+        userController.fetchNearbyTasks()
+                .thenAccept(taskDetailsList -> {
+                    for (TaskDetails taskDetails : taskDetailsList) {
+                        LatLng location = new LatLng(taskDetails.getLocationLat(), taskDetails.getLocationLon());
+
+                        // TODO: Radius must be adjustable by users for collaborative tasks
                         setupGeofence(taskDetails.getTitle(), location, 1000);
 
                         MarkerOptions markerOptions = new MarkerOptions()

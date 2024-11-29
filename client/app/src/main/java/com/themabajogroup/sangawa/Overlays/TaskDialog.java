@@ -23,7 +23,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
 import com.themabajogroup.sangawa.Activities.MapViewActivity;
 import com.themabajogroup.sangawa.Controllers.TaskController;
 import com.themabajogroup.sangawa.Controllers.UserController;
@@ -165,7 +164,7 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
             TaskController.getInstance().createUserTask(task).thenAccept(success -> {
                 if (success) {
                     mapViewActivity.refreshTaskList();
-                    mapViewActivity.refreshTaskMarkers();
+                    mapViewActivity.refreshUserTaskMarkers();
                     Toast.makeText(getContext(), "Task added successfully!", Toast.LENGTH_SHORT).show();
                     dismiss();
                 } else {
