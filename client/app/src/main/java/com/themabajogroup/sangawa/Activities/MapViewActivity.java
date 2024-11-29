@@ -241,24 +241,24 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         inflater.inflate(R.menu.menu_task_options, popupMenu.getMenu());
         popupMenu.setForceShowIcon(true);
 
-//        popupMenu.setOnMenuItemClickListener(item -> {
-//            switch (item.getItemId()) {
-//                case R.id.menu_view_task:
-//                    Toast.makeText(this, "View task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
-//                    return true;
-//                case R.id.menu_done_task:
-//                    Toast.makeText(this, "Finished task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
-//                    return true;
-//                case R.id.menu_edit_task:
-//                    Toast.makeText(this, "Edit task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
-//                    return true;
-//                case R.id.menu_delete_task:
-//                    Toast.makeText(this, "Delete task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
-//                    return true;
-//                default:
-//                    return false;
-//            }
-//        });
+        popupMenu.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.menu_view_task) {
+                Toast.makeText(this, "View task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+                return true;
+            } else if (itemId == R.id.menu_done_task) {
+                Toast.makeText(this, "Finished task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+                return true;
+            } else if (itemId == R.id.menu_edit_task) {
+                Toast.makeText(this, "Edit task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+                return true;
+            } else if (itemId == R.id.menu_delete_task) {
+                Toast.makeText(this, "Delete task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+                return true;
+            } else {
+                return false;
+            }
+        });
 
         popupMenu.show();
     }

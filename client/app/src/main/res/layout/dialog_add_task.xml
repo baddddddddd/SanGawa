@@ -28,7 +28,7 @@
             android:layout_marginBottom="5dp"
             android:fontFamily="@font/konkhmer_sleokchher"
             android:text="Add Task"
-            android:textColor="#E58C44"
+            android:textColor="@color/fun_orange"
             android:textSize="34sp"
             tools:ignore="HardcodedText,TextContrastCheck" />
 
@@ -43,8 +43,8 @@
             app:boxCornerRadiusTopEnd="20dp"
             app:boxCornerRadiusTopStart="20dp"
             app:hintEnabled="false"
-            app:boxStrokeColor="#3B7C5C"
-            app:cursorColor="#3B7C5C"
+            app:boxStrokeColor="@color/amazing_green"
+            app:cursorColor="@color/amazing_green"
             app:boxBackgroundMode="outline">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -53,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:hint="Title"
                 android:inputType="textPersonName"
-                android:textColor="#26353B"
+                android:textColor="@color/deep_blue"
                 android:textSize="16sp"
                 tools:ignore="HardcodedText,TextContrastCheck" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -69,8 +69,8 @@
             app:boxCornerRadiusTopEnd="20dp"
             app:boxCornerRadiusTopStart="20dp"
             app:hintEnabled="false"
-            app:boxStrokeColor="#3B7C5C"
-            app:cursorColor="#3B7C5C"
+            app:boxStrokeColor="@color/amazing_green"
+            app:cursorColor="@color/amazing_green"
             app:boxBackgroundMode="outline">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -82,7 +82,7 @@
                 android:lines="3"
                 android:gravity="top|start"
                 android:scrollbars="vertical"
-                android:textColor="#26353B"
+                android:textColor="@color/deep_blue"
                 android:textSize="16sp"
                 android:overScrollMode="always"
                 tools:ignore="HardcodedText,TextContrastCheck" />
@@ -107,8 +107,8 @@
                 app:boxCornerRadiusTopEnd="20dp"
                 app:boxCornerRadiusTopStart="20dp"
                 app:hintEnabled="false"
-                app:boxStrokeColor="#3B7C5C"
-                app:cursorColor="#3B7C5C"
+                app:boxStrokeColor="@color/amazing_green"
+                app:cursorColor="@color/amazing_green"
                 app:boxBackgroundMode="outline">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -117,7 +117,7 @@
                     android:layout_height="wrap_content"
                     android:hint="Deadline"
                     android:inputType="textEmailAddress"
-                    android:textColor="#26353B"
+                    android:textColor="@color/deep_blue"
                     android:textSize="16sp"
                     tools:ignore="HardcodedText,TextContrastCheck" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -192,7 +192,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Public"
-                    android:textColor="#26353B"
+                    android:textColor="@color/deep_blue"
                     android:textSize="16sp"
                     tools:ignore="HardcodedText" />
 
@@ -206,7 +206,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Private"
-                    android:textColor="#26353B"
+                    android:textColor="@color/deep_blue"
                     android:textSize="16sp"
                     tools:ignore="HardcodedText" />
 
@@ -219,7 +219,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Invite Only"
-                    android:textColor="#26353B"
+                    android:textColor="@color/deep_blue"
                     android:textSize="16sp"
                     tools:ignore="HardcodedText" />
 
@@ -256,7 +256,7 @@
                 android:id="@+id/add_button"
                 android:layout_width="150dp"
                 android:layout_height="60dp"
-                android:backgroundTint="#3B7C5C"
+                android:backgroundTint="@color/amazing_green"
                 android:paddingTop="10dp"
                 android:fontFamily="@font/konkhmer_sleokchher"
                 android:text="ADD"

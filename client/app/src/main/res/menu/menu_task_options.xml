@@ -2,14 +2,14 @@
 <menu xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/menu_view_task"
-        android:title="View Task"
-        android:icon="@drawable/baseline_edit_24"
-        tools:ignore="HardcodedText" />
-    <item
         android:id="@+id/menu_done_task"
         android:title="Mark as Done"
-        android:icon="@drawable/baseline_edit_24"
+        android:icon="@drawable/baseline_check_24"
+        tools:ignore="HardcodedText" />
+    <item
+        android:id="@+id/menu_view_task"
+        android:title="View Task"
+        android:icon="@drawable/outline_remove_red_eye_24"
         tools:ignore="HardcodedText" />
     <item
         android:id="@+id/menu_edit_task"
