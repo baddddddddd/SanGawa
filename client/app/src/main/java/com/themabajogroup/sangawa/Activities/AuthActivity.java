@@ -48,6 +48,13 @@ public class AuthActivity extends AppCompatActivity {
 
         updateUIForLogin();
 
+        // Check if user session is valid
+        if (authController.isLoggedIn()) {
+            Intent intent = new Intent(this, MapViewActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
         swapTextView.setOnClickListener(v -> {
             if (isLogin) {
                 updateUIForSignup();

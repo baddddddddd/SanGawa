@@ -1,6 +1,7 @@
 package com.themabajogroup.sangawa.Controllers;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -70,5 +71,17 @@ public class AuthController {
                 });
 
         return result;
+    }
+
+    public boolean isLoggedIn() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        if (currentUser == null) {
+            return false;
+        }
+
+        UserController userController = UserController.getInstance();
+        userController.setCurrentUser(currentUser);
+        return true;
     }
 }
