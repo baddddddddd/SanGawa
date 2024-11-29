@@ -52,10 +52,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     private ActivityMapViewBinding binding;
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
-    private Marker currentMarker;
-    private LatLng currentLocation;
     private GeofencingClient geofencingClient;
-    private PendingIntent geofencePendingIntent;
     private UserController userController;
     private RecyclerView recyclerViewTasks;
 
@@ -125,10 +122,10 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                     return;
                 }
 
-                currentLocation = new LatLng(
+                userController.setCurrentLocation(new LatLng(
                         locationResult.getLastLocation().getLatitude(),
                         locationResult.getLastLocation().getLongitude()
-                );
+                ));
             }
         };
 
@@ -210,7 +207,8 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
         // Move camera to a default location until the location updates
         LatLng bsuAlangilan = new LatLng(13.7839623, 121.0740536);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bsuAlangilan, 10));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bsuAlangilan, 15));
+        userController.setCurrentLocation(bsuAlangilan);
 
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);

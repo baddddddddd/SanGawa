@@ -26,6 +26,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.themabajogroup.sangawa.Activities.MapViewActivity;
 import com.themabajogroup.sangawa.Controllers.TaskController;
+import com.themabajogroup.sangawa.Controllers.UserController;
 import com.themabajogroup.sangawa.Models.TaskDetails;
 import com.themabajogroup.sangawa.Models.TaskVisibility;
 import com.themabajogroup.sangawa.Models.Transaction;
@@ -46,10 +47,10 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
     private GoogleMap mMap;
     private TextView head;
     private Button btnAdd;
-    private LatLng currentLocation;
     private TextInputEditText titleInput, descInput, deadlineInput;
     private int selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute;
-
+    private UserController userController;
+    
     public TaskDialog(MapViewActivity mapViewActivity, Transaction transaction) {
         this.mapViewActivity = mapViewActivity;
         this.transaction = transaction;
@@ -73,7 +74,7 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
         deadlinePicker.setOnClickListener(v -> showDatePicker());
         deadlineInput.setOnClickListener(v -> showDatePicker());
 
-        currentLocation = new LatLng(34.3850155, 132.4541501);
+        userController = UserController.getInstance();
 
         if (transaction == Transaction.EDIT) {
             head.setText("Edit Task");
@@ -101,7 +102,7 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 10f));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userController.getCurrentLocation(), 15));
     }
 
     private void showDatePicker() {
