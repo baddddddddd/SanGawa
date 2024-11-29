@@ -213,22 +213,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
 
-        userController.fetchUserTasks()
-                .thenAccept(taskDetailsList -> {
-                    for (TaskDetails taskDetails : taskDetailsList) {
-                        // Setup geofencing for tasks
-                        LatLng location = new LatLng(taskDetails.getLocationLat(), taskDetails.getLocationLon());
-                        setupGeofence(taskDetails.getTitle(), location, 1000);
-
-                        // Display markers for tasks
-                        MarkerOptions markerOptions = new MarkerOptions()
-                                .position(location)
-                                .title(taskDetails.getTitle())
-                                .snippet(taskDetails.getDescription());
-
-                        Marker marker = mMap.addMarker(markerOptions);
-                    }
-                });
+        refreshTaskMarkers();
     }
 
 
@@ -263,7 +248,6 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         popupMenu.show();
     }
 
-
     public void refreshTaskList() {
         recyclerViewTasks = findViewById(R.id.recyclerViewTasks);
         recyclerViewTasks.setLayoutManager(new LinearLayoutManager(this));
@@ -276,5 +260,22 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                 Toast.makeText(this, "No tasks found", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void refreshTaskMarkers() {
+        userController.fetchUserTasks()
+                .thenAccept(taskDetailsList -> {
+                    for (TaskDetails taskDetails : taskDetailsList) {
+                        LatLng location = new LatLng(taskDetails.getLocationLat(), taskDetails.getLocationLon());
+                        setupGeofence(taskDetails.getTitle(), location, 1000);
+
+                        MarkerOptions markerOptions = new MarkerOptions()
+                                .position(location)
+                                .title(taskDetails.getTitle())
+                                .snippet(taskDetails.getDescription());
+
+                        mMap.addMarker(markerOptions);
+                    }
+                });
     }
 }

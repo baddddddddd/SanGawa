@@ -45,12 +45,10 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
     private final MapViewActivity mapViewActivity;
     private final Transaction transaction;
     private GoogleMap mMap;
-    private TextView head;
-    private Button btnAdd;
     private TextInputEditText titleInput, descInput, deadlineInput;
     private int selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute;
     private UserController userController;
-    
+
     public TaskDialog(MapViewActivity mapViewActivity, Transaction transaction) {
         this.mapViewActivity = mapViewActivity;
         this.transaction = transaction;
@@ -63,12 +61,12 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
         View view = inflater.inflate(R.layout.dialog_add_task, container, false);
         getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
-        head = view.findViewById(R.id.head);
+        TextView head = view.findViewById(R.id.head);
         titleInput = view.findViewById(R.id.title);
         descInput = view.findViewById(R.id.description);
         deadlineInput = view.findViewById(R.id.deadline);
         ImageButton deadlinePicker = view.findViewById(R.id.deadline_picker);
-        btnAdd = view.findViewById(R.id.add_button);
+        Button btnAdd = view.findViewById(R.id.add_button);
         Button btnCancel = view.findViewById(R.id.cancel_button);
 
         deadlinePicker.setOnClickListener(v -> showDatePicker());
@@ -138,7 +136,6 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
         String title = titleInput.getText().toString().trim();
         String description = descInput.getText().toString().trim();
         String deadlineStr = deadlineInput.getText().toString().trim();
-        String location = getLocationString();
         int selectedPrivacyId = ((RadioGroup) requireView().findViewById(R.id.privacy_group)).getCheckedRadioButtonId();
 
         if (TextUtils.isEmpty(title) || TextUtils.isEmpty(description) || TextUtils.isEmpty(deadlineStr) || selectedPrivacyId == -1) {
@@ -168,6 +165,7 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
             TaskController.getInstance().createUserTask(task).thenAccept(success -> {
                 if (success) {
                     mapViewActivity.refreshTaskList();
+                    mapViewActivity.refreshTaskMarkers();
                     Toast.makeText(getContext(), "Task added successfully!", Toast.LENGTH_SHORT).show();
                     dismiss();
                 } else {
@@ -190,13 +188,5 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
         } else {
             throw new IllegalArgumentException("Invalid privacy option selected");
         }
-    }
-
-    private String getLocationString() {
-        if (mMap != null) {
-            LatLng center = mMap.getCameraPosition().target;
-            return String.format(Locale.getDefault(), "%.7f, %.7f", center.latitude, center.longitude);
-        }
-        return "Location not available";
     }
 }
