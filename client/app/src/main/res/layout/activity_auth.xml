@@ -160,6 +160,15 @@
                     tools:ignore="HardcodedText" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                style="?android:attr/progressBarStyle"
+                android:layout_marginTop="25dp"
+                android:padding="10dp"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="60dp" />
+
             <Button
                 android:id="@+id/action_button"
                 android:layout_width="150dp"
