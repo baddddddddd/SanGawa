@@ -1,17 +1,22 @@
 package com.themabajogroup.sangawa.Activities;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.ContextThemeWrapper;
+import android.view.MenuInflater;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -32,13 +37,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.themabajogroup.sangawa.Controllers.UserController;
 import com.themabajogroup.sangawa.Models.TaskDetails;
-import com.themabajogroup.sangawa.Overlays.TaskAdapter;
+import com.themabajogroup.sangawa.Models.Transaction;
+import com.themabajogroup.sangawa.Overlays.TaskDialog;
+import com.themabajogroup.sangawa.Overlays.TaskListAdapter;
 import com.themabajogroup.sangawa.R;
-import com.themabajogroup.sangawa.Overlays.AddTaskDialog;
 import com.themabajogroup.sangawa.Utils.GeofenceBroadcastReceiver;
 import com.themabajogroup.sangawa.databinding.ActivityMapViewBinding;
 
-public class MapViewActivity extends FragmentActivity implements OnMapReadyCallback, TaskAdapter.TaskItemClickListener {
+public class MapViewActivity extends AppCompatActivity implements OnMapReadyCallback, TaskListAdapter.TaskItemClickListener {
 
     private static final int FINE_LOCATION_PERMISSION_REQUEST_CODE = 1;
     private static final int BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE = 2;
@@ -67,7 +73,8 @@ public class MapViewActivity extends FragmentActivity implements OnMapReadyCallb
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         ImageButton btnAddTask = findViewById(R.id.add_task_button);
-        new AddTaskDialog(this, btnAddTask, getSupportFragmentManager(), MapViewActivity.this);
+        TaskDialog editTaskDialog = new TaskDialog(this, Transaction.ADD);
+        btnAddTask.setOnClickListener(view -> editTaskDialog.show(getSupportFragmentManager(), "MapFragment"));
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -226,27 +233,38 @@ public class MapViewActivity extends FragmentActivity implements OnMapReadyCallb
                 });
     }
 
-    @Override
-    public void onEditTaskClick(TaskDetails task) {
-        Toast.makeText(this, "Edit Task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
-        // TODO: Create ui for this
-    }
 
     @Override
-    public void onDeleteTaskClick(TaskDetails task) {
-        Toast.makeText(this, "Delete Task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
-//        UserController.getInstance().getTaskController().deleteUserTask(task.getId())
-//                .thenAccept(success -> {
-//                    if (success) {
-//                        Toast.makeText(this, "Task deleted", Toast.LENGTH_SHORT).show();
-//                        ArrayAdapter<Object> taskAdapter = null;
-//                        taskAdapter.notifyDataSetChanged();
-//                    } else {
-//                        Toast.makeText(this, "Failed to delete task", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-//        TODO: Lacking getId() method and taskId in TaskDetails
+    public void onMoreOptionClick(View view, TaskDetails task) {
+        Context wrapper = new ContextThemeWrapper(this, R.style.popupMenuStyle);
+        PopupMenu popupMenu = new PopupMenu(wrapper, view);
+        MenuInflater inflater = popupMenu.getMenuInflater();
+        inflater.inflate(R.menu.menu_task_options, popupMenu.getMenu());
+        popupMenu.setForceShowIcon(true);
+
+        popupMenu.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.menu_view_task) {
+                Toast.makeText(this, "View task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+                return true;
+            } else if (itemId == R.id.menu_done_task) {
+                Toast.makeText(this, "Finished task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+                return true;
+            } else if (itemId == R.id.menu_edit_task) {
+                TaskDialog editTaskDialog = new TaskDialog(this, Transaction.EDIT);
+                editTaskDialog.show(getSupportFragmentManager(), "MapFragment");
+                return true;
+            } else if (itemId == R.id.menu_delete_task) {
+                Toast.makeText(this, "Delete task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+                return true;
+            } else {
+                return false;
+            }
+        });
+
+        popupMenu.show();
     }
+
 
     public void refreshTaskList() {
         recyclerViewTasks = findViewById(R.id.recyclerViewTasks);
@@ -254,8 +272,8 @@ public class MapViewActivity extends FragmentActivity implements OnMapReadyCallb
 
         userController.fetchUserTasks().thenAccept(tasks -> {
             if (tasks != null && !tasks.isEmpty()) {
-                TaskAdapter taskAdapter = new TaskAdapter(tasks, this);
-                recyclerViewTasks.setAdapter(taskAdapter);
+                TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this);
+                recyclerViewTasks.setAdapter(taskListAdapter);
             } else {
                 Toast.makeText(this, "No tasks found", Toast.LENGTH_SHORT).show();
             }

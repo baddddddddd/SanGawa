@@ -10,12 +10,12 @@ import com.themabajogroup.sangawa.Models.TaskDetails;
 import com.themabajogroup.sangawa.R;
 import java.util.List;
 
-public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
+public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskViewHolder> {
 
     private final List<TaskDetails> tasks;
     private final TaskItemClickListener taskItemClickListener;
 
-    public TaskAdapter(List<TaskDetails> tasks, TaskItemClickListener listener) {
+    public TaskListAdapter(List<TaskDetails> tasks, TaskItemClickListener listener) {
         this.tasks = tasks;
         this.taskItemClickListener = listener;
     }
@@ -33,8 +33,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         holder.textViewTaskTitle.setText(task.getTitle());
         holder.textViewTaskDescription.setText(task.getDescription());
 
-        holder.buttonEditTask.setOnClickListener(v -> taskItemClickListener.onEditTaskClick(task));
-        holder.buttonDeleteTask.setOnClickListener(v -> taskItemClickListener.onDeleteTaskClick(task));
+        holder.buttonMoreOptions.setOnClickListener(v -> taskItemClickListener.onMoreOptionClick(v, task));
     }
 
     @Override
@@ -46,20 +45,17 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
         public TextView textViewTaskTitle;
         public TextView textViewTaskDescription;
-        public ImageButton buttonEditTask;
-        public ImageButton buttonDeleteTask;
+        public ImageButton buttonMoreOptions;
 
         public TaskViewHolder(View view) {
             super(view);
             textViewTaskTitle = view.findViewById(R.id.textViewTaskTitle);
             textViewTaskDescription = view.findViewById(R.id.textViewTaskDescription);
-            buttonEditTask = view.findViewById(R.id.buttonEditTask);
-            buttonDeleteTask = view.findViewById(R.id.buttonDeleteTask);
+            buttonMoreOptions = view.findViewById(R.id.buttonMoreOptions);
         }
     }
 
     public interface TaskItemClickListener {
-        void onEditTaskClick(TaskDetails task);
-        void onDeleteTaskClick(TaskDetails task);
+        void onMoreOptionClick(View view, TaskDetails task);
     }
 }

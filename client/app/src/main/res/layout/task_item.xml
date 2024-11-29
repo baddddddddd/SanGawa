@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginBottom="8dp"
+    app:cardCornerRadius="4dp"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground">
@@ -14,7 +15,8 @@
         android:layout_height="wrap_content"
         android:baselineAligned="false"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="4dp"
         android:gravity="center_vertical">
 
         <LinearLayout
@@ -28,12 +30,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Task Title"
-                android:fontFamily="@font/alexandria_semibold"
+                android:fontFamily="@font/konkhmer_sleokchher"
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="#26353B"
+                android:layout_marginBottom="-4dp"
+                android:textColor="@color/fun_orange"
                 tools:ignore="HardcodedText" />
 
             <TextView
@@ -44,36 +47,18 @@
                 android:textSize="14sp"
                 android:textColor="#757575"
                 android:ellipsize="end"
-                android:maxLines="2"
+                android:maxLines="1"
                 tools:ignore="HardcodedText" />
         </LinearLayout>
 
-        <LinearLayout
+        <ImageButton
+            android:id="@+id/buttonMoreOptions"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end">
-
-            <ImageButton
-                android:id="@+id/buttonEditTask"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/baseline_edit_24"
-                android:contentDescription="Edit Task"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:layout_marginHorizontal="10dp"
-                android:padding="10dp"
-                tools:ignore="HardcodedText" />
-
-            <ImageButton
-                android:id="@+id/buttonDeleteTask"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/baseline_delete_24"
-                android:padding="10dp"
-                android:contentDescription="Delete Task"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                tools:ignore="HardcodedText" />
-        </LinearLayout>
+            android:src="@drawable/baseline_more_horiz_24"
+            android:contentDescription="More Options"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="10dp"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

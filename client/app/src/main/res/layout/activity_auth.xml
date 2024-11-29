@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#26353B"
+    android:background="@color/deep_blue"
     tools:context=".Activities.MainActivity"
     android:id="@+id/main">
 
@@ -50,7 +50,7 @@
                 android:fontFamily="@font/konkhmer_sleokchher"
                 android:text="Login"
                 android:textSize="34sp"
-                android:textColor="#E58C44"
+                android:textColor="@color/fun_orange"
                 android:layout_marginBottom="16dp"
                 tools:ignore="HardcodedText" />
 
@@ -65,8 +65,8 @@
                 app:boxCornerRadiusTopEnd="20dp"
                 app:boxCornerRadiusTopStart="20dp"
                 app:hintEnabled="false"
-                app:boxStrokeColor="#3B7C5C"
-                app:cursorColor="#3B7C5C"
+                app:boxStrokeColor="@color/amazing_green"
+                app:cursorColor="@color/amazing_green"
                 app:boxBackgroundMode="outline">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -75,7 +75,7 @@
                     android:layout_height="wrap_content"
                     android:hint="Username"
                     android:inputType="textPersonName"
-                    android:textColor="#26353B"
+                    android:textColor="@color/deep_blue"
                     android:textSize="16sp"
                     tools:ignore="HardcodedText" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -91,8 +91,8 @@
                 app:boxCornerRadiusTopEnd="20dp"
                 app:boxCornerRadiusTopStart="20dp"
                 app:hintEnabled="false"
-                app:boxStrokeColor="#3B7C5C"
-                app:cursorColor="#3B7C5C"
+                app:boxStrokeColor="@color/amazing_green"
+                app:cursorColor="@color/amazing_green"
                 app:boxBackgroundMode="outline">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -101,7 +101,7 @@
                     android:layout_height="wrap_content"
                     android:hint="Email"
                     android:inputType="textEmailAddress"
-                    android:textColor="#26353B"
+                    android:textColor="@color/deep_blue"
                     android:textSize="16sp"
                     tools:ignore="HardcodedText" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -117,8 +117,8 @@
                 app:boxCornerRadiusTopEnd="20dp"
                 app:boxCornerRadiusTopStart="20dp"
                 app:hintEnabled="false"
-                app:boxStrokeColor="#3B7C5C"
-                app:cursorColor="#3B7C5C"
+                app:boxStrokeColor="@color/amazing_green"
+                app:cursorColor="@color/amazing_green"
                 app:boxBackgroundMode="outline"
                 app:endIconMode="password_toggle">
 
@@ -128,7 +128,7 @@
                     android:layout_height="wrap_content"
                     android:hint="Password"
                     android:inputType="textPassword"
-                    android:textColor="#26353B"
+                    android:textColor="@color/deep_blue"
                     android:textSize="16sp"
                     tools:ignore="HardcodedText" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -144,8 +144,8 @@
                 app:boxCornerRadiusTopEnd="20dp"
                 app:boxCornerRadiusTopStart="20dp"
                 app:hintEnabled="false"
-                app:boxStrokeColor="#3B7C5C"
-                app:cursorColor="#3B7C5C"
+                app:boxStrokeColor="@color/amazing_green"
+                app:cursorColor="@color/amazing_green"
                 app:boxBackgroundMode="outline"
                 app:endIconMode="password_toggle">
 
@@ -155,17 +155,26 @@
                     android:layout_height="wrap_content"
                     android:hint="Confirm Password"
                     android:inputType="textPassword"
-                    android:textColor="#26353B"
+                    android:textColor="@color/deep_blue"
                     android:textSize="16sp"
                     tools:ignore="HardcodedText" />
             </com.google.android.material.textfield.TextInputLayout>
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                style="?android:attr/progressBarStyle"
+                android:layout_marginTop="25dp"
+                android:padding="10dp"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="60dp" />
 
             <Button
                 android:id="@+id/action_button"
                 android:layout_width="150dp"
                 android:layout_height="60dp"
                 android:layout_marginTop="25dp"
-                android:backgroundTint="#3B7C5C"
+                android:backgroundTint="@color/amazing_green"
                 android:paddingTop="10dp"
                 android:fontFamily="@font/konkhmer_sleokchher"
                 android:text="LOGIN"

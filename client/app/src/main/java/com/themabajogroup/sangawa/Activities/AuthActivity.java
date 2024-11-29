@@ -1,6 +1,7 @@
 package com.themabajogroup.sangawa.Activities;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -9,7 +10,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.content.Context;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -62,19 +62,24 @@ public class AuthActivity extends AppCompatActivity {
                 String password = Objects.requireNonNull(passwordEditText.getText()).toString();
 
                 if (validateLogin(AuthActivity.this, email, password)) {
-                    // TK: Add UI feedback while waiting for response
+                    actionButton.setVisibility(View.GONE);
+                    findViewById(R.id.progress_bar).setVisibility(View.VISIBLE);
+
                     authController.verifyCredentials(email, password)
-                            .thenAccept(isSuccess -> {
+                            .thenAccept(isSuccess -> runOnUiThread(() -> {
+                                findViewById(R.id.progress_bar).setVisibility(View.GONE);
+                                actionButton.setVisibility(View.VISIBLE);
+
                                 if (isSuccess) {
                                     Intent intent = new Intent(AuthActivity.this, MapViewActivity.class);
                                     startActivity(intent);
                                     finish();
                                 } else {
-                                    // TK: Add UI feedback for unsuccessful login
-
+                                    showToast(AuthActivity.this, "Incorrect email or password");
                                 }
-                            });
+                            }));
                 } else {
+                    showToast(AuthActivity.this, "Please check the entered details and try again.");
                 }
             } else {
                 String username = Objects.requireNonNull(usernameEditText.getText()).toString();
@@ -83,19 +88,24 @@ public class AuthActivity extends AppCompatActivity {
                 String confirmPassword = Objects.requireNonNull(confirmPasswordEditText.getText()).toString();
 
                 if (validateSignup(AuthActivity.this, username, email, password, confirmPassword)) {
-                    // TK: Add UI feedback while waiting for response
+                    actionButton.setVisibility(View.GONE);
+                    findViewById(R.id.progress_bar).setVisibility(View.VISIBLE);
+
                     authController.registerCredentials(username, email, password)
-                            .thenAccept(isSuccess -> {
+                            .thenAccept(isSuccess -> runOnUiThread(() -> {
+                                findViewById(R.id.progress_bar).setVisibility(View.GONE);
+                                actionButton.setVisibility(View.VISIBLE);
 
                                 if (isSuccess) {
                                     Intent intent = new Intent(AuthActivity.this, MapViewActivity.class);
                                     startActivity(intent);
                                     finish();
                                 } else {
-                                    // TK: Add UI feedback for unsuccessful registration
+                                    showToast(AuthActivity.this, "Registration failed. Please try again.");
                                 }
-                            });
+                            }));
                 } else {
+                    showToast(AuthActivity.this, "Please check the entered details and try again.");
                 }
             }
         });
@@ -142,7 +152,6 @@ public class AuthActivity extends AppCompatActivity {
         }
         return true;
     }
-
 
     private boolean validateSignup(Context context, String username, String email, String password, String confirmPassword) {
         if (username.isEmpty()) {
