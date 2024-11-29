@@ -29,6 +29,7 @@ public class AuthActivity extends AppCompatActivity {
     private boolean isLogin = true;
     private AuthController authController;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,8 +71,7 @@ public class AuthActivity extends AppCompatActivity {
                                     startActivity(intent);
                                     finish();
                                 } else {
-                                    // TK: Add UI feedback for unsuccessful login
-
+                                    runOnUiThread(() -> showToast(AuthActivity.this, "Incorrect email or password"));
                                 }
                             });
                 } else {
