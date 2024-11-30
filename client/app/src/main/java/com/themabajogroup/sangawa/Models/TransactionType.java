@@ -1,6 +1,6 @@
 package com.themabajogroup.sangawa.Models;
 
-public enum Transaction {
+public enum TransactionType {
     ADD,
     EDIT,
 }

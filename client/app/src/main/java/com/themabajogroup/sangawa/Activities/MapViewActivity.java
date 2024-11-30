@@ -34,9 +34,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.themabajogroup.sangawa.Controllers.TaskController;
 import com.themabajogroup.sangawa.Controllers.UserController;
 import com.themabajogroup.sangawa.Models.TaskDetails;
-import com.themabajogroup.sangawa.Models.Transaction;
+import com.themabajogroup.sangawa.Models.TransactionType;
 import com.themabajogroup.sangawa.Overlays.TaskDialog;
 import com.themabajogroup.sangawa.Overlays.TaskListAdapter;
 import com.themabajogroup.sangawa.R;
@@ -53,6 +54,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     private LocationCallback locationCallback;
     private GeofencingClient geofencingClient;
     private UserController userController;
+    private TaskController taskController;
     private RecyclerView recyclerViewTasks;
 
     @Override
@@ -63,13 +65,14 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         setContentView(binding.getRoot());
 
         userController = UserController.getInstance();
+        taskController = TaskController.getInstance();
 
         LinearLayout bottomSheet = findViewById(R.id.bottom_sheet);
         BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         ImageButton btnAddTask = findViewById(R.id.add_task_button);
-        TaskDialog editTaskDialog = new TaskDialog(this, Transaction.ADD);
+        TaskDialog editTaskDialog = new TaskDialog(this, TransactionType.ADD);
         btnAddTask.setOnClickListener(view -> editTaskDialog.show(getSupportFragmentManager(), "MapFragment"));
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -228,20 +231,20 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             int itemId = item.getItemId();
             if (itemId == R.id.menu_view_task) {
                 Toast.makeText(this, "View task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
-                return true;
             } else if (itemId == R.id.menu_done_task) {
                 Toast.makeText(this, "Finished task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
-                return true;
             } else if (itemId == R.id.menu_edit_task) {
-                TaskDialog editTaskDialog = new TaskDialog(this, Transaction.EDIT);
+                TaskDialog editTaskDialog = new TaskDialog(this, TransactionType.EDIT, task);
                 editTaskDialog.show(getSupportFragmentManager(), "MapFragment");
-                return true;
             } else if (itemId == R.id.menu_delete_task) {
-                Toast.makeText(this, "Delete task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
-                return true;
+                taskController.deleteUserTask(task.getTaskId());
+                Toast.makeText(this, "Deleted " + task.getTitle() + " successfully!", Toast.LENGTH_SHORT).show();
             } else {
                 return false;
             }
+            refreshTaskList();
+            refreshUserTaskMarkers();
+            return true;
         });
 
         popupMenu.show();
@@ -253,7 +256,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
         userController.fetchUserTasks().thenAccept(tasks -> {
             if (tasks != null && !tasks.isEmpty()) {
-                TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this);
+                TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this, userController.getCurrentUser());
                 recyclerViewTasks.setAdapter(taskListAdapter);
             } else {
                 Toast.makeText(this, "No tasks found", Toast.LENGTH_SHORT).show();
