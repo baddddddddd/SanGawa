@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,6 +28,7 @@ import com.themabajogroup.sangawa.Activities.MapViewActivity;
 import com.themabajogroup.sangawa.Controllers.TaskController;
 import com.themabajogroup.sangawa.Models.TaskDetails;
 import com.themabajogroup.sangawa.Models.TaskVisibility;
+import com.themabajogroup.sangawa.Models.Transaction;
 import com.themabajogroup.sangawa.R;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,33 +39,50 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class AddTaskDialog extends DialogFragment implements OnMapReadyCallback {
+public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
 
     private final MapViewActivity mapViewActivity;
+    private final Transaction transaction;
     private GoogleMap mMap;
+    private TextView head;
+    private Button btnAdd;
+    private LatLng currentLocation;
     private TextInputEditText titleInput, descInput, deadlineInput;
     private int selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute;
 
-    public AddTaskDialog(MapViewActivity mapViewActivity) {
+    public TaskDialog(MapViewActivity mapViewActivity, Transaction transaction) {
         this.mapViewActivity = mapViewActivity;
+        this.transaction = transaction;
     }
 
+    @SuppressLint("SetTextI18n")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dialog_add_task, container, false);
         getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
+        head = view.findViewById(R.id.head);
         titleInput = view.findViewById(R.id.title);
         descInput = view.findViewById(R.id.description);
         deadlineInput = view.findViewById(R.id.deadline);
         ImageButton deadlinePicker = view.findViewById(R.id.deadline_picker);
-        Button btnAdd = view.findViewById(R.id.add_button);
+        btnAdd = view.findViewById(R.id.add_button);
         Button btnCancel = view.findViewById(R.id.cancel_button);
 
         deadlinePicker.setOnClickListener(v -> showDatePicker());
         deadlineInput.setOnClickListener(v -> showDatePicker());
-        btnAdd.setOnClickListener(v -> submitCreatedTask());
+
+        currentLocation = new LatLng(34.3850155, 132.4541501);
+
+        if (transaction == Transaction.EDIT) {
+            head.setText("Edit Task");
+            btnAdd.setText("Update");
+//            btnAdd.setOnClickListener(v -> saveChanges());
+        }
+        else {
+            btnAdd.setOnClickListener(v -> submitCreatedTask());
+        }
         btnCancel.setOnClickListener(v -> dismiss());
 
         return view;
@@ -82,8 +101,7 @@ public class AddTaskDialog extends DialogFragment implements OnMapReadyCallback 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        LatLng currentLocation = new LatLng(34.3850155, 132.4541501);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15f));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 10f));
     }
 
     private void showDatePicker() {
@@ -107,7 +125,12 @@ public class AddTaskDialog extends DialogFragment implements OnMapReadyCallback 
 
     @SuppressLint("DefaultLocale")
     private void updateDeadline() {
-        deadlineInput.setText(String.format("%02d/%02d/%d %02d:%02d", selectedDay, selectedMonth + 1, selectedYear, selectedHour, selectedMinute));
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm a", Locale.getDefault());
+        String formattedDate = sdf.format(calendar.getTime());
+        deadlineInput.setText(formattedDate);
     }
 
     private void submitCreatedTask() {
@@ -126,7 +149,7 @@ public class AddTaskDialog extends DialogFragment implements OnMapReadyCallback 
             double locationLat = mMap.getCameraPosition().target.latitude;
             double locationLon = mMap.getCameraPosition().target.longitude;
 
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm a", Locale.getDefault());
             Date deadline = sdf.parse(deadlineStr);
 
             TaskVisibility visibility = getTaskVisibility(selectedPrivacyId);

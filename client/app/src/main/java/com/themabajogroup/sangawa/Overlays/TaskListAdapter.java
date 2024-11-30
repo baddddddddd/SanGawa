@@ -10,12 +10,12 @@ import com.themabajogroup.sangawa.Models.TaskDetails;
 import com.themabajogroup.sangawa.R;
 import java.util.List;
 
-public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
+public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskViewHolder> {
 
     private final List<TaskDetails> tasks;
     private final TaskItemClickListener taskItemClickListener;
 
-    public TaskAdapter(List<TaskDetails> tasks, TaskItemClickListener listener) {
+    public TaskListAdapter(List<TaskDetails> tasks, TaskItemClickListener listener) {
         this.tasks = tasks;
         this.taskItemClickListener = listener;
     }
