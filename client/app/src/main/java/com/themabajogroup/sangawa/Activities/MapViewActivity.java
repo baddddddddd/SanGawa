@@ -234,7 +234,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             } else if (itemId == R.id.menu_done_task) {
                 Toast.makeText(this, "Finished task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
             } else if (itemId == R.id.menu_edit_task) {
-                TaskDialog editTaskDialog = new TaskDialog(this, TransactionType.EDIT);
+                TaskDialog editTaskDialog = new TaskDialog(this, TransactionType.EDIT, task);
                 editTaskDialog.show(getSupportFragmentManager(), "MapFragment");
             } else if (itemId == R.id.menu_delete_task) {
                 taskController.deleteUserTask(task.getTaskId());

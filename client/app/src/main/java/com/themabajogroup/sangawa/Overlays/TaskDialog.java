@@ -23,6 +23,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.themabajogroup.sangawa.Activities.MapViewActivity;
 import com.themabajogroup.sangawa.Controllers.TaskController;
 import com.themabajogroup.sangawa.Controllers.UserController;
@@ -43,14 +44,21 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
 
     private final MapViewActivity mapViewActivity;
     private final TransactionType transactionType;
+    private TaskDetails taskDetails;
     private GoogleMap mMap;
     private TextInputEditText titleInput, descInput, deadlineInput;
     private int selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute;
     private UserController userController;
+    private LatLng location;
 
     public TaskDialog(MapViewActivity mapViewActivity, TransactionType transactionType) {
         this.mapViewActivity = mapViewActivity;
         this.transactionType = transactionType;
+    }
+
+    public TaskDialog(MapViewActivity mapViewActivity, TransactionType transactionType, TaskDetails taskDetails) {
+        this(mapViewActivity, transactionType);
+        this.taskDetails = taskDetails;
     }
 
     @SuppressLint("SetTextI18n")
@@ -60,7 +68,6 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
         View view = inflater.inflate(R.layout.dialog_add_task, container, false);
         getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
-        TextView head = view.findViewById(R.id.head);
         titleInput = view.findViewById(R.id.title);
         descInput = view.findViewById(R.id.description);
         deadlineInput = view.findViewById(R.id.deadline);
@@ -72,11 +79,11 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
         deadlineInput.setOnClickListener(v -> showDatePicker());
 
         userController = UserController.getInstance();
+        location = userController.getCurrentLocation();
 
         if (transactionType == TransactionType.EDIT) {
-            head.setText("Edit Task");
-            btnAdd.setText("Update");
-//            btnAdd.setOnClickListener(v -> saveChanges());
+            fillPastInputs(view, btnAdd);
+            btnAdd.setOnClickListener(v -> saveChanges());
         }
         else {
             btnAdd.setOnClickListener(v -> submitCreatedTask());
@@ -84,6 +91,22 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
         btnCancel.setOnClickListener(v -> dismiss());
 
         return view;
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void fillPastInputs(View view, Button btnAdd) {
+        TextView head = view.findViewById(R.id.head);
+        head.setText("Edit Task");
+        btnAdd.setText("Update");
+        titleInput.setText(taskDetails.getTitle());
+        descInput.setText(taskDetails.getDescription());
+        Date deadline = taskDetails.getDeadline();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm a", Locale.getDefault());
+        String formattedDate = dateFormat.format(deadline);
+        deadlineInput.setText(formattedDate);
+        location = new LatLng(taskDetails.getLocationLat(), taskDetails.getLocationLon());
+        RadioGroup privacyGroup = view.findViewById(R.id.privacy_group);
+        setPrivacyGroupSelection(taskDetails.getVisibility(), privacyGroup);
     }
 
     @Override
@@ -99,7 +122,7 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userController.getCurrentLocation(), 15));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
     }
 
     private void showDatePicker() {
@@ -132,6 +155,14 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
     }
 
     private void submitCreatedTask() {
+        processTaskSubmission(false);
+    }
+
+    private void saveChanges() {
+        processTaskSubmission(true);
+    }
+
+    private void processTaskSubmission(boolean isEditing) {
         String title = titleInput.getText().toString().trim();
         String description = descInput.getText().toString().trim();
         String deadlineStr = deadlineInput.getText().toString().trim();
@@ -161,20 +192,32 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
                     currentUser.getUid(), title, description, locationLat, locationLon, visibility, deadline
             );
 
-            TaskController.getInstance().createUserTask(task).thenAccept(success -> {
-                if (success) {
-                    mapViewActivity.refreshTaskList();
-                    mapViewActivity.refreshUserTaskMarkers();
-                    Toast.makeText(getContext(), "Task added successfully!", Toast.LENGTH_SHORT).show();
-                    dismiss();
-                } else {
-                    Toast.makeText(getContext(), "Failed to add task. Please try again.", Toast.LENGTH_SHORT).show();
-                }
-            });
+            if (isEditing) {
+                TaskController.getInstance().editUserTask(taskDetails.getTaskId(), task).thenAccept(success -> handleTaskResult(success, "updated"));
+            } else {
+                TaskController.getInstance().createUserTask(task).thenAccept(success -> handleTaskResult(success, "added"));
+            }
         } catch (Exception e) {
             Log.e("TaskInputError", "Error: ", e);
             Toast.makeText(getContext(), "Invalid input. Please check your values.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void handleTaskResult(boolean success, String action) {
+        if (success) {
+            mapViewActivity.refreshTaskList();
+            mapViewActivity.refreshUserTaskMarkers();
+            Toast.makeText(getContext(), "Task " + action + " successfully!", Toast.LENGTH_SHORT).show();
+            dismiss();
+        } else {
+            Toast.makeText(getContext(), "Failed to " + action + " task. Please try again.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private static void setPrivacyGroupSelection(TaskVisibility visibility, RadioGroup privacyGroup) {
+        privacyGroup.check(visibility == TaskVisibility.OPEN_TO_ALL ? R.id.OPEN_TO_ALL :
+                visibility == TaskVisibility.PRIVATE ? R.id.PRIVATE :
+                        R.id.REQUEST_TO_JOIN);
     }
 
     private static TaskVisibility getTaskVisibility(int selectedPrivacyId) {
