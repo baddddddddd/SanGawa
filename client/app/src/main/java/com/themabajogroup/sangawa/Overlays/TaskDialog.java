@@ -28,7 +28,7 @@ import com.themabajogroup.sangawa.Controllers.TaskController;
 import com.themabajogroup.sangawa.Controllers.UserController;
 import com.themabajogroup.sangawa.Models.TaskDetails;
 import com.themabajogroup.sangawa.Models.TaskVisibility;
-import com.themabajogroup.sangawa.Models.Transaction;
+import com.themabajogroup.sangawa.Models.TransactionType;
 import com.themabajogroup.sangawa.R;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,15 +42,15 @@ import java.util.Locale;
 public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
 
     private final MapViewActivity mapViewActivity;
-    private final Transaction transaction;
+    private final TransactionType transactionType;
     private GoogleMap mMap;
     private TextInputEditText titleInput, descInput, deadlineInput;
     private int selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute;
     private UserController userController;
 
-    public TaskDialog(MapViewActivity mapViewActivity, Transaction transaction) {
+    public TaskDialog(MapViewActivity mapViewActivity, TransactionType transactionType) {
         this.mapViewActivity = mapViewActivity;
-        this.transaction = transaction;
+        this.transactionType = transactionType;
     }
 
     @SuppressLint("SetTextI18n")
@@ -73,7 +73,7 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
 
         userController = UserController.getInstance();
 
-        if (transaction == Transaction.EDIT) {
+        if (transactionType == TransactionType.EDIT) {
             head.setText("Edit Task");
             btnAdd.setText("Update");
 //            btnAdd.setOnClickListener(v -> saveChanges());
