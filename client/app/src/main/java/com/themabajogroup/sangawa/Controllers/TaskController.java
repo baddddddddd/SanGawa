@@ -5,6 +5,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.themabajogroup.sangawa.Models.CollabRequest;
 import com.themabajogroup.sangawa.Models.RequestStatus;
 import com.themabajogroup.sangawa.Models.TaskDetails;
 import com.themabajogroup.sangawa.Utils.Converter;
@@ -167,14 +168,16 @@ public class TaskController {
         return result;
     }
 
-    public CompletableFuture<Boolean> createJoinRequest(String requesterId, String ownerId, String taskId) {
+    public CompletableFuture<Boolean> createJoinRequest(String requesterName, String requesterId, String ownerId, String taskId) {
         CompletableFuture<Boolean> result = new CompletableFuture<>();
+
+        CollabRequest requestDetails = new CollabRequest(requesterName, RequestStatus.PENDING);
 
         realtimeDb.child("requests")
                 .child(ownerId)
                 .child(taskId)
                 .child(requesterId)
-                .setValue(RequestStatus.PENDING.name())
+                .setValue(requestDetails)
                 .addOnCompleteListener(task -> {
                     result.complete(task.isSuccessful());
                 });
@@ -189,7 +192,8 @@ public class TaskController {
                 .child(ownerId)
                 .child(taskId)
                 .child(requesterId)
-                .setValue(status.name())
+                .child("status")
+                .setValue(status)
                 .addOnCompleteListener(task -> {
                     result.complete(task.isSuccessful());
                 });
