@@ -173,6 +173,7 @@ public class TaskController {
         realtimeDb.child("requests")
                 .child(ownerId)
                 .child(taskId)
+                .child(requesterId)
                 .setValue(RequestStatus.PENDING.name())
                 .addOnCompleteListener(task -> {
                     result.complete(task.isSuccessful());
@@ -187,6 +188,7 @@ public class TaskController {
         realtimeDb.child("requests")
                 .child(ownerId)
                 .child(taskId)
+                .child(requesterId)
                 .setValue(status.name())
                 .addOnCompleteListener(task -> {
                     result.complete(task.isSuccessful());
