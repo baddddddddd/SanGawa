@@ -19,14 +19,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-
         setContentView(R.layout.activity_main);
 
-        findViewById(R.id.main).postDelayed(() -> {
-            Intent intent = new Intent(MainActivity.this, AuthActivity.class);
-            startActivity(intent);
-            finish();
-        }, 3000);
+        findViewById(R.id.main).post(this::redirectToAuthActivity);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -34,7 +29,13 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        createNotificationChannel();
+        new Thread(this::createNotificationChannel).start();
+    }
+
+    private void redirectToAuthActivity() {
+        Intent intent = new Intent(MainActivity.this, AuthActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     private void createNotificationChannel() {
