@@ -256,7 +256,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
         userController.fetchUserTasks().thenAccept(tasks -> {
             if (tasks != null && !tasks.isEmpty()) {
-                TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this);
+                TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this, userController.getCurrentUser());
                 recyclerViewTasks.setAdapter(taskListAdapter);
             } else {
                 Toast.makeText(this, "No tasks found", Toast.LENGTH_SHORT).show();

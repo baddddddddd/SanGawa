@@ -6,6 +6,8 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseUser;
 import com.themabajogroup.sangawa.Models.TaskDetails;
 import com.themabajogroup.sangawa.R;
 import java.util.List;
@@ -14,10 +16,12 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
 
     private final List<TaskDetails> tasks;
     private final TaskItemClickListener taskItemClickListener;
+    private final FirebaseUser currentUser;
 
-    public TaskListAdapter(List<TaskDetails> tasks, TaskItemClickListener listener) {
+    public TaskListAdapter(List<TaskDetails> tasks, TaskItemClickListener listener, FirebaseUser currentUser) {
         this.tasks = tasks;
         this.taskItemClickListener = listener;
+        this.currentUser = currentUser;
     }
 
     @Override
@@ -32,6 +36,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
         TaskDetails task = tasks.get(position);
         holder.textViewTaskTitle.setText(task.getTitle());
         holder.textViewTaskDescription.setText(task.getDescription());
+        holder.textViewIsNearby.setVisibility(task.getUserId().equals(currentUser.getUid()) ? View.GONE : View.VISIBLE);
 
         holder.buttonMoreOptions.setOnClickListener(v -> taskItemClickListener.onMoreOptionClick(v, task));
     }
@@ -43,7 +48,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
 
     public static class TaskViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView textViewTaskTitle;
+        public TextView textViewTaskTitle, textViewIsNearby;
         public TextView textViewTaskDescription;
         public ImageButton buttonMoreOptions;
 
@@ -52,6 +57,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
             textViewTaskTitle = view.findViewById(R.id.textViewTaskTitle);
             textViewTaskDescription = view.findViewById(R.id.textViewTaskDescription);
             buttonMoreOptions = view.findViewById(R.id.buttonMoreOptions);
+            textViewIsNearby = view.findViewById(R.id.is_nearby);
         }
     }
 
