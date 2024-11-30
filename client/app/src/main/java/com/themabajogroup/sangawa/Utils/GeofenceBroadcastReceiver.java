@@ -9,6 +9,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
+import com.themabajogroup.sangawa.R;
 
 import java.util.List;
 
@@ -51,8 +52,9 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
     }
 
     private void sendNotification(Context context, String title, String message) {
+        // TODO: Use NotificationSender class instead
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "GeofenceChannel")
-                .setSmallIcon(android.R.drawable.ic_dialog_map)
+                .setSmallIcon(R.drawable.logo)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)

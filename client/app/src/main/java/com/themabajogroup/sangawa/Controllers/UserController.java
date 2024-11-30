@@ -3,9 +3,12 @@ package com.themabajogroup.sangawa.Controllers;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.themabajogroup.sangawa.Models.CollabDetails;
 import com.themabajogroup.sangawa.Models.TaskDetails;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class UserController {
@@ -14,10 +17,13 @@ public class UserController {
     private FirebaseUser currentUser;
     private final TaskController taskController;
     private LatLng currentLocation;
+    private Map<String, Map<String, CollabDetails>> collabRequests;
 
     private UserController() {
         mAuth = FirebaseAuth.getInstance();
         taskController = TaskController.getInstance();
+
+        collabRequests = new HashMap<>();
     }
 
     public static UserController getInstance() {
@@ -69,5 +75,9 @@ public class UserController {
 
     public void setCurrentLocation(LatLng currentLocation) {
         this.currentLocation = currentLocation;
+    }
+
+    public Map<String, Map<String, CollabDetails>> getCollabRequests() {
+        return collabRequests;
     }
 }

@@ -1,5 +1,6 @@
 package com.themabajogroup.sangawa.Activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -34,15 +35,26 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.themabajogroup.sangawa.Controllers.TaskController;
 import com.themabajogroup.sangawa.Controllers.UserController;
+import com.themabajogroup.sangawa.Models.CollabDetails;
+import com.themabajogroup.sangawa.Models.RequestStatus;
 import com.themabajogroup.sangawa.Models.TaskDetails;
 import com.themabajogroup.sangawa.Models.TransactionType;
 import com.themabajogroup.sangawa.Overlays.TaskDialog;
 import com.themabajogroup.sangawa.Overlays.TaskListAdapter;
 import com.themabajogroup.sangawa.R;
 import com.themabajogroup.sangawa.Utils.GeofenceBroadcastReceiver;
+import com.themabajogroup.sangawa.Utils.NotificationSender;
 import com.themabajogroup.sangawa.databinding.ActivityMapViewBinding;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import kotlin.NotImplementedError;
 
 public class MapViewActivity extends AppCompatActivity implements OnMapReadyCallback, TaskListAdapter.TaskItemClickListener {
 
@@ -56,6 +68,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     private UserController userController;
     private TaskController taskController;
     private RecyclerView recyclerViewTasks;
+    private Map<String, Map<String, CollabDetails>> collabRequests;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +79,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
         userController = UserController.getInstance();
         taskController = TaskController.getInstance();
+        collabRequests = userController.getCollabRequests();
 
         LinearLayout bottomSheet = findViewById(R.id.bottom_sheet);
         BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
@@ -83,6 +97,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         geofencingClient = LocationServices.getGeofencingClient(this);
 
         checkLocationPermissions();
+        setupCollabListener();
 
         refreshTaskList();
     }
@@ -271,6 +286,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                         LatLng location = new LatLng(taskDetails.getLocationLat(), taskDetails.getLocationLon());
 
                         // TODO: Radius must be adjustable by users for own tasks
+                        // TODO: Do not create new geofence for existing tasks
                         setupGeofence(taskDetails.getTitle(), location, 1000);
 
                         MarkerOptions markerOptions = new MarkerOptions()
@@ -305,5 +321,60 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                         mMap.addMarker(markerOptions);
                     }
                 });
+    }
+
+    public void setupCollabListener() {
+        String userId = userController.getCurrentUser().getUid();
+        taskController.attachJoinRequestListener(userId, new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Map<String, Object> data = (Map<String, Object>) snapshot.getValue();
+
+                for (Map.Entry<String, Object> entry : data.entrySet()) {
+                    String taskId = entry.getKey();
+                    Map<String, Object> requestDetails = (Map<String, Object>) entry.getValue();
+
+                    Map.Entry<String, Object> singleEntry = requestDetails.entrySet().iterator().next();
+                    String requesterId = singleEntry.getKey();
+
+                    Map<String, String> details = (Map<String, String>) singleEntry.getValue();
+                    String requesterName = details.get("requesterName");
+                    RequestStatus status = RequestStatus.valueOf(details.get("status"));
+
+                    if (status != RequestStatus.PENDING) {
+                        continue;
+                    }
+
+                    CollabDetails collabDetails = new CollabDetails(taskId, requesterId, requesterName, status);
+
+                    if (!collabRequests.containsKey(taskId)) {
+                        collabRequests.put(taskId, new HashMap<>());
+                    }
+
+                    Map<String, CollabDetails> taskCollabs = collabRequests.get(taskId);
+
+                    if (!taskCollabs.containsKey(requesterId)) {
+                        taskCollabs.put(requesterId, collabDetails);
+                        notifyNewCollab(collabDetails);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void notifyNewCollab(CollabDetails collabDetails) {
+        String channelId = "CollabRequestChannel";
+        NotificationSender sender = NotificationSender.getInstance(channelId, this);
+
+        // TODO: Use real name of the task for notifications
+        // TODO: Add quick accept and decline button for collab requests notifications
+        String title = "Collaboration request for " + collabDetails.getTaskId();
+        String description = collabDetails.getRequesterName() + " wants to join you!";
+        sender.sendNotification(title, description);
     }
 }
