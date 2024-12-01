@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -71,11 +72,11 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     private GeofencingClient geofencingClient;
     private UserController userController;
     private TaskController taskController;
-    private RecyclerView recyclerViewTasks;
     private Map<String, Map<String, CollabDetails>> collabRequests;
     private Map<String, TaskDetails> currentTasks;
     private MaterialButtonToggleGroup toggleGroup;
-    private MaterialButton userTab;
+    private MaterialButton userTab, sharedTab;
+    private RecyclerView recyclerViewUserTasks, recyclerViewNearbyTasks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,10 +100,21 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
         toggleGroup = findViewById(R.id.toggleGroup);
         userTab = findViewById(R.id.usertab);
+        sharedTab = findViewById(R.id.sharedtab);
+        recyclerViewUserTasks = findViewById(R.id.recyclerViewUserTasks);
+        recyclerViewNearbyTasks = findViewById(R.id.recyclerViewNearbyTasks);
+
         toggleGroup.check(userTab.getId());
         toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            Log.d("ToggleGroup", "Checked ID: " + checkedId + ", Is Checked: " + isChecked);
             if (isChecked) {
-                refreshTaskList();
+                if (checkedId == userTab.getId()) {
+                    recyclerViewUserTasks.setVisibility(View.VISIBLE);
+                    recyclerViewNearbyTasks.setVisibility(View.GONE);
+                } else if (checkedId == sharedTab.getId()) {
+                    recyclerViewUserTasks.setVisibility(View.GONE);
+                    recyclerViewNearbyTasks.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -258,9 +270,14 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         MenuInflater inflater = popupMenu.getMenuInflater();
         inflater.inflate(R.menu.menu_task_options, popupMenu.getMenu());
         MenuItem acceptTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_accept_task);
-        if (acceptTaskMenuItem != null) {
-            acceptTaskMenuItem.setVisible(!isCurrentUserTask);
-        }
+        MenuItem doneTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_done_task);
+        MenuItem editTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_edit_task);
+        MenuItem deleteTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_delete_task);
+        acceptTaskMenuItem.setVisible(!isCurrentUserTask);
+        doneTaskMenuItem.setVisible(isCurrentUserTask);
+        editTaskMenuItem.setVisible(isCurrentUserTask);
+        deleteTaskMenuItem.setVisible(isCurrentUserTask);
+
         popupMenu.setForceShowIcon(true);
 
         popupMenu.setOnMenuItemClickListener(item -> {
@@ -281,7 +298,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             } else {
                 return false;
             }
-            refreshTaskList();
+            refreshUserTaskList();
             refreshUserTaskMarkers();
             return true;
         });
@@ -290,22 +307,20 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     }
 
     public void initializeTaskList() {
-        refreshTaskList().thenAccept(unused -> {
-           setupCollabListener();
+        refreshUserTaskList().thenAccept(unused -> {
+            setupCollabListener();
         });
     }
 
-    public CompletableFuture<Void> refreshTaskList() {
+    public CompletableFuture<Void> refreshUserTaskList() {
         CompletableFuture<Void> result = new CompletableFuture<>();
 
-        recyclerViewTasks = findViewById(R.id.recyclerViewTasks);
-        recyclerViewTasks.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewUserTasks.setLayoutManager(new LinearLayoutManager(this));
 
         userController.fetchUserTasks().thenAccept(tasks -> {
             if (tasks != null && !tasks.isEmpty()) {
-                boolean isCurrentUserTask = toggleGroup.getCheckedButtonId() == userTab.getId();
-                TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this, isCurrentUserTask);
-                recyclerViewTasks.setAdapter(taskListAdapter);
+                TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this, true);
+                recyclerViewUserTasks.setAdapter(taskListAdapter);
 
                 currentTasks = new HashMap<>();
                 for (TaskDetails taskDetails : tasks) {
@@ -319,7 +334,33 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
+        refreshNearbyTaskList();
+
         return result;
+    }
+
+    public void refreshNearbyTaskList() {
+        CompletableFuture<Void> result = new CompletableFuture<>();
+
+        recyclerViewNearbyTasks.setLayoutManager(new LinearLayoutManager(this));
+
+        userController.fetchNearbyTasks().thenAccept(tasks -> {
+            if (tasks != null && !tasks.isEmpty()) {
+                TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this, false);
+                recyclerViewNearbyTasks.setAdapter(taskListAdapter);
+
+                currentTasks = new HashMap<>();
+                for (TaskDetails taskDetails : tasks) {
+                    currentTasks.put(taskDetails.getTaskId(), taskDetails);
+                }
+
+                result.complete(null);
+
+            } else {
+                Toast.makeText(this, "No tasks found", Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     public void refreshUserTaskMarkers() {
