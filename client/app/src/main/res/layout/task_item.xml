@@ -52,17 +52,6 @@
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/is_nearby"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/konkhmer_sleokchher"
-            android:textColor="@color/deep_blue"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginBottom="-1dp"
-            android:text="Nearby"
-            tools:ignore="HardcodedText"/>
-
         <ImageButton
             android:id="@+id/buttonMoreOptions"
             android:layout_width="wrap_content"

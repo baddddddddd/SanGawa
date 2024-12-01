@@ -5,9 +5,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.auth.FirebaseUser;
 import com.themabajogroup.sangawa.Models.TaskDetails;
 import com.themabajogroup.sangawa.R;
 import java.util.List;
@@ -16,14 +17,15 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
 
     private final List<TaskDetails> tasks;
     private final TaskItemClickListener taskItemClickListener;
-    private final FirebaseUser currentUser;
+    private final Boolean isCurrentUserTask;
 
-    public TaskListAdapter(List<TaskDetails> tasks, TaskItemClickListener listener, FirebaseUser currentUser) {
+    public TaskListAdapter(List<TaskDetails> tasks, TaskItemClickListener listener, Boolean isCurrentUserTask) {
         this.tasks = tasks;
         this.taskItemClickListener = listener;
-        this.currentUser = currentUser;
+        this.isCurrentUserTask = isCurrentUserTask;
     }
 
+    @NonNull
     @Override
     public TaskViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
@@ -36,9 +38,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
         TaskDetails task = tasks.get(position);
         holder.textViewTaskTitle.setText(task.getTitle());
         holder.textViewTaskDescription.setText(task.getDescription());
-        holder.textViewIsNearby.setVisibility(task.getUserId().equals(currentUser.getUid()) ? View.GONE : View.VISIBLE);
-
-        holder.buttonMoreOptions.setOnClickListener(v -> taskItemClickListener.onMoreOptionClick(v, task));
+        holder.buttonMoreOptions.setOnClickListener(v -> taskItemClickListener.onMoreOptionClick(v, task, isCurrentUserTask));
     }
 
     @Override
@@ -48,8 +48,8 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
 
     public static class TaskViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView textViewTaskTitle, textViewIsNearby;
-        public TextView textViewTaskDescription;
+        public TextView textViewTaskTitle, textViewTaskDescription;
+        public TextView optionAcceptTask;
         public ImageButton buttonMoreOptions;
 
         public TaskViewHolder(View view) {
@@ -57,11 +57,11 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
             textViewTaskTitle = view.findViewById(R.id.textViewTaskTitle);
             textViewTaskDescription = view.findViewById(R.id.textViewTaskDescription);
             buttonMoreOptions = view.findViewById(R.id.buttonMoreOptions);
-            textViewIsNearby = view.findViewById(R.id.is_nearby);
+            optionAcceptTask = view.findViewById(R.id.menu_accept_task);
         }
     }
 
     public interface TaskItemClickListener {
-        void onMoreOptionClick(View view, TaskDetails task);
+        void onMoreOptionClick(View view, TaskDetails task, Boolean isCurrentUserTask);
     }
 }

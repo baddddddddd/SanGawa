@@ -14,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.ContextThemeWrapper;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -71,6 +72,8 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     private TaskController taskController;
     private RecyclerView recyclerViewTasks;
     private Map<String, Map<String, CollabDetails>> collabRequests;
+    private MaterialButtonToggleGroup toggleGroup;
+    private MaterialButton userTab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,9 +94,14 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         TaskDialog editTaskDialog = new TaskDialog(this, TransactionType.ADD);
         btnAddTask.setOnClickListener(view -> editTaskDialog.show(getSupportFragmentManager(), "MapFragment"));
 
-        MaterialButtonToggleGroup toggleGroup = findViewById(R.id.toggleGroup);
-        MaterialButton userTab = findViewById(R.id.usertab);
+        toggleGroup = findViewById(R.id.toggleGroup);
+        userTab = findViewById(R.id.usertab);
         toggleGroup.check(userTab.getId());
+        toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (isChecked) {
+                refreshTaskList();
+            }
+        });
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -241,17 +249,24 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
 
     @Override
-    public void onMoreOptionClick(View view, TaskDetails task) {
+    public void onMoreOptionClick(View view, TaskDetails task, Boolean isCurrentUserTask) {
         Context wrapper = new ContextThemeWrapper(this, R.style.popupMenuStyle);
         PopupMenu popupMenu = new PopupMenu(wrapper, view);
         MenuInflater inflater = popupMenu.getMenuInflater();
         inflater.inflate(R.menu.menu_task_options, popupMenu.getMenu());
+        MenuItem acceptTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_accept_task);
+        if (acceptTaskMenuItem != null) {
+            acceptTaskMenuItem.setVisible(!isCurrentUserTask);
+        }
         popupMenu.setForceShowIcon(true);
 
         popupMenu.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.menu_view_task) {
                 Toast.makeText(this, "View task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+            } else if (itemId == R.id.menu_accept_task) {
+                // TODO: Add logic here for accepting task
+                Toast.makeText(this, task.getTitle() + " Accepted Successfully", Toast.LENGTH_SHORT).show();
             } else if (itemId == R.id.menu_done_task) {
                 Toast.makeText(this, "Finished task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
             } else if (itemId == R.id.menu_edit_task) {
@@ -277,7 +292,8 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
         userController.fetchUserTasks().thenAccept(tasks -> {
             if (tasks != null && !tasks.isEmpty()) {
-                TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this, userController.getCurrentUser());
+                boolean isCurrentUserTask = toggleGroup.getCheckedButtonId() == userTab.getId();
+                TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this, isCurrentUserTask);
                 recyclerViewTasks.setAdapter(taskListAdapter);
             } else {
                 Toast.makeText(this, "No tasks found", Toast.LENGTH_SHORT).show();
@@ -336,34 +352,34 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Map<String, Object> data = (Map<String, Object>) snapshot.getValue();
 
-                for (Map.Entry<String, Object> entry : data.entrySet()) {
-                    String taskId = entry.getKey();
-                    Map<String, Object> requestDetails = (Map<String, Object>) entry.getValue();
-
-                    Map.Entry<String, Object> singleEntry = requestDetails.entrySet().iterator().next();
-                    String requesterId = singleEntry.getKey();
-
-                    Map<String, String> details = (Map<String, String>) singleEntry.getValue();
-                    String requesterName = details.get("requesterName");
-                    RequestStatus status = RequestStatus.valueOf(details.get("status"));
-
-                    if (status != RequestStatus.PENDING) {
-                        continue;
-                    }
-
-                    CollabDetails collabDetails = new CollabDetails(taskId, requesterId, requesterName, status);
-
-                    if (!collabRequests.containsKey(taskId)) {
-                        collabRequests.put(taskId, new HashMap<>());
-                    }
-
-                    Map<String, CollabDetails> taskCollabs = collabRequests.get(taskId);
-
-                    if (!taskCollabs.containsKey(requesterId)) {
-                        taskCollabs.put(requesterId, collabDetails);
-                        notifyNewCollab(collabDetails);
-                    }
-                }
+//                for (Map.Entry<String, Object> entry : data.entrySet()) {
+//                    String taskId = entry.getKey();
+//                    Map<String, Object> requestDetails = (Map<String, Object>) entry.getValue();
+//
+//                    Map.Entry<String, Object> singleEntry = requestDetails.entrySet().iterator().next();
+//                    String requesterId = singleEntry.getKey();
+//
+//                    Map<String, String> details = (Map<String, String>) singleEntry.getValue();
+//                    String requesterName = details.get("requesterName");
+//                    RequestStatus status = RequestStatus.valueOf(details.get("status"));
+//
+//                    if (status != RequestStatus.PENDING) {
+//                        continue;
+//                    }
+//
+//                    CollabDetails collabDetails = new CollabDetails(taskId, requesterId, requesterName, status);
+//
+//                    if (!collabRequests.containsKey(taskId)) {
+//                        collabRequests.put(taskId, new HashMap<>());
+//                    }
+//
+//                    Map<String, CollabDetails> taskCollabs = collabRequests.get(taskId);
+//
+//                    if (!taskCollabs.containsKey(requesterId)) {
+//                        taskCollabs.put(requesterId, collabDetails);
+//                        notifyNewCollab(collabDetails);
+//                    }
+//                }
             }
 
             @Override

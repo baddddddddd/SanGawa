@@ -7,6 +7,11 @@
         android:icon="@drawable/baseline_check_24"
         tools:ignore="HardcodedText" />
     <item
+        android:id="@+id/menu_accept_task"
+        android:title="Accept Task"
+        android:icon="@drawable/baseline_check_24"
+        tools:ignore="HardcodedText" />
+    <item
         android:id="@+id/menu_view_task"
         android:title="View Task"
         android:icon="@drawable/outline_remove_red_eye_24"
