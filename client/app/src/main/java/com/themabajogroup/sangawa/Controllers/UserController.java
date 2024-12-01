@@ -3,8 +3,11 @@ package com.themabajogroup.sangawa.Controllers;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.themabajogroup.sangawa.Models.CollabDetails;
 import com.themabajogroup.sangawa.Models.TaskDetails;
+import com.themabajogroup.sangawa.Models.UserProfile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,10 +21,13 @@ public class UserController {
     private final TaskController taskController;
     private LatLng currentLocation;
     private Map<String, Map<String, CollabDetails>> collabRequests;
+    private UserProfile profile;
+    private FirebaseFirestore db;
 
     private UserController() {
         mAuth = FirebaseAuth.getInstance();
         taskController = TaskController.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         collabRequests = new HashMap<>();
     }
@@ -79,5 +85,43 @@ public class UserController {
 
     public Map<String, Map<String, CollabDetails>> getCollabRequests() {
         return collabRequests;
+    }
+
+    public UserProfile getProfile() {
+        return profile;
+    }
+
+    public void setProfile(UserProfile profile) {
+        this.profile = profile;
+    }
+
+    public CompletableFuture<Boolean> fetchProfile() {
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+        String userId = mAuth.getCurrentUser().getUid();
+
+        db.collection("users")
+                .document(userId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        result.complete(false);
+                        return;
+                    }
+
+                    DocumentSnapshot document = task.getResult();
+
+                    if (document == null) {
+                        result.complete(false);
+                        return;
+                    }
+
+                    String email = (String) document.get("email");
+                    String username = (String) document.get("username");
+
+                    setProfile(new UserProfile(userId, email, username));
+                    result.complete(true);
+                });
+
+        return result;
     }
 }

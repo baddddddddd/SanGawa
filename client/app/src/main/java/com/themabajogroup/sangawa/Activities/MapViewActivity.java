@@ -46,6 +46,7 @@ import com.themabajogroup.sangawa.Controllers.UserController;
 import com.themabajogroup.sangawa.Models.CollabDetails;
 import com.themabajogroup.sangawa.Models.RequestStatus;
 import com.themabajogroup.sangawa.Models.TaskDetails;
+import com.themabajogroup.sangawa.Models.TaskVisibility;
 import com.themabajogroup.sangawa.Models.TransactionType;
 import com.themabajogroup.sangawa.Overlays.TaskDialog;
 import com.themabajogroup.sangawa.Overlays.TaskListAdapter;
@@ -54,6 +55,7 @@ import com.themabajogroup.sangawa.Utils.GeofenceBroadcastReceiver;
 import com.themabajogroup.sangawa.Utils.NotificationSender;
 import com.themabajogroup.sangawa.databinding.ActivityMapViewBinding;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -114,7 +116,9 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         geofencingClient = LocationServices.getGeofencingClient(this);
 
         checkLocationPermissions();
+
         initializeTaskList();
+        userController.fetchProfile();
     }
 
     private void checkLocationPermissions() {
@@ -428,5 +432,32 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         String title = "Collaboration request for " + task.getTitle();
         String description = collabDetails.getRequesterName() + " wants to join you!";
         sender.sendCollabNotification(title, description, collabDetails.getTaskId(), collabDetails.getRequesterId());
+    }
+
+    public CompletableFuture<Boolean> sendCollabRequest(TaskDetails taskDetails) {
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+
+        String requesterId = userController.getCurrentUser().getUid();
+        String taskId = taskDetails.getTaskId();
+        String ownerId = taskDetails.getUserId();
+        String requesterName = userController.getProfile().getUsername();
+        taskController.createJoinRequest(ownerId, taskId, requesterId, requesterName)
+                .thenAccept(isSuccess -> {
+                    if (!isSuccess) {
+                        result.complete(false);
+                        return;
+                    }
+
+                    // TODO: Add listener for collab reply
+
+                });
+
+        return result;
+    }
+
+    // TODO: Push notif when request was replied to
+    // TODO: Fetch firestore database for pending collab requests, and add listeners for all of them
+    public void addCollabReplyListener(TaskDetails taskDetails) {
+
     }
 }

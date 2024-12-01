@@ -13,7 +13,9 @@ import com.themabajogroup.sangawa.Utils.Converter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class TaskController {
@@ -169,23 +171,38 @@ public class TaskController {
         return result;
     }
 
-    public CompletableFuture<Boolean> createJoinRequest(String requesterName, String requesterId, String ownerId, String taskId) {
+    public CompletableFuture<Boolean> createJoinRequest(String ownerId, String taskId, String requesterId, String requesterName) {
         CompletableFuture<Boolean> result = new CompletableFuture<>();
 
-        CollabRequest requestDetails = new CollabRequest(requesterName, RequestStatus.PENDING);
+        CollabRequest collabRequest = new CollabRequest(requesterName, RequestStatus.PENDING);
 
         realtimeDb.child("requests")
                 .child(ownerId)
                 .child(taskId)
                 .child(requesterId)
-                .setValue(requestDetails)
-                .addOnCompleteListener(task -> {
-                    result.complete(task.isSuccessful());
+                .setValue(collabRequest)
+                .addOnCompleteListener(rtdbTask -> {
+                    if (!rtdbTask.isSuccessful()) {
+                        result.complete(false);
+                        return;
+                    }
+
+                    Map<String, Object> requestDetails = new HashMap<>();
+                    requestDetails.put("requesterId", requesterId);
+                    requestDetails.put("ownerId", ownerId);
+                    requestDetails.put("taskId", taskId);
+
+                    db.collection("requests")
+                            .add(requestDetails)
+                            .addOnCompleteListener(firestoreTask -> {
+                                result.complete(firestoreTask.isSuccessful());
+                            });
                 });
 
         return result;
     }
 
+    // TODO: Delete pending request in Firestore when new status is not PENDING
     public CompletableFuture<Boolean> updateJoinRequest(String ownerId, String taskId, String requesterId, RequestStatus status) {
         CompletableFuture<Boolean> result = new CompletableFuture<>();
 
