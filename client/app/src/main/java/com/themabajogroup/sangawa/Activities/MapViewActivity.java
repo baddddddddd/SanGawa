@@ -279,7 +279,10 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         popupMenu.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.menu_view_task) {
-                Toast.makeText(this, "View task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+                LatLng taskLocation = new LatLng(task.getLocationLat(), task.getLocationLon());
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(taskLocation, 16f));
+                BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet));
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             } else if (itemId == R.id.menu_accept_task) {
                 // TODO: Add logic here for accepting task
                 Toast.makeText(this, task.getTitle() + " Accepted Successfully", Toast.LENGTH_SHORT).show();
