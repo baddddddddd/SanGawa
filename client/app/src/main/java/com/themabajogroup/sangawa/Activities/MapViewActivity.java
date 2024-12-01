@@ -116,24 +116,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         checkLocationPermissions();
 
         initializeTaskList();
-        userController.fetchProfile().thenAccept(aBoolean -> {
-
-
-            // TODO: Remove test code
-            TaskDetails details = new TaskDetails(
-               "pQfsXyxqyxOPNTt1bZhAuQyBo4s1",
-               "testing edited",
-                    "try",
-                    100,
-                    100,
-                    TaskVisibility.REQUEST_TO_JOIN,
-                    new Date()
-            );
-            details.setTaskId("0B5cXHjol6wluosUuSt9");
-            sendCollabRequest(details);
-
-        });
-
+        userController.fetchProfile();
     }
 
     private void checkLocationPermissions() {
