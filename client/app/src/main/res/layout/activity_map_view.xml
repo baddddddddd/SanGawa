@@ -89,12 +89,22 @@
 
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewTasks"
+            android:id="@+id/recyclerViewUserTasks"
             android:layout_width="match_parent"
             android:layout_height="500dp"
             android:layout_marginHorizontal="24dp"
             android:clipToPadding="false"
             android:paddingBottom="8dp"
+            android:scrollbars="vertical" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewNearbyTasks"
+            android:layout_width="match_parent"
+            android:layout_height="500dp"
+            android:layout_marginHorizontal="24dp"
+            android:clipToPadding="false"
+            android:paddingBottom="8dp"
+            android:visibility="gone"
             android:scrollbars="vertical" />
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
