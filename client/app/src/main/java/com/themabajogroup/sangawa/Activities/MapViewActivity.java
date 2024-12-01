@@ -60,8 +60,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import kotlin.NotImplementedError;
-
 public class MapViewActivity extends AppCompatActivity implements OnMapReadyCallback, TaskListAdapter.TaskItemClickListener {
 
     private static final int FINE_LOCATION_PERMISSION_REQUEST_CODE = 1;
@@ -118,7 +116,24 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         checkLocationPermissions();
 
         initializeTaskList();
-        userController.fetchProfile();
+        userController.fetchProfile().thenAccept(aBoolean -> {
+
+
+            // TODO: Remove test code
+            TaskDetails details = new TaskDetails(
+               "pQfsXyxqyxOPNTt1bZhAuQyBo4s1",
+               "testing edited",
+                    "try",
+                    100,
+                    100,
+                    TaskVisibility.REQUEST_TO_JOIN,
+                    new Date()
+            );
+            details.setTaskId("0B5cXHjol6wluosUuSt9");
+            sendCollabRequest(details);
+
+        });
+
     }
 
     private void checkLocationPermissions() {
@@ -448,16 +463,47 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                         return;
                     }
 
-                    // TODO: Add listener for collab reply
-
+                    addCollabReplyListener(taskDetails);
                 });
 
         return result;
     }
 
-    // TODO: Push notif when request was replied to
     // TODO: Fetch firestore database for pending collab requests, and add listeners for all of them
     public void addCollabReplyListener(TaskDetails taskDetails) {
+        String requesterId = userController.getCurrentUser().getUid();
 
+        taskController.attachCollabReplyListener(requesterId, taskDetails, new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Map<String, String> data = (Map<String, String>) snapshot.getValue();
+
+                if (data == null) {
+                    return;
+                }
+
+                RequestStatus status = RequestStatus.valueOf(data.get("status"));
+                NotificationSender sender = NotificationSender.getInstance("CollabNotifications", MapViewActivity.this);
+
+                // TODO: (Low Prio) Remove ValueEventListener on ACCEPT/DECLINE
+                if (status == RequestStatus.ACCEPTED) {
+                    String title = "Collaboration request ACCEPTED!";
+                    String description = "Your request to join " + taskDetails.getTitle() + " has been accepted";
+
+                    sender.sendNotification(title, description);
+
+                } else if (status == RequestStatus.DECLINED) {
+                    String title = "Collaboration request DECLINED!";
+                    String description = "Your request to join " + taskDetails.getTitle() + " has been declined";
+
+                    sender.sendNotification(title, description);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

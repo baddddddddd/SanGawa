@@ -224,4 +224,13 @@ public class TaskController {
                 .getRef()
                 .addValueEventListener(listener);
     }
+
+    public void attachCollabReplyListener(String requesterId, TaskDetails taskDetails, ValueEventListener listener) {
+        realtimeDb.child("requests")
+                .child(taskDetails.getUserId())
+                .child(taskDetails.getTaskId())
+                .child(requesterId)
+                .getRef()
+                .addValueEventListener(listener);
+    }
 }
