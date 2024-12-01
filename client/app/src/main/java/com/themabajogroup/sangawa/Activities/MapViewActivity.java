@@ -45,6 +45,7 @@ import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.themabajogroup.sangawa.Controllers.TaskController;
 import com.themabajogroup.sangawa.Controllers.UserController;
 import com.themabajogroup.sangawa.Models.CollabDetails;
+import com.themabajogroup.sangawa.Models.RequestDetails;
 import com.themabajogroup.sangawa.Models.RequestStatus;
 import com.themabajogroup.sangawa.Models.TaskDetails;
 import com.themabajogroup.sangawa.Models.TaskVisibility;
@@ -58,6 +59,7 @@ import com.themabajogroup.sangawa.databinding.ActivityMapViewBinding;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -285,8 +287,9 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             if (itemId == R.id.menu_view_task) {
                 Toast.makeText(this, "View task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
             } else if (itemId == R.id.menu_accept_task) {
-                // TODO: Add logic here for accepting task
-                Toast.makeText(this, task.getTitle() + " Accepted Successfully", Toast.LENGTH_SHORT).show();
+                sendCollabRequest(task).thenAccept(isSuccess -> {
+                    Toast.makeText(this, task.getTitle() + " Accepted Successfully", Toast.LENGTH_SHORT).show();
+                });
             } else if (itemId == R.id.menu_done_task) {
                 Toast.makeText(this, "Finished task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
             } else if (itemId == R.id.menu_edit_task) {
@@ -309,6 +312,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     public void initializeTaskList() {
         refreshUserTaskList().thenAccept(unused -> {
             setupCollabListener();
+            setupPendingCollabRequests();
         });
     }
 
@@ -529,5 +533,24 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
             }
         });
+    }
+
+    public void setupPendingCollabRequests() {
+        String userId = userController.getCurrentUser().getUid();
+
+        taskController.getPendingCollabRequests(userId)
+                .thenAccept(requests -> {
+                    for (RequestDetails details : requests) {
+                        String taskId = details.getTaskId();
+
+                        TaskDetails taskDetails = currentTasks.get(taskId);
+
+                        if (taskDetails == null) {
+                            return;
+                        }
+
+                        addCollabReplyListener(taskDetails);
+                    }
+                });
     }
 }

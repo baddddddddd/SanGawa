@@ -7,6 +7,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.themabajogroup.sangawa.Models.CollabRequest;
+import com.themabajogroup.sangawa.Models.RequestDetails;
 import com.themabajogroup.sangawa.Models.RequestStatus;
 import com.themabajogroup.sangawa.Models.TaskDetails;
 import com.themabajogroup.sangawa.Utils.Converter;
@@ -191,6 +192,7 @@ public class TaskController {
                     requestDetails.put("requesterId", requesterId);
                     requestDetails.put("ownerId", ownerId);
                     requestDetails.put("taskId", taskId);
+                    requestDetails.put("status", RequestStatus.PENDING.name());
 
                     db.collection("requests")
                             .add(requestDetails)
@@ -202,7 +204,6 @@ public class TaskController {
         return result;
     }
 
-    // TODO: Delete pending request in Firestore when new status is not PENDING
     public CompletableFuture<Boolean> updateJoinRequest(String ownerId, String taskId, String requesterId, RequestStatus status) {
         CompletableFuture<Boolean> result = new CompletableFuture<>();
 
@@ -212,8 +213,49 @@ public class TaskController {
                 .child(requesterId)
                 .child("status")
                 .setValue(status)
+                .addOnCompleteListener(rtdbTask -> {
+                    if (!rtdbTask.isSuccessful()) {
+                        result.complete(false);
+                        return;
+                    }
+
+                    Map<String, Object> requestDetails = new HashMap<>();
+                    requestDetails.put("requesterId", requesterId);
+                    requestDetails.put("ownerId", ownerId);
+                    requestDetails.put("taskId", taskId);
+                    requestDetails.put("status", status.name());
+
+                    db.collection("requests")
+                            .add(requestDetails)
+                            .addOnCompleteListener(firestoreTask -> {
+                                result.complete(firestoreTask.isSuccessful());
+                            });
+                });
+
+        return result;
+    }
+
+    public CompletableFuture<List<RequestDetails>> getPendingCollabRequests(String userId) {
+        CompletableFuture<List<RequestDetails>> result = new CompletableFuture<>();
+        db.collection("requests")
+                .whereEqualTo("requesterId", userId)
+                .get()
                 .addOnCompleteListener(task -> {
-                    result.complete(task.isSuccessful());
+                    if (!task.isSuccessful()) {
+                        return;
+                    }
+
+                    List<DocumentSnapshot> documents = task.getResult().getDocuments();
+                    ArrayList<RequestDetails> requests = new ArrayList<>();
+
+                    for (DocumentSnapshot document : documents) {
+                        RequestDetails requestDetails = RequestDetails.fromDocumentSnapshot(document);
+                        if (requestDetails.getStatus() == RequestStatus.PENDING) {
+                            requests.add(requestDetails);
+                        }
+                    }
+
+                    result.complete(requests);
                 });
 
         return result;
