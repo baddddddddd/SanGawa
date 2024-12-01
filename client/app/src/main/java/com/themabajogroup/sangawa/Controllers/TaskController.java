@@ -1,8 +1,13 @@
 package com.themabajogroup.sangawa.Controllers;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.themabajogroup.sangawa.Models.CollabRequest;
+import com.themabajogroup.sangawa.Models.RequestStatus;
 import com.themabajogroup.sangawa.Models.TaskDetails;
 import com.themabajogroup.sangawa.Utils.Converter;
 
@@ -14,9 +19,11 @@ import java.util.concurrent.CompletableFuture;
 public class TaskController {
     private static TaskController instance;
     private final FirebaseFirestore db;
+    private final DatabaseReference realtimeDb;
 
     private TaskController() {
         db = FirebaseFirestore.getInstance();
+        realtimeDb = FirebaseDatabase.getInstance("https://sangawa-db-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference();
     }
 
     public static TaskController getInstance() {
@@ -160,5 +167,44 @@ public class TaskController {
                 });
 
         return result;
+    }
+
+    public CompletableFuture<Boolean> createJoinRequest(String requesterName, String requesterId, String ownerId, String taskId) {
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+
+        CollabRequest requestDetails = new CollabRequest(requesterName, RequestStatus.PENDING);
+
+        realtimeDb.child("requests")
+                .child(ownerId)
+                .child(taskId)
+                .child(requesterId)
+                .setValue(requestDetails)
+                .addOnCompleteListener(task -> {
+                    result.complete(task.isSuccessful());
+                });
+
+        return result;
+    }
+
+    public CompletableFuture<Boolean> updateJoinRequest(String requesterId, String ownerId, String taskId, RequestStatus status) {
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+
+        realtimeDb.child("requests")
+                .child(ownerId)
+                .child(taskId)
+                .child(requesterId)
+                .child("status")
+                .setValue(status)
+                .addOnCompleteListener(task -> {
+                    result.complete(task.isSuccessful());
+                });
+
+        return result;
+    }
+
+    public void attachJoinRequestListener(String userId, ValueEventListener listener) {
+        realtimeDb.child("requests").child(userId)
+                .getRef()
+                .addValueEventListener(listener);
     }
 }
