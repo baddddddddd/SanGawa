@@ -420,8 +420,6 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         String channelId = "CollabRequestChannel";
         NotificationSender sender = NotificationSender.getInstance(channelId, this);
 
-        // TODO: Add quick accept and decline button for collab requests notifications
-
         TaskDetails task = currentTasks.get(collabDetails.getTaskId());
         if (task == null) {
             return;
@@ -429,6 +427,6 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
         String title = "Collaboration request for " + task.getTitle();
         String description = collabDetails.getRequesterName() + " wants to join you!";
-        sender.sendNotification(title, description);
+        sender.sendCollabNotification(title, description, collabDetails.getTaskId(), collabDetails.getRequesterId());
     }
 }

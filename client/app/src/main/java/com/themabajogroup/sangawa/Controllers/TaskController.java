@@ -186,7 +186,7 @@ public class TaskController {
         return result;
     }
 
-    public CompletableFuture<Boolean> updateJoinRequest(String requesterId, String ownerId, String taskId, RequestStatus status) {
+    public CompletableFuture<Boolean> updateJoinRequest(String ownerId, String taskId, String requesterId, RequestStatus status) {
         CompletableFuture<Boolean> result = new CompletableFuture<>();
 
         realtimeDb.child("requests")

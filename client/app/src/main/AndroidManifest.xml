@@ -43,6 +43,10 @@
             android:name=".Utils.GeofenceBroadcastReceiver"
             android:exported="true" />
 
+        <receiver
+            android:name=".Utils.NotificationActionReceiver"
+            android:exported="true" />
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
