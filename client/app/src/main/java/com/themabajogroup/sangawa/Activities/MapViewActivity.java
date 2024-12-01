@@ -56,6 +56,7 @@ import com.themabajogroup.sangawa.databinding.ActivityMapViewBinding;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import kotlin.NotImplementedError;
 
@@ -72,6 +73,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     private TaskController taskController;
     private RecyclerView recyclerViewTasks;
     private Map<String, Map<String, CollabDetails>> collabRequests;
+    private Map<String, TaskDetails> currentTasks;
     private MaterialButtonToggleGroup toggleGroup;
     private MaterialButton userTab;
 
@@ -85,6 +87,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         userController = UserController.getInstance();
         taskController = TaskController.getInstance();
         collabRequests = userController.getCollabRequests();
+        currentTasks = new HashMap<>();
 
         LinearLayout bottomSheet = findViewById(R.id.bottom_sheet);
         BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
@@ -111,9 +114,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         geofencingClient = LocationServices.getGeofencingClient(this);
 
         checkLocationPermissions();
-        setupCollabListener();
-
-        refreshTaskList();
+        initializeTaskList();
     }
 
     private void checkLocationPermissions() {
@@ -286,7 +287,15 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         popupMenu.show();
     }
 
-    public void refreshTaskList() {
+    public void initializeTaskList() {
+        refreshTaskList().thenAccept(unused -> {
+           setupCollabListener();
+        });
+    }
+
+    public CompletableFuture<Void> refreshTaskList() {
+        CompletableFuture<Void> result = new CompletableFuture<>();
+
         recyclerViewTasks = findViewById(R.id.recyclerViewTasks);
         recyclerViewTasks.setLayoutManager(new LinearLayoutManager(this));
 
@@ -295,10 +304,20 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                 boolean isCurrentUserTask = toggleGroup.getCheckedButtonId() == userTab.getId();
                 TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this, isCurrentUserTask);
                 recyclerViewTasks.setAdapter(taskListAdapter);
+
+                currentTasks = new HashMap<>();
+                for (TaskDetails taskDetails : tasks) {
+                    currentTasks.put(taskDetails.getTaskId(), taskDetails);
+                }
+
+                result.complete(null);
+
             } else {
                 Toast.makeText(this, "No tasks found", Toast.LENGTH_SHORT).show();
             }
         });
+
+        return result;
     }
 
     public void refreshUserTaskMarkers() {
@@ -352,34 +371,42 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Map<String, Object> data = (Map<String, Object>) snapshot.getValue();
 
-//                for (Map.Entry<String, Object> entry : data.entrySet()) {
-//                    String taskId = entry.getKey();
-//                    Map<String, Object> requestDetails = (Map<String, Object>) entry.getValue();
-//
-//                    Map.Entry<String, Object> singleEntry = requestDetails.entrySet().iterator().next();
-//                    String requesterId = singleEntry.getKey();
-//
-//                    Map<String, String> details = (Map<String, String>) singleEntry.getValue();
-//                    String requesterName = details.get("requesterName");
-//                    RequestStatus status = RequestStatus.valueOf(details.get("status"));
-//
-//                    if (status != RequestStatus.PENDING) {
-//                        continue;
-//                    }
-//
-//                    CollabDetails collabDetails = new CollabDetails(taskId, requesterId, requesterName, status);
-//
-//                    if (!collabRequests.containsKey(taskId)) {
-//                        collabRequests.put(taskId, new HashMap<>());
-//                    }
-//
-//                    Map<String, CollabDetails> taskCollabs = collabRequests.get(taskId);
-//
-//                    if (!taskCollabs.containsKey(requesterId)) {
-//                        taskCollabs.put(requesterId, collabDetails);
-//                        notifyNewCollab(collabDetails);
-//                    }
-//                }
+                if (data == null) {
+                    return;
+                }
+
+                for (Map.Entry<String, Object> entry : data.entrySet()) {
+                    String taskId = entry.getKey();
+                    Map<String, Object> requestDetails = (Map<String, Object>) entry.getValue();
+
+                    Map.Entry<String, Object> singleEntry = requestDetails.entrySet().iterator().next();
+                    String requesterId = singleEntry.getKey();
+
+                    Map<String, String> details = (Map<String, String>) singleEntry.getValue();
+                    String requesterName = details.get("requesterName");
+                    RequestStatus status = RequestStatus.valueOf(details.get("status"));
+
+                    if (status != RequestStatus.PENDING) {
+                        continue;
+                    }
+
+                    CollabDetails collabDetails = new CollabDetails(taskId, requesterId, requesterName, status);
+
+                    if (!collabRequests.containsKey(taskId)) {
+                        collabRequests.put(taskId, new HashMap<>());
+                    }
+
+                    Map<String, CollabDetails> taskCollabs = collabRequests.get(taskId);
+
+                    if (taskCollabs == null) {
+                        continue;
+                    }
+
+                    if (!taskCollabs.containsKey(requesterId)) {
+                        taskCollabs.put(requesterId, collabDetails);
+                        notifyNewCollab(collabDetails);
+                    }
+                }
             }
 
             @Override
@@ -393,9 +420,14 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         String channelId = "CollabRequestChannel";
         NotificationSender sender = NotificationSender.getInstance(channelId, this);
 
-        // TODO: Use real name of the task for notifications
         // TODO: Add quick accept and decline button for collab requests notifications
-        String title = "Collaboration request for " + collabDetails.getTaskId();
+
+        TaskDetails task = currentTasks.get(collabDetails.getTaskId());
+        if (task == null) {
+            return;
+        }
+
+        String title = "Collaboration request for " + task.getTitle();
         String description = collabDetails.getRequesterName() + " wants to join you!";
         sender.sendNotification(title, description);
     }

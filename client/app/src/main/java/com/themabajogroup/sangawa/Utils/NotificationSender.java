@@ -32,11 +32,11 @@ public class NotificationSender {
     private void createNotificationChannel() {
         NotificationChannel channel = new NotificationChannel(
                 channelId,
-                "Notifications for SanGawa App",
+                "SanGawa App Notifications",
                 NotificationManager.IMPORTANCE_HIGH
         );
 
-        channel.setDescription("Notifications for geofence transitions");
+        channel.setDescription("Notifications for geofence transitions and task collaborations");
 
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (manager != null) {
