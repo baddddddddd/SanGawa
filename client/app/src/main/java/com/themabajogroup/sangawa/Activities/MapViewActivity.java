@@ -34,6 +34,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.themabajogroup.sangawa.Controllers.TaskController;
 import com.themabajogroup.sangawa.Controllers.UserController;
 import com.themabajogroup.sangawa.Models.TaskDetails;
@@ -74,6 +76,10 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         ImageButton btnAddTask = findViewById(R.id.add_task_button);
         TaskDialog editTaskDialog = new TaskDialog(this, TransactionType.ADD);
         btnAddTask.setOnClickListener(view -> editTaskDialog.show(getSupportFragmentManager(), "MapFragment"));
+
+        MaterialButtonToggleGroup toggleGroup = findViewById(R.id.toggleGroup);
+        MaterialButton userTab = findViewById(R.id.usertab);
+        toggleGroup.check(userTab.getId());
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
