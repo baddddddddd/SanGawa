@@ -9,20 +9,24 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.themabajogroup.sangawa.Controllers.TaskController;
+import com.themabajogroup.sangawa.Models.RequestDetails;
 import com.themabajogroup.sangawa.Models.TaskDetails;
 import com.themabajogroup.sangawa.R;
 import java.util.List;
 
 public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskViewHolder> {
 
-    private final List<TaskDetails> tasks;
+    private final List<Object> items;
     private final TaskItemClickListener taskItemClickListener;
     private final Boolean isCurrentUserTask;
+    private final TaskController taskController;
 
-    public TaskListAdapter(List<TaskDetails> tasks, TaskItemClickListener listener, Boolean isCurrentUserTask) {
-        this.tasks = tasks;
+    public TaskListAdapter(List<?> items, TaskItemClickListener listener, Boolean isCurrentUserTask) {
+        this.items = (List<Object>) items;
         this.taskItemClickListener = listener;
         this.isCurrentUserTask = isCurrentUserTask;
+        this.taskController = TaskController.getInstance();
     }
 
     @NonNull
@@ -35,15 +39,30 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
 
     @Override
     public void onBindViewHolder(TaskViewHolder holder, int position) {
-        TaskDetails task = tasks.get(position);
-        holder.textViewTaskTitle.setText(task.getTitle());
-        holder.textViewTaskDescription.setText(task.getDescription());
-        holder.buttonMoreOptions.setOnClickListener(v -> taskItemClickListener.onMoreOptionClick(v, task, isCurrentUserTask));
+        Object item = items.get(position);
+
+        if (item instanceof TaskDetails) {
+            TaskDetails task = (TaskDetails) item;
+            holder.textViewTaskTitle.setText(task.getTitle());
+            holder.textViewTaskDescription.setText(task.getDescription());
+            holder.buttonMoreOptions.setOnClickListener(v ->
+                    taskItemClickListener.onMoreOptionClick(v, task, isCurrentUserTask)
+            );
+        } else if (item instanceof RequestDetails) {
+            RequestDetails request = (RequestDetails) item;
+            taskController.getUserTask(request.getTaskId())
+                    .thenAccept(task -> {
+                        holder.textViewTaskTitle.setText(task.getTitle());
+                        holder.textViewTaskDescription.setText(task.getDescription());
+                        holder.buttonMoreOptions.setOnClickListener(v ->
+                                taskItemClickListener.onMoreOptionClick(v, task, isCurrentUserTask));
+                    });
+        }
     }
 
     @Override
     public int getItemCount() {
-        return tasks.size();
+        return items.size();
     }
 
     public static class TaskViewHolder extends RecyclerView.ViewHolder {
