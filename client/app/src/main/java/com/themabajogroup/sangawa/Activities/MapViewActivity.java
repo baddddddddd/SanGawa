@@ -35,6 +35,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.firebase.database.DataSnapshot;
@@ -59,6 +60,7 @@ import com.themabajogroup.sangawa.Utils.GeofenceBroadcastReceiver;
 import com.themabajogroup.sangawa.Utils.NotificationSender;
 import com.themabajogroup.sangawa.databinding.ActivityMapViewBinding;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,6 +83,8 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     private MaterialButton userTab, sharedTab;
     private RecyclerView recyclerViewUserTasks, recyclerViewNearbyTasks;
     private UserProfile userProfile;
+    private List<Marker> userTaskMarkers;
+    private List<Marker> sharedTaskMarkers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +97,8 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         taskController = TaskController.getInstance();
         collabRequests = userController.getCollabRequests();
         currentTasks = new HashMap<>();
+        userTaskMarkers = new ArrayList<>();
+        sharedTaskMarkers = new ArrayList<>();
 
         LinearLayout bottomSheet = findViewById(R.id.bottom_sheet);
         BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
@@ -389,8 +395,14 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
     }
 
-    // TODO: Remove non-existing task markers
     public void refreshUserTaskMarkers(List<TaskDetails> taskDetailsList) {
+        // Remove existing task markers
+        for (Marker marker : userTaskMarkers) {
+            marker.remove();
+        }
+
+        List<Marker> markers = new ArrayList<>();
+
         for (TaskDetails taskDetails : taskDetailsList) {
             LatLng location = new LatLng(taskDetails.getLocationLat(), taskDetails.getLocationLon());
 
@@ -402,13 +414,20 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                     .title(taskDetails.getTitle())
                     .snippet(taskDetails.getDescription());
 
-            mMap.addMarker(markerOptions);
+            Marker marker = mMap.addMarker(markerOptions);
+            markers.add(marker);
         }
+
+        userTaskMarkers = markers;
     }
 
-    // TODO: Remove non-existing task markers
     public void refreshNearbyTaskMarkers(List<TaskDetails> taskDetailsList) {
-        // TODO: Remove existing nearby task markers, then proceed to add new ones
+        // Remove existing task markers
+        for (Marker marker : sharedTaskMarkers) {
+            marker.remove();
+        }
+
+        List<Marker> markers = new ArrayList<>();
         // TODO: Remove existing geofence for nearby tasks, then proceed to add new ones
         for (TaskDetails taskDetails : taskDetailsList) {
             LatLng location = new LatLng(taskDetails.getLocationLat(), taskDetails.getLocationLon());
@@ -420,8 +439,11 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                     .title(taskDetails.getTitle())
                     .snippet(taskDetails.getDescription());
 
-            mMap.addMarker(markerOptions);
+            Marker marker = mMap.addMarker(markerOptions);
+            markers.add(marker);
         }
+
+        sharedTaskMarkers = markers;
     }
 
     public void setupCollabListener() {
