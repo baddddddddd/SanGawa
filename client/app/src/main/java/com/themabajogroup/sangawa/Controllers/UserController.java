@@ -130,4 +130,18 @@ public class UserController {
 
         return result;
     }
+
+    public CompletableFuture<Boolean> uploadProfile() {
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+        String userId = currentUser.getUid();
+
+        db.collection("users")
+                .document(userId)
+                .set(profile.toMap())
+                .addOnCompleteListener(task -> {
+                    result.complete(task.isSuccessful());
+                });
+
+        return result;
+    }
 }

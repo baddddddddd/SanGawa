@@ -1,5 +1,8 @@
 package com.themabajogroup.sangawa.Models;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class UserProfile {
     private String userId;
     private String email;
@@ -50,5 +53,16 @@ public class UserProfile {
 
     public void setScanRadius(float scanRadius) {
         this.scanRadius = scanRadius;
+    }
+
+    public Map<String, String> toMap() {
+        Map<String, String> map = new HashMap<>();
+
+        map.put("email", email);
+        map.put("username", username);
+        map.put("fencingRadius", fencingRadius.toString());
+        map.put("scanRadius", scanRadius.toString());
+
+        return map;
     }
 }
