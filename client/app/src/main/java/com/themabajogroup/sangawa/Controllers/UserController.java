@@ -66,7 +66,8 @@ public class UserController {
         LatLng currentLocation = getCurrentLocation();
 
         if (currentLocation == null) {
-            currentLocation = new LatLng(13.7839623, 121.0740536);
+            LatLng bsuAlangilan = new LatLng(13.7839623, 121.0740536);
+            currentLocation = bsuAlangilan;
         }
 
         double radius = profile.getScanRadius();

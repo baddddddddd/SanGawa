@@ -54,11 +54,11 @@ import com.themabajogroup.sangawa.Models.UserProfile;
 import com.themabajogroup.sangawa.Overlays.TaskDialog;
 import com.themabajogroup.sangawa.Overlays.TaskListAdapter;
 import com.themabajogroup.sangawa.R;
+import com.themabajogroup.sangawa.Utils.Converter;
 import com.themabajogroup.sangawa.Utils.GeofenceBroadcastReceiver;
 import com.themabajogroup.sangawa.Utils.NotificationSender;
 import com.themabajogroup.sangawa.databinding.ActivityMapViewBinding;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -166,8 +166,8 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
     private void startLocationUpdates() {
         LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(5000); // Update every 5 seconds
-        locationRequest.setFastestInterval(2000); // Fastest update every 2 seconds
+        locationRequest.setInterval(5000);
+        locationRequest.setFastestInterval(2000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         locationCallback = new LocationCallback() {
@@ -178,10 +178,21 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                     return;
                 }
 
-                userController.setCurrentLocation(new LatLng(
+                LatLng lastLocation = userController.getCurrentLocation();
+                LatLng newLocation = new LatLng(
                         locationResult.getLastLocation().getLatitude(),
                         locationResult.getLastLocation().getLongitude()
-                ));
+                );
+                userController.setCurrentLocation(newLocation);
+
+                if (lastLocation != null) {
+                    double distance = Converter.getDistance(lastLocation, newLocation);
+                    final double SCAN_REFRESH_DISTANCE = 1000;
+
+                    if (distance >= SCAN_REFRESH_DISTANCE) {
+                        refreshNearbyTaskList();
+                    }
+                }
             }
         };
 
@@ -332,21 +343,21 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         recyclerViewUserTasks.setLayoutManager(new LinearLayoutManager(this));
 
         userController.fetchUserTasks().thenAccept(tasks -> {
-            if (tasks != null && !tasks.isEmpty()) {
-                TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this, true);
-                recyclerViewUserTasks.setAdapter(taskListAdapter);
-
-                currentTasks = new HashMap<>();
-                for (TaskDetails taskDetails : tasks) {
-                    currentTasks.put(taskDetails.getTaskId(), taskDetails);
-                }
-
-                refreshUserTaskMarkers();
-                result.complete(null);
-
-            } else {
+            if (tasks == null) {
                 Toast.makeText(this, "No tasks found", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this, true);
+            recyclerViewUserTasks.setAdapter(taskListAdapter);
+
+            currentTasks = new HashMap<>();
+            for (TaskDetails taskDetails : tasks) {
+                currentTasks.put(taskDetails.getTaskId(), taskDetails);
+            }
+
+            refreshUserTaskMarkers(tasks);
+            result.complete(null);
         });
 
         return result;
@@ -358,63 +369,59 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         recyclerViewNearbyTasks.setLayoutManager(new LinearLayoutManager(this));
 
         userController.fetchNearbyTasks().thenAccept(tasks -> {
-            if (tasks != null && !tasks.isEmpty()) {
-                TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this, false);
-                recyclerViewNearbyTasks.setAdapter(taskListAdapter);
-
-                currentTasks = new HashMap<>();
-                for (TaskDetails taskDetails : tasks) {
-                    currentTasks.put(taskDetails.getTaskId(), taskDetails);
-                }
-
-                refreshNearbyTaskMarkers();
-
-                result.complete(null);
-
-            } else {
+            if (tasks == null) {
                 Toast.makeText(this, "No tasks found", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this, false);
+            recyclerViewNearbyTasks.setAdapter(taskListAdapter);
+
+            currentTasks = new HashMap<>();
+            for (TaskDetails taskDetails : tasks) {
+                currentTasks.put(taskDetails.getTaskId(), taskDetails);
+            }
+
+            refreshNearbyTaskMarkers(tasks);
+
+            result.complete(null);
         });
 
     }
 
-    public void refreshUserTaskMarkers() {
-        userController.fetchUserTasks()
-                .thenAccept(taskDetailsList -> {
-                    for (TaskDetails taskDetails : taskDetailsList) {
-                        LatLng location = new LatLng(taskDetails.getLocationLat(), taskDetails.getLocationLon());
+    // TODO: Remove non-existing task markers
+    public void refreshUserTaskMarkers(List<TaskDetails> taskDetailsList) {
+        for (TaskDetails taskDetails : taskDetailsList) {
+            LatLng location = new LatLng(taskDetails.getLocationLat(), taskDetails.getLocationLon());
 
-                        // TODO: Do not create new geofence for existing tasks
-                        setupGeofence(taskDetails.getTitle(), location, userProfile.getFencingRadius());
+            // TODO: Do not create new geofence for existing tasks
+            setupGeofence(taskDetails.getTitle(), location, userProfile.getFencingRadius());
 
-                        MarkerOptions markerOptions = new MarkerOptions()
-                                .position(location)
-                                .title(taskDetails.getTitle())
-                                .snippet(taskDetails.getDescription());
+            MarkerOptions markerOptions = new MarkerOptions()
+                    .position(location)
+                    .title(taskDetails.getTitle())
+                    .snippet(taskDetails.getDescription());
 
-                        mMap.addMarker(markerOptions);
-                    }
-                });
+            mMap.addMarker(markerOptions);
+        }
     }
 
-    public void refreshNearbyTaskMarkers() {
+    // TODO: Remove non-existing task markers
+    public void refreshNearbyTaskMarkers(List<TaskDetails> taskDetailsList) {
         // TODO: Remove existing nearby task markers, then proceed to add new ones
         // TODO: Remove existing geofence for nearby tasks, then proceed to add new ones
-        userController.fetchNearbyTasks()
-                .thenAccept(taskDetailsList -> {
-                    for (TaskDetails taskDetails : taskDetailsList) {
-                        LatLng location = new LatLng(taskDetails.getLocationLat(), taskDetails.getLocationLon());
+        for (TaskDetails taskDetails : taskDetailsList) {
+            LatLng location = new LatLng(taskDetails.getLocationLat(), taskDetails.getLocationLon());
 
-                        setupGeofence(taskDetails.getTitle(), location, userProfile.getFencingRadius());
+            setupGeofence(taskDetails.getTitle(), location, userProfile.getFencingRadius());
 
-                        MarkerOptions markerOptions = new MarkerOptions()
-                                .position(location)
-                                .title(taskDetails.getTitle())
-                                .snippet(taskDetails.getDescription());
+            MarkerOptions markerOptions = new MarkerOptions()
+                    .position(location)
+                    .title(taskDetails.getTitle())
+                    .snippet(taskDetails.getDescription());
 
-                        mMap.addMarker(markerOptions);
-                    }
-                });
+            mMap.addMarker(markerOptions);
+        }
     }
 
     public void setupCollabListener() {

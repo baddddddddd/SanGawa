@@ -206,7 +206,6 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
     private void handleTaskResult(boolean success, String action) {
         if (success) {
             mapViewActivity.refreshUserTaskList();
-            mapViewActivity.refreshUserTaskMarkers();
             Toast.makeText(getContext(), "Task " + action + " successfully!", Toast.LENGTH_SHORT).show();
             dismiss();
         } else {
