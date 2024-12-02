@@ -252,6 +252,18 @@ public class TaskController {
         return result;
     }
 
+    public CompletableFuture<Boolean> removeJoinRequest(String ownerId, String taskid, String requesterId) {
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+
+        String path = String.format("requests/%s/%s/%s", ownerId, taskid, requesterId);
+
+        realtimeDb.child(path).setValue(null).addOnCompleteListener(task -> {
+            result.complete(task.isSuccessful());
+        });
+
+        return result;
+    }
+
     public CompletableFuture<List<RequestDetails>> getRequestHistory(String userId) {
         CompletableFuture<List<RequestDetails>> result = new CompletableFuture<>();
         db.collection("requests")

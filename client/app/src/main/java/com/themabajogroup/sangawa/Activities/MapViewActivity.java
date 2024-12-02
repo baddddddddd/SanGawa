@@ -586,18 +586,21 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                 RequestStatus status = RequestStatus.valueOf(data.get("status"));
                 NotificationSender sender = NotificationSender.getInstance("CollabNotifications", MapViewActivity.this);
 
-                // TODO: (Low Prio) Remove ValueEventListener on ACCEPT/DECLINE
                 if (status == RequestStatus.ACCEPTED) {
                     String title = "Collaboration request ACCEPTED!";
                     String description = "Your request to join " + taskDetails.getTitle() + " has been accepted";
 
                     sender.sendNotification(title, description);
 
+                    removeCollabListener(taskDetails);
+
                 } else if (status == RequestStatus.DECLINED) {
                     String title = "Collaboration request DECLINED!";
                     String description = "Your request to join " + taskDetails.getTitle() + " has been declined";
 
                     sender.sendNotification(title, description);
+
+                    removeCollabListener(taskDetails);
                 }
             }
 
@@ -643,6 +646,17 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             currentTasks.put(taskId, taskDetails);
             result.complete(taskDetails);
         });
+
+        return result;
+    }
+
+    public CompletableFuture<Boolean> removeCollabListener(TaskDetails taskDetails) {
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+
+        String requesterId = userController.getCurrentUser().getUid();
+        String ownerId = taskDetails.getUserId();
+        String taskId = taskDetails.getTaskId();
+        taskController.removeJoinRequest(ownerId, taskId, requesterId).thenAccept(result::complete);
 
         return result;
     }
