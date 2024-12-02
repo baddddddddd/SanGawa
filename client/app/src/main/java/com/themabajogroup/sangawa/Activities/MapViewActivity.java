@@ -130,9 +130,9 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         geofencingClient = LocationServices.getGeofencingClient(this);
 
         checkLocationPermissions();
-
-        initializeTaskList();
         userController.fetchProfile().thenAccept(isSuccess -> {
+            initializeTaskList();
+
             if (isSuccess) {
                 userProfile = userController.getProfile();
             } else {
@@ -268,8 +268,6 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
-
-        refreshUserTaskMarkers();
     }
 
 
@@ -313,7 +311,6 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                 return false;
             }
             refreshUserTaskList();
-            refreshUserTaskMarkers();
             return true;
         });
 
@@ -325,6 +322,8 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             setupCollabListener();
             setupPendingCollabRequests();
         });
+        refreshNearbyTaskList();
+
     }
 
     public CompletableFuture<Void> refreshUserTaskList() {
@@ -342,14 +341,13 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                     currentTasks.put(taskDetails.getTaskId(), taskDetails);
                 }
 
+                refreshUserTaskMarkers();
                 result.complete(null);
 
             } else {
                 Toast.makeText(this, "No tasks found", Toast.LENGTH_SHORT).show();
             }
         });
-
-        refreshNearbyTaskList();
 
         return result;
     }
@@ -368,6 +366,8 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                 for (TaskDetails taskDetails : tasks) {
                     currentTasks.put(taskDetails.getTaskId(), taskDetails);
                 }
+
+                refreshNearbyTaskMarkers();
 
                 result.complete(null);
 
@@ -395,9 +395,6 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                         mMap.addMarker(markerOptions);
                     }
                 });
-
-        // TODO: Only call this function when user has moved a certain amount of distance to conserve resources
-        refreshNearbyTaskMarkers();
     }
 
     public void refreshNearbyTaskMarkers() {

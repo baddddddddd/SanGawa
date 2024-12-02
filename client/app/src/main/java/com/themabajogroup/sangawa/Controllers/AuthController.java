@@ -51,6 +51,8 @@ public class AuthController {
                         Map<String, Object> user = new HashMap<>();
                         user.put("email", email);
                         user.put("username", username);
+                        user.put("fencingRadius", 1000);
+                        user.put("scanRadius", 3000);
 
                         db.collection("users")
                                 .document(userId)

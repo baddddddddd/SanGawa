@@ -120,8 +120,8 @@ public class UserController {
 
                     String email = (String) document.get("email");
                     String username = (String) document.get("username");
-                    float fencingRadius = (float) document.get("fencingRadius");
-                    float scanRadius = (float) document.get("scanRadius");
+                    float fencingRadius = Float.parseFloat(document.get("fencingRadius").toString());
+                    float scanRadius = Float.parseFloat(document.get("scanRadius").toString());
 
                     setProfile(new UserProfile(userId, email, username, fencingRadius, scanRadius));
                     result.complete(true);
