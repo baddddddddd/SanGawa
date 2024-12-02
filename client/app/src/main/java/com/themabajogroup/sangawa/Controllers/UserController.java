@@ -63,8 +63,11 @@ public class UserController {
         // TODO: Potentially bad coupling again, but whatever
 
         String userId = currentUser.getUid();
-//        LatLng currentLocation = getCurrentLocation();
-        LatLng currentLocation = new LatLng(13.7839623, 121.0740536); // TODO: temp location
+        LatLng currentLocation = getCurrentLocation();
+
+        if (currentLocation == null) {
+            currentLocation = new LatLng(13.7839623, 121.0740536);
+        }
 
         // TODO: Radius should be adjustable by user
         double radius = 3000;

@@ -500,7 +500,6 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         return result;
     }
 
-    // TODO: Fetch firestore database for pending collab requests, and add listeners for all of them
     public void addCollabReplyListener(TaskDetails taskDetails) {
         String requesterId = userController.getCurrentUser().getUid();
 
