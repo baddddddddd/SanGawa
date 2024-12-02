@@ -69,8 +69,7 @@ public class UserController {
             currentLocation = new LatLng(13.7839623, 121.0740536);
         }
 
-        // TODO: Radius should be adjustable by user
-        double radius = 3000;
+        double radius = profile.getScanRadius();
 
         CompletableFuture<List<TaskDetails>> result = new CompletableFuture<>();
         taskController.getNearbyTasks(userId, currentLocation.latitude, currentLocation.longitude, radius)
@@ -121,8 +120,10 @@ public class UserController {
 
                     String email = (String) document.get("email");
                     String username = (String) document.get("username");
+                    float fencingRadius = (float) document.get("fencingRadius");
+                    float scanRadius = (float) document.get("scanRadius");
 
-                    setProfile(new UserProfile(userId, email, username));
+                    setProfile(new UserProfile(userId, email, username, fencingRadius, scanRadius));
                     result.complete(true);
                 });
 

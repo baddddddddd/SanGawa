@@ -50,6 +50,7 @@ import com.themabajogroup.sangawa.Models.RequestStatus;
 import com.themabajogroup.sangawa.Models.TaskDetails;
 import com.themabajogroup.sangawa.Models.TaskVisibility;
 import com.themabajogroup.sangawa.Models.TransactionType;
+import com.themabajogroup.sangawa.Models.UserProfile;
 import com.themabajogroup.sangawa.Overlays.TaskDialog;
 import com.themabajogroup.sangawa.Overlays.TaskListAdapter;
 import com.themabajogroup.sangawa.R;
@@ -79,6 +80,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     private MaterialButtonToggleGroup toggleGroup;
     private MaterialButton userTab, sharedTab;
     private RecyclerView recyclerViewUserTasks, recyclerViewNearbyTasks;
+    private UserProfile userProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,7 +132,13 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         checkLocationPermissions();
 
         initializeTaskList();
-        userController.fetchProfile();
+        userController.fetchProfile().thenAccept(isSuccess -> {
+            if (isSuccess) {
+                userProfile = userController.getProfile();
+            } else {
+                Toast.makeText(MapViewActivity.this, "Unable to get profile information.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void checkLocationPermissions() {
@@ -376,9 +384,8 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                     for (TaskDetails taskDetails : taskDetailsList) {
                         LatLng location = new LatLng(taskDetails.getLocationLat(), taskDetails.getLocationLon());
 
-                        // TODO: Radius must be adjustable by users for own tasks
                         // TODO: Do not create new geofence for existing tasks
-                        setupGeofence(taskDetails.getTitle(), location, 1000);
+                        setupGeofence(taskDetails.getTitle(), location, userProfile.getFencingRadius());
 
                         MarkerOptions markerOptions = new MarkerOptions()
                                 .position(location)
@@ -401,8 +408,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                     for (TaskDetails taskDetails : taskDetailsList) {
                         LatLng location = new LatLng(taskDetails.getLocationLat(), taskDetails.getLocationLon());
 
-                        // TODO: Radius must be adjustable by users for collaborative tasks
-                        setupGeofence(taskDetails.getTitle(), location, 1000);
+                        setupGeofence(taskDetails.getTitle(), location, userProfile.getFencingRadius());
 
                         MarkerOptions markerOptions = new MarkerOptions()
                                 .position(location)
