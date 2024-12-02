@@ -252,7 +252,7 @@ public class TaskController {
         return result;
     }
 
-    public CompletableFuture<List<RequestDetails>> getPendingCollabRequests(String userId) {
+    public CompletableFuture<List<RequestDetails>> getRequestHistory(String userId) {
         CompletableFuture<List<RequestDetails>> result = new CompletableFuture<>();
         db.collection("requests")
                 .whereEqualTo("requesterId", userId)
@@ -267,9 +267,7 @@ public class TaskController {
 
                     for (DocumentSnapshot document : documents) {
                         RequestDetails requestDetails = RequestDetails.fromDocumentSnapshot(document);
-                        if (requestDetails.getStatus() == RequestStatus.PENDING) {
-                            requests.add(requestDetails);
-                        }
+                        requests.add(requestDetails);
                     }
 
                     result.complete(requests);

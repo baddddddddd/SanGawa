@@ -49,7 +49,6 @@ import com.themabajogroup.sangawa.Models.CollabDetails;
 import com.themabajogroup.sangawa.Models.RequestDetails;
 import com.themabajogroup.sangawa.Models.RequestStatus;
 import com.themabajogroup.sangawa.Models.TaskDetails;
-import com.themabajogroup.sangawa.Models.TaskVisibility;
 import com.themabajogroup.sangawa.Models.TransactionType;
 import com.themabajogroup.sangawa.Models.UserProfile;
 import com.themabajogroup.sangawa.Overlays.TaskDialog;
@@ -210,6 +209,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         }
     }
 
+    // TODO: Setup Geofence for Join shared tasks only
     private void setupGeofence(String id, LatLng latLng, float radius) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             checkLocationPermissions();
@@ -229,8 +229,6 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                         .addGeofence(geofence)
                         .build(),
                 getGeofencePendingIntent()
-        ).addOnSuccessListener(aVoid ->
-                Toast.makeText(this, "Geofence added successfully!", Toast.LENGTH_SHORT).show()
         ).addOnFailureListener(e ->
                 Toast.makeText(this, "Failed to add task geofence: " + e.getMessage(), Toast.LENGTH_SHORT).show()
         );
@@ -363,7 +361,6 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this, true);
             recyclerViewUserTasks.setAdapter(taskListAdapter);
 
-            currentTasks = new HashMap<>();
             for (TaskDetails taskDetails : tasks) {
                 currentTasks.put(taskDetails.getTaskId(), taskDetails);
             }
@@ -395,7 +392,6 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                     TaskListAdapter taskListAdapter = new TaskListAdapter(filteredTasks, this, false);
                     recyclerViewNearbyTasks.setAdapter(taskListAdapter);
 
-                    currentTasks = new HashMap<>();
                     for (TaskDetails taskDetails : filteredTasks) {
                         currentTasks.put(taskDetails.getTaskId(), taskDetails);
                     }
@@ -416,7 +412,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         LinearLayout pendingLayout = findViewById(R.id.layout_pending);
         recyclerViewPendingRequests.setLayoutManager(new LinearLayoutManager(this));
 
-        taskController.getPendingCollabRequests(userController.getCurrentUser().getUid()).thenAccept(request -> {
+        taskController.getRequestHistory(userController.getCurrentUser().getUid()).thenAccept(request -> {
             if (request != null && !request.isEmpty()) {
                 pendingLayout.setVisibility(View.VISIBLE);
                 TaskListAdapter taskListAdapter = new TaskListAdapter(request, this, false);
@@ -424,7 +420,9 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
                 currentRequests = new HashMap<>();
                 for (RequestDetails requestDetails : request) {
-                    currentRequests.put(requestDetails.getTaskId(), requestDetails);
+                    if (requestDetails.getStatus() == RequestStatus.PENDING) {
+                        currentRequests.put(requestDetails.getTaskId(), requestDetails);
+                    }
                 }
 
             } else{
@@ -612,19 +610,39 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     public void setupPendingCollabRequests() {
         String userId = userController.getCurrentUser().getUid();
 
-        taskController.getPendingCollabRequests(userId)
+        taskController.getRequestHistory(userId)
                 .thenAccept(requests -> {
+
                     for (RequestDetails details : requests) {
                         String taskId = details.getTaskId();
 
                         TaskDetails taskDetails = currentTasks.get(taskId);
 
-                        if (taskDetails == null) {
-                            return;
+                        if (taskDetails != null) {
+                            addCollabReplyListener(taskDetails);
+                            continue;
                         }
 
-                        addCollabReplyListener(taskDetails);
+                        getTaskByIdForced(taskId).thenAccept(fetchedTaskDetails -> {
+                           addCollabReplyListener(fetchedTaskDetails);
+                        });
                     }
                 });
+    }
+
+    public CompletableFuture<TaskDetails> getTaskByIdForced(String taskId) {
+        CompletableFuture<TaskDetails> result = new CompletableFuture<>();
+
+        if (currentTasks.containsKey(taskId)) {
+            result.complete(currentTasks.get(taskId));
+            return result;
+        }
+
+        taskController.getUserTask(taskId).thenAccept(taskDetails -> {
+            currentTasks.put(taskId, taskDetails);
+            result.complete(taskDetails);
+        });
+
+        return result;
     }
 }
