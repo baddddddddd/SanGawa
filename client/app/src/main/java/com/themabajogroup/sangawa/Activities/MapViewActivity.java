@@ -98,6 +98,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         taskController = TaskController.getInstance();
         collabRequests = userController.getCollabRequests();
         currentTasks = new HashMap<>();
+        currentRequests = new HashMap<>();
         userTaskMarkers = new ArrayList<>();
         sharedTaskMarkers = new ArrayList<>();
 
@@ -377,9 +378,16 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         LinearLayout nearbyLayout = findViewById(R.id.layout_nearby);
 
         userController.fetchNearbyTasks().thenAccept(tasks -> {
+            System.out.println("AWDAWD 1: " + tasks);
+
             if (tasks != null && !tasks.isEmpty()) {
+                System.out.println("AWDAWD HERE: " + currentRequests);
+
                 List<TaskDetails> filteredTasks = new ArrayList<>();
                 Set<String> pendingRequestIds = currentRequests.keySet();
+
+                System.out.println("AWDAWD END: " + tasks);
+
 
                 for (TaskDetails task : tasks) {
                     if (!pendingRequestIds.contains(task.getTaskId())) {
@@ -399,6 +407,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                 } else {
                     nearbyLayout.setVisibility(View.GONE);
                 }
+
                 refreshNearbyTaskMarkers(tasks);
             } else {
                 nearbyLayout.setVisibility(View.GONE);
@@ -418,7 +427,6 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                 TaskListAdapter taskListAdapter = new TaskListAdapter(request, this, false);
                 recyclerViewPendingRequests.setAdapter(taskListAdapter);
 
-                currentRequests = new HashMap<>();
                 for (RequestDetails requestDetails : request) {
                     if (requestDetails.getStatus() == RequestStatus.PENDING) {
                         currentRequests.put(requestDetails.getTaskId(), requestDetails);
@@ -464,6 +472,9 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         for (Marker marker : sharedTaskMarkers) {
             marker.remove();
         }
+
+        System.out.println("AWDAWD 2: " + taskDetailsList);
+
 
         List<Marker> markers = new ArrayList<>();
         // TODO: Remove existing geofence for nearby tasks, then proceed to add new ones
