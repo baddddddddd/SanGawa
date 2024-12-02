@@ -6,6 +6,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.themabajogroup.sangawa.Models.CollabRequest;
 import com.themabajogroup.sangawa.Models.RequestDetails;
 import com.themabajogroup.sangawa.Models.RequestStatus;
@@ -226,9 +228,24 @@ public class TaskController {
                     requestDetails.put("status", status.name());
 
                     db.collection("requests")
-                            .add(requestDetails)
+                            .whereEqualTo("requesterId", requesterId)
+                            .whereEqualTo("taskId", taskId)
+                            .get()
                             .addOnCompleteListener(firestoreTask -> {
-                                result.complete(firestoreTask.isSuccessful());
+                                if (!firestoreTask.isSuccessful()) {
+                                    result.complete(false);
+                                    return;
+                                }
+
+                                WriteBatch batch = db.batch();
+                                for (QueryDocumentSnapshot document : firestoreTask.getResult()) {
+                                    batch.update(document.getReference(), requestDetails);
+                                    break;
+                                }
+
+                                batch.commit().addOnCompleteListener(task -> {
+                                    result.complete(task.isSuccessful());
+                                });
                             });
                 });
 
