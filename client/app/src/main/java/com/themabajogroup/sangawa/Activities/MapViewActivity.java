@@ -368,70 +368,65 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         CompletableFuture<Void> result = new CompletableFuture<>();
 
         RecyclerView recyclerViewActiveTask = findViewById(R.id.recyclerViewActiveTasks);
-        RecyclerView recyclerViewDueTask = findViewById(R.id.recyclerViewOverdueTasks);
-        RecyclerView recyclerViewCompletedTask = findViewById(R.id.recyclerViewCompletedTasks);
-
         LinearLayout activeLayout = findViewById(R.id.layout_active);
-        LinearLayout dueLayout = findViewById(R.id.layout_due);
-        LinearLayout completedLayout = findViewById(R.id.layout_complete);
+        recyclerViewActiveTask.setLayoutManager(new LinearLayoutManager(this));
 
-        setRecyclerViewLayoutManager(recyclerViewActiveTask);
-        setRecyclerViewLayoutManager(recyclerViewDueTask);
-        setRecyclerViewLayoutManager(recyclerViewCompletedTask);
+        RecyclerView recyclerViewDueTask = findViewById(R.id.recyclerViewOverdueTasks);
+        LinearLayout dueLayout = findViewById(R.id.layout_due);
+        recyclerViewDueTask.setLayoutManager(new LinearLayoutManager(this));
+
+        RecyclerView recyclerViewCompletedTask = findViewById(R.id.recyclerViewCompletedTasks);
+        LinearLayout completedLayout = findViewById(R.id.layout_complete);
+        recyclerViewCompletedTask.setLayoutManager(new LinearLayoutManager(this));
 
         userController.fetchUserTasks().thenAccept(tasks -> {
             if (tasks != null) {
-                Map<String, TaskDetails> activeTasks = filterTasksByStatus(tasks, TaskStatus.PENDING, activeLayout, recyclerViewActiveTask);
-                Map<String, TaskDetails> dueTasks = filterTasksByDeadline(tasks, dueLayout, recyclerViewDueTask);
-                Map<String, TaskDetails> completedTasks = filterTasksByStatus(tasks, TaskStatus.COMPLETED, completedLayout, recyclerViewCompletedTask);
+                List<TaskDetails> activeTask = tasks.stream()
+                        .filter(r -> r.getStatus() == TaskStatus.PENDING)
+                        .peek(r -> currentTasks.put(r.getTaskId(), r))
+                        .collect(Collectors.toList());
+
+                List<TaskDetails> dueTask = tasks.stream()
+                        .filter(r -> LocalDateTime.ofInstant(r.getDeadline().toInstant(), ZoneId.systemDefault()).isBefore(LocalDateTime.now()))
+                        .peek(r -> currentTasks.put(r.getTaskId(), r))
+                        .collect(Collectors.toList());
+
+                List<TaskDetails> completedTask = tasks.stream()
+                        .filter(r -> r.getStatus() == TaskStatus.COMPLETED)
+                        .peek(r -> currentTasks.put(r.getTaskId(), r))
+                        .collect(Collectors.toList());
+
+                if (!activeTask.isEmpty()) {
+                    activeLayout.setVisibility(View.VISIBLE);
+                    recyclerViewActiveTask.setAdapter(new TaskListAdapter(activeTask, this, true));
+                } else {
+                    activeLayout.setVisibility(View.GONE);
+                }
+
+                if (!dueTask.isEmpty()) {
+                    dueLayout.setVisibility(View.VISIBLE);
+                    recyclerViewDueTask.setAdapter(new TaskListAdapter(dueTask, this, true));
+                } else {
+                    dueLayout.setVisibility(View.GONE);
+                }
+
+                if (!completedTask.isEmpty()) {
+                    completedLayout.setVisibility(View.VISIBLE);
+                    recyclerViewCompletedTask.setAdapter(new TaskListAdapter(completedTask, this, true));
+                } else {
+                    completedLayout.setVisibility(View.GONE);
+                }
 
                 refreshUserTaskMarkers(tasks);
+                result.complete(null);
             } else {
-                hideAllLayouts(activeLayout, dueLayout, completedLayout);
+                activeLayout.setVisibility(View.GONE);
+                dueLayout.setVisibility(View.GONE);
+                completedLayout.setVisibility(View.GONE);
             }
-            result.complete(null);
         });
 
         return result;
-    }
-
-    private void setRecyclerViewLayoutManager(RecyclerView recyclerView) {
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-    }
-
-    private Map<String, TaskDetails> filterTasksByStatus(List<TaskDetails> tasks, TaskStatus status, LinearLayout layout, RecyclerView recyclerView) {
-        List<TaskDetails> filteredTasks = tasks.stream()
-                .filter(task -> task.getStatus() == status)
-                .peek(task -> currentTasks.put(task.getTaskId(), task))
-                .collect(Collectors.toList());
-
-        setRecyclerViewVisibility(filteredTasks, layout, recyclerView);
-        return filteredTasks.stream().collect(Collectors.toMap(TaskDetails::getTaskId, task -> task));
-    }
-
-    private Map<String, TaskDetails> filterTasksByDeadline(List<TaskDetails> tasks, LinearLayout layout, RecyclerView recyclerView) {
-        List<TaskDetails> filteredTasks = tasks.stream()
-                .filter(task -> LocalDateTime.ofInstant(task.getDeadline().toInstant(), ZoneId.systemDefault()).isBefore(LocalDateTime.now()))
-                .peek(task -> currentTasks.put(task.getTaskId(), task))
-                .collect(Collectors.toList());
-
-        setRecyclerViewVisibility(filteredTasks, layout, recyclerView);
-        return filteredTasks.stream().collect(Collectors.toMap(TaskDetails::getTaskId, task -> task));
-    }
-
-    private void setRecyclerViewVisibility(List<?> tasks, LinearLayout layout, RecyclerView recyclerView) {
-        if (!tasks.isEmpty()) {
-            layout.setVisibility(View.VISIBLE);
-            recyclerView.setAdapter(new TaskListAdapter(tasks, this, true));
-        } else {
-            layout.setVisibility(View.GONE);
-        }
-    }
-
-    private void hideAllLayouts(LinearLayout... layouts) {
-        for (LinearLayout layout : layouts) {
-            layout.setVisibility(View.GONE);
-        }
     }
 
     public void refreshNearbyTaskList() {
@@ -440,13 +435,27 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
         userController.fetchNearbyTasks().thenAccept(tasks -> {
             if (tasks != null && !tasks.isEmpty()) {
-                List<TaskDetails> filteredTasks = tasks.stream()
-                        .filter(task -> !currentRequests.containsKey(task.getTaskId()))
-                        .collect(Collectors.toList());
+                List<TaskDetails> filteredTasks = new ArrayList<>();
+                Set<String> pendingRequestIds = currentRequests.keySet();
 
-                setRecyclerViewVisibility(filteredTasks, nearbyLayout, recyclerViewNearbyTasks);
+                for (TaskDetails task : tasks) {
+                    if (!pendingRequestIds.contains(task.getTaskId())) {
+                        filteredTasks.add(task);
+                    }
+                }
 
-                filteredTasks.forEach(task -> currentTasks.put(task.getTaskId(), task));
+                if (!filteredTasks.isEmpty()) {
+                    nearbyLayout.setVisibility(View.VISIBLE);
+                    TaskListAdapter taskListAdapter = new TaskListAdapter(filteredTasks, this, false);
+                    recyclerViewNearbyTasks.setAdapter(taskListAdapter);
+
+                    for (TaskDetails taskDetails : filteredTasks) {
+                        currentTasks.put(taskDetails.getTaskId(), taskDetails);
+                    }
+
+                } else {
+                    nearbyLayout.setVisibility(View.GONE);
+                }
 
                 refreshNearbyTaskMarkers(tasks);
             } else {
@@ -457,32 +466,43 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
     public void refreshCollabLists() {
         RecyclerView recyclerViewPending = findViewById(R.id.recyclerViewPendingRequest);
-        RecyclerView recyclerViewJoined = findViewById(R.id.recyclerViewJoinedTasks);
-
         LinearLayout pendingLayout = findViewById(R.id.layout_pending);
-        LinearLayout joinedLayout = findViewById(R.id.layout_joined);
+        recyclerViewPending.setLayoutManager(new LinearLayoutManager(this));
 
-        setRecyclerViewLayoutManager(recyclerViewPending);
-        setRecyclerViewLayoutManager(recyclerViewJoined);
+        RecyclerView recyclerViewJoined = findViewById(R.id.recyclerViewJoinedTasks);
+        LinearLayout joinedLayout = findViewById(R.id.layout_joined);
+        recyclerViewJoined.setLayoutManager(new LinearLayoutManager(this));
 
         taskController.getRequestHistory(userController.getCurrentUser().getUid()).thenAccept(request -> {
             if (request != null) {
-                List<RequestDetails> pendingRequests = filterRequestsByStatus(request, RequestStatus.PENDING, pendingLayout, recyclerViewPending);
-                List<RequestDetails> acceptedRequests = filterRequestsByStatus(request, RequestStatus.ACCEPTED, joinedLayout, recyclerViewJoined);
+                List<RequestDetails> pendingRequests = request.stream()
+                        .filter(r -> r.getStatus() == RequestStatus.PENDING)
+                        .peek(r -> currentRequests.put(r.getTaskId(), r))
+                        .collect(Collectors.toList());
+
+                List<RequestDetails> acceptedRequests = request.stream()
+                        .filter(r -> r.getStatus() == RequestStatus.ACCEPTED)
+                        .peek(r -> currentRequests.put(r.getTaskId(), r))
+                        .collect(Collectors.toList());
+
+                if (!pendingRequests.isEmpty()) {
+                    pendingLayout.setVisibility(View.VISIBLE);
+                    recyclerViewPending.setAdapter(new TaskListAdapter(pendingRequests, this, false));
+                } else {
+                    pendingLayout.setVisibility(View.GONE);
+                }
+
+                if (!acceptedRequests.isEmpty()) {
+                    joinedLayout.setVisibility(View.VISIBLE);
+                    recyclerViewJoined.setAdapter(new TaskListAdapter(acceptedRequests, this, false));
+                } else {
+                    joinedLayout.setVisibility(View.GONE);
+                }
             } else {
-                hideAllLayouts(pendingLayout, joinedLayout);
+                pendingLayout.setVisibility(View.GONE);
+                joinedLayout.setVisibility(View.GONE);
             }
         });
-    }
-
-    private List<RequestDetails> filterRequestsByStatus(List<RequestDetails> requests, RequestStatus status, LinearLayout layout, RecyclerView recyclerView) {
-        List<RequestDetails> filteredRequests = requests.stream()
-                .filter(request -> request.getStatus() == status)
-                .peek(request -> currentRequests.put(request.getTaskId(), request))
-                .collect(Collectors.toList());
-
-        setRecyclerViewVisibility(filteredRequests, layout, recyclerView);
-        return filteredRequests;
     }
 
     public void refreshUserTaskMarkers(List<TaskDetails> taskDetailsList) {
