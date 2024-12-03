@@ -50,6 +50,7 @@ import com.themabajogroup.sangawa.Models.CollabDetails;
 import com.themabajogroup.sangawa.Models.RequestDetails;
 import com.themabajogroup.sangawa.Models.RequestStatus;
 import com.themabajogroup.sangawa.Models.TaskDetails;
+import com.themabajogroup.sangawa.Models.TaskStatus;
 import com.themabajogroup.sangawa.Models.TransactionType;
 import com.themabajogroup.sangawa.Models.UserProfile;
 import com.themabajogroup.sangawa.Overlays.TaskDialog;
@@ -62,6 +63,7 @@ import com.themabajogroup.sangawa.databinding.ActivityMapViewBinding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -87,7 +89,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     private UserProfile userProfile;
     private List<Marker> userTaskMarkers;
     private List<Marker> sharedTaskMarkers;
-    private int geofenceRequestCode = -1;
+    private Set<String> geofencedTasks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +105,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         currentRequests = new HashMap<>();
         userTaskMarkers = new ArrayList<>();
         sharedTaskMarkers = new ArrayList<>();
+        geofencedTasks = new HashSet<>();
 
         LinearLayout bottomSheet = findViewById(R.id.bottom_sheet);
         BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
@@ -219,6 +222,10 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             return;
         }
 
+        if (geofencedTasks.contains(taskDetails.getTaskId())) {
+            return;
+        }
+
         Geofence geofence = new Geofence.Builder()
                 .setRequestId(taskDetails.getTaskId())
                 .setCircularRegion(latLng.latitude, latLng.longitude, radius)
@@ -227,8 +234,6 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                 .build();
 
         Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
-        intent.putExtra("TASK_TITLE", taskDetails.getTitle());
-
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 
         geofencingClient.addGeofences(
@@ -237,6 +242,8 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                         .addGeofence(geofence)
                         .build(),
                 pendingIntent
+        ).addOnSuccessListener(aVoid ->
+                geofencedTasks.add(taskDetails.getTaskId())
         ).addOnFailureListener(e ->
                 Toast.makeText(this, "Failed to add task geofence: " + taskDetails.getTitle(), Toast.LENGTH_SHORT).show()
         );
@@ -322,6 +329,8 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                     refreshCollabLists();
                 });
             } else if (itemId == R.id.menu_done_task) {
+                geofencingClient.removeGeofences(List.of(task.getTaskId()));
+                geofencedTasks.remove(task.getTaskId());
                 Toast.makeText(this, "Finished task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
             } else if (itemId == R.id.menu_edit_task) {
                 TaskDialog editTaskDialog = new TaskDialog(this, TransactionType.EDIT, task);
@@ -329,6 +338,9 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                 refreshUserTaskList();
             } else if (itemId == R.id.menu_delete_task) {
                 taskController.deleteUserTask(task.getTaskId());
+                currentTasks.remove(task.getTaskId());
+                geofencingClient.removeGeofences(List.of(task.getTaskId()));
+                geofencedTasks.remove(task.getTaskId());
                 refreshUserTaskList();
                 Toast.makeText(this, "Deleted " + task.getTitle() + " successfully!", Toast.LENGTH_SHORT).show();
             } else {
@@ -455,9 +467,12 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         List<Marker> markers = new ArrayList<>();
 
         for (TaskDetails taskDetails : taskDetailsList) {
+            if (taskDetails.getStatus() == TaskStatus.COMPLETED) {
+                continue;
+            }
+
             LatLng location = new LatLng(taskDetails.getLocationLat(), taskDetails.getLocationLon());
 
-            // TODO: Do not create new geofence for existing tasks
             setupGeofence(taskDetails, location, userProfile.getFencingRadius());
 
             MarkerOptions markerOptions = new MarkerOptions()
@@ -480,6 +495,10 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         List<Marker> markers = new ArrayList<>();
         // TODO: Remove existing geofence for nearby tasks, then proceed to add new ones
         for (TaskDetails taskDetails : taskDetailsList) {
+            if (taskDetails.getStatus() == TaskStatus.COMPLETED) {
+                continue;
+            }
+
             LatLng location = new LatLng(taskDetails.getLocationLat(), taskDetails.getLocationLon());
 
             setupGeofence(taskDetails, location, userProfile.getFencingRadius());
