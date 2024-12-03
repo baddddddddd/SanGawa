@@ -3,6 +3,7 @@ package com.themabajogroup.sangawa.Activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -115,7 +116,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         sharedTab = findViewById(R.id.sharedtab);
         recyclerViewUserTasks = findViewById(R.id.recyclerViewUserTasks);
         recyclerViewNearbyTasks = findViewById(R.id.recyclerViewNearbyTasks);
-        LinearLayout shareTabList = findViewById(R.id.sharedTabList);
+        NestedScrollView shareTabList = findViewById(R.id.sharedTabList);
 
         toggleGroup.check(userTab.getId());
         toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
