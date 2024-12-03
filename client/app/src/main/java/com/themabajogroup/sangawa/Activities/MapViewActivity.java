@@ -64,6 +64,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class MapViewActivity extends AppCompatActivity implements OnMapReadyCallback, TaskListAdapter.TaskItemClickListener {
@@ -79,6 +80,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     private TaskController taskController;
     private Map<String, Map<String, CollabDetails>> collabRequests;
     private Map<String, TaskDetails> currentTasks;
+    private Map<String, RequestDetails> currentRequests;
     private MaterialButtonToggleGroup toggleGroup;
     private MaterialButton userTab, sharedTab;
     private RecyclerView recyclerViewUserTasks, recyclerViewNearbyTasks;
@@ -113,6 +115,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         sharedTab = findViewById(R.id.sharedtab);
         recyclerViewUserTasks = findViewById(R.id.recyclerViewUserTasks);
         recyclerViewNearbyTasks = findViewById(R.id.recyclerViewNearbyTasks);
+        LinearLayout shareTabList = findViewById(R.id.sharedTabList);
 
         toggleGroup.check(userTab.getId());
         toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
@@ -120,10 +123,10 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             if (isChecked) {
                 if (checkedId == userTab.getId()) {
                     recyclerViewUserTasks.setVisibility(View.VISIBLE);
-                    recyclerViewNearbyTasks.setVisibility(View.GONE);
+                    shareTabList.setVisibility(View.GONE);
                 } else if (checkedId == sharedTab.getId()) {
                     recyclerViewUserTasks.setVisibility(View.GONE);
-                    recyclerViewNearbyTasks.setVisibility(View.VISIBLE);
+                    shareTabList.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -314,20 +317,22 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             } else if (itemId == R.id.menu_request_task) {
                 sendCollabRequest(task).thenAccept(isSuccess -> {
-                    Toast.makeText(this, task.getTitle() + " Accepted Successfully", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Request for" + task.getTitle() + "Sent", Toast.LENGTH_SHORT).show();
+                    refreshPendingCollabList();
                 });
             } else if (itemId == R.id.menu_done_task) {
                 Toast.makeText(this, "Finished task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
             } else if (itemId == R.id.menu_edit_task) {
                 TaskDialog editTaskDialog = new TaskDialog(this, TransactionType.EDIT, task);
                 editTaskDialog.show(getSupportFragmentManager(), "MapFragment");
+                refreshUserTaskList();
             } else if (itemId == R.id.menu_delete_task) {
                 taskController.deleteUserTask(task.getTaskId());
+                refreshUserTaskList();
                 Toast.makeText(this, "Deleted " + task.getTitle() + " successfully!", Toast.LENGTH_SHORT).show();
             } else {
                 return false;
             }
-            refreshUserTaskList();
             return true;
         });
 
@@ -340,6 +345,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             setupPendingCollabRequests();
         });
         refreshNearbyTaskList();
+        refreshPendingCollabList();
 
     }
 
@@ -370,30 +376,64 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     }
 
     public void refreshNearbyTaskList() {
-        CompletableFuture<Void> result = new CompletableFuture<>();
-
         recyclerViewNearbyTasks.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayout nearbyLayout = findViewById(R.id.layout_nearby);
 
         userController.fetchNearbyTasks().thenAccept(tasks -> {
-            if (tasks == null) {
-                Toast.makeText(this, "No tasks found", Toast.LENGTH_SHORT).show();
-                return;
+            if (tasks != null && !tasks.isEmpty()) {
+                List<TaskDetails> filteredTasks = new ArrayList<>();
+                Set<String> pendingRequestIds = currentRequests.keySet();
+
+                for (TaskDetails task : tasks) {
+                    if (!pendingRequestIds.contains(task.getTaskId())) {
+                        filteredTasks.add(task);
+                    }
+                }
+
+                if (!filteredTasks.isEmpty()) {
+                    nearbyLayout.setVisibility(View.VISIBLE);
+                    TaskListAdapter taskListAdapter = new TaskListAdapter(filteredTasks, this, false);
+                    recyclerViewNearbyTasks.setAdapter(taskListAdapter);
+
+                    currentTasks = new HashMap<>();
+                    for (TaskDetails taskDetails : filteredTasks) {
+                        currentTasks.put(taskDetails.getTaskId(), taskDetails);
+                    }
+
+                } else {
+                    nearbyLayout.setVisibility(View.GONE);
+                }
+                refreshNearbyTaskMarkers(tasks);
+            } else {
+                nearbyLayout.setVisibility(View.GONE);
             }
+        });
+    }
 
-            TaskListAdapter taskListAdapter = new TaskListAdapter(tasks, this, false);
-            recyclerViewNearbyTasks.setAdapter(taskListAdapter);
 
-            currentTasks = new HashMap<>();
-            for (TaskDetails taskDetails : tasks) {
-                currentTasks.put(taskDetails.getTaskId(), taskDetails);
+    public void refreshPendingCollabList() {
+        RecyclerView recyclerViewPendingRequests = findViewById(R.id.recyclerViewPendingRequest);
+        LinearLayout pendingLayout = findViewById(R.id.layout_pending);
+        recyclerViewPendingRequests.setLayoutManager(new LinearLayoutManager(this));
+
+        taskController.getPendingCollabRequests(userController.getCurrentUser().getUid()).thenAccept(request -> {
+            if (request != null && !request.isEmpty()) {
+                pendingLayout.setVisibility(View.VISIBLE);
+                TaskListAdapter taskListAdapter = new TaskListAdapter(request, this, false);
+                recyclerViewPendingRequests.setAdapter(taskListAdapter);
+
+                currentRequests = new HashMap<>();
+                for (RequestDetails requestDetails : request) {
+                    currentRequests.put(requestDetails.getTaskId(), requestDetails);
+                }
+
+            } else{
+                pendingLayout.setVisibility(View.GONE);
             }
-
-            refreshNearbyTaskMarkers(tasks);
-
-            result.complete(null);
         });
 
     }
+
 
     public void refreshUserTaskMarkers(List<TaskDetails> taskDetailsList) {
         // Remove existing task markers
