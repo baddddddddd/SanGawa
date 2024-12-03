@@ -7,9 +7,9 @@
         android:icon="@drawable/baseline_check_24"
         tools:ignore="HardcodedText" />
     <item
-        android:id="@+id/menu_accept_task"
-        android:title="Accept Task"
-        android:icon="@drawable/baseline_check_24"
+        android:id="@+id/menu_request_task"
+        android:title="Send a Request"
+        android:icon="@drawable/baseline_send_24"
         tools:ignore="HardcodedText" />
     <item
         android:id="@+id/menu_view_task"
