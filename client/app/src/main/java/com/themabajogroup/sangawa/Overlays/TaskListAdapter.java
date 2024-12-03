@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.themabajogroup.sangawa.Controllers.TaskController;
 import com.themabajogroup.sangawa.Models.RequestDetails;
 import com.themabajogroup.sangawa.Models.TaskDetails;
+import com.themabajogroup.sangawa.Models.TaskType;
 import com.themabajogroup.sangawa.R;
 import java.util.List;
 
@@ -19,13 +20,13 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
 
     private final List<Object> items;
     private final TaskItemClickListener taskItemClickListener;
-    private final Boolean isCurrentUserTask;
+    private final TaskType taskType;
     private final TaskController taskController;
 
-    public TaskListAdapter(List<?> items, TaskItemClickListener listener, Boolean isCurrentUserTask) {
+    public TaskListAdapter(List<?> items, TaskItemClickListener listener, TaskType taskType) {
         this.items = (List<Object>) items;
         this.taskItemClickListener = listener;
-        this.isCurrentUserTask = isCurrentUserTask;
+        this.taskType = taskType;
         this.taskController = TaskController.getInstance();
     }
 
@@ -46,7 +47,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
             holder.textViewTaskTitle.setText(task.getTitle());
             holder.textViewTaskDescription.setText(task.getDescription());
             holder.buttonMoreOptions.setOnClickListener(v ->
-                    taskItemClickListener.onMoreOptionClick(v, task, isCurrentUserTask)
+                    taskItemClickListener.onMoreOptionClick(v, task, taskType)
             );
         } else if (item instanceof RequestDetails) {
             RequestDetails request = (RequestDetails) item;
@@ -55,7 +56,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
                         holder.textViewTaskTitle.setText(task.getTitle());
                         holder.textViewTaskDescription.setText(task.getDescription());
                         holder.buttonMoreOptions.setOnClickListener(v ->
-                                taskItemClickListener.onMoreOptionClick(v, task, isCurrentUserTask));
+                                taskItemClickListener.onMoreOptionClick(v, task, taskType));
                     });
         }
     }
@@ -81,6 +82,6 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
     }
 
     public interface TaskItemClickListener {
-        void onMoreOptionClick(View view, TaskDetails task, Boolean isCurrentUserTask);
+        void onMoreOptionClick(View view, TaskDetails task, TaskType taskType);
     }
 }

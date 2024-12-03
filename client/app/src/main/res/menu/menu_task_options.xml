@@ -7,14 +7,19 @@
         android:icon="@drawable/baseline_check_24"
         tools:ignore="HardcodedText" />
     <item
+        android:id="@+id/menu_view_task"
+        android:title="View Task"
+        android:icon="@drawable/outline_remove_red_eye_24"
+        tools:ignore="HardcodedText" />
+    <item
         android:id="@+id/menu_request_task"
         android:title="Send a Request"
         android:icon="@drawable/baseline_send_24"
         tools:ignore="HardcodedText" />
     <item
-        android:id="@+id/menu_view_task"
-        android:title="View Task"
-        android:icon="@drawable/outline_remove_red_eye_24"
+        android:id="@+id/menu_cancel_request"
+        android:title="Cancel Request"
+        android:icon="@drawable/baseline_close_24"
         tools:ignore="HardcodedText" />
     <item
         android:id="@+id/menu_edit_task"

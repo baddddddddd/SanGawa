@@ -51,6 +51,7 @@ import com.themabajogroup.sangawa.Models.RequestDetails;
 import com.themabajogroup.sangawa.Models.RequestStatus;
 import com.themabajogroup.sangawa.Models.TaskDetails;
 import com.themabajogroup.sangawa.Models.TaskStatus;
+import com.themabajogroup.sangawa.Models.TaskType;
 import com.themabajogroup.sangawa.Models.TransactionType;
 import com.themabajogroup.sangawa.Models.UserProfile;
 import com.themabajogroup.sangawa.Overlays.TaskDialog;
@@ -302,19 +303,17 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
 
     @Override
-    public void onMoreOptionClick(View view, TaskDetails task, Boolean isCurrentUserTask) {
+    public void onMoreOptionClick(View view, TaskDetails task, TaskType taskType) {
         Context wrapper = new ContextThemeWrapper(this, R.style.popupMenuStyle);
         PopupMenu popupMenu = new PopupMenu(wrapper, view);
         MenuInflater inflater = popupMenu.getMenuInflater();
         inflater.inflate(R.menu.menu_task_options, popupMenu.getMenu());
-        MenuItem acceptTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_request_task);
+        MenuItem requestTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_request_task);
+        MenuItem cancelRequestMenuItem = popupMenu.getMenu().findItem(R.id.menu_cancel_request);
         MenuItem doneTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_done_task);
         MenuItem editTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_edit_task);
         MenuItem deleteTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_delete_task);
-        acceptTaskMenuItem.setVisible(!isCurrentUserTask);
-        doneTaskMenuItem.setVisible(isCurrentUserTask);
-        editTaskMenuItem.setVisible(isCurrentUserTask);
-        deleteTaskMenuItem.setVisible(isCurrentUserTask);
+        taskType.setVisibilityFor(requestTaskMenuItem, cancelRequestMenuItem, doneTaskMenuItem, editTaskMenuItem, deleteTaskMenuItem);
 
         popupMenu.setForceShowIcon(true);
 
@@ -398,21 +397,21 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
                 if (!activeTask.isEmpty()) {
                     activeLayout.setVisibility(View.VISIBLE);
-                    recyclerViewActiveTask.setAdapter(new TaskListAdapter(activeTask, this, true));
+                    recyclerViewActiveTask.setAdapter(new TaskListAdapter(activeTask, this, TaskType.ACTIVE));
                 } else {
                     activeLayout.setVisibility(View.GONE);
                 }
 
                 if (!dueTask.isEmpty()) {
                     dueLayout.setVisibility(View.VISIBLE);
-                    recyclerViewDueTask.setAdapter(new TaskListAdapter(dueTask, this, true));
+                    recyclerViewDueTask.setAdapter(new TaskListAdapter(dueTask, this, TaskType.DUE));
                 } else {
                     dueLayout.setVisibility(View.GONE);
                 }
 
                 if (!completedTask.isEmpty()) {
                     completedLayout.setVisibility(View.VISIBLE);
-                    recyclerViewCompletedTask.setAdapter(new TaskListAdapter(completedTask, this, true));
+                    recyclerViewCompletedTask.setAdapter(new TaskListAdapter(completedTask, this, TaskType.COMPLETE));
                 } else {
                     completedLayout.setVisibility(View.GONE);
                 }
@@ -446,7 +445,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
                 if (!filteredTasks.isEmpty()) {
                     nearbyLayout.setVisibility(View.VISIBLE);
-                    TaskListAdapter taskListAdapter = new TaskListAdapter(filteredTasks, this, false);
+                    TaskListAdapter taskListAdapter = new TaskListAdapter(filteredTasks, this, TaskType.NEARBY);
                     recyclerViewNearbyTasks.setAdapter(taskListAdapter);
 
                     for (TaskDetails taskDetails : filteredTasks) {
@@ -487,14 +486,14 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
                 if (!pendingRequests.isEmpty()) {
                     pendingLayout.setVisibility(View.VISIBLE);
-                    recyclerViewPending.setAdapter(new TaskListAdapter(pendingRequests, this, false));
+                    recyclerViewPending.setAdapter(new TaskListAdapter(pendingRequests, this, TaskType.PENDING));
                 } else {
                     pendingLayout.setVisibility(View.GONE);
                 }
 
                 if (!acceptedRequests.isEmpty()) {
                     joinedLayout.setVisibility(View.VISIBLE);
-                    recyclerViewJoined.setAdapter(new TaskListAdapter(acceptedRequests, this, false));
+                    recyclerViewJoined.setAdapter(new TaskListAdapter(acceptedRequests, this, TaskType.JOINED));
                 } else {
                     joinedLayout.setVisibility(View.GONE);
                 }
