@@ -450,11 +450,6 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     }
 
     public void refreshUserTaskMarkers(List<TaskDetails> taskDetailsList) {
-        // Remove existing task markers
-        for (Marker marker : userTaskMarkers) {
-            marker.remove();
-        }
-
         List<Marker> markers = new ArrayList<>();
 
         for (TaskDetails taskDetails : taskDetailsList) {
@@ -472,15 +467,14 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             markers.add(marker);
         }
 
+        for (Marker marker : userTaskMarkers) {
+            marker.remove();
+        }
+
         userTaskMarkers = markers;
     }
 
     public void refreshNearbyTaskMarkers(List<TaskDetails> taskDetailsList) {
-        // Remove existing task markers
-        for (Marker marker : sharedTaskMarkers) {
-            marker.remove();
-        }
-
         List<Marker> markers = new ArrayList<>();
         // TODO: Remove existing geofence for nearby tasks, then proceed to add new ones
         for (TaskDetails taskDetails : taskDetailsList) {
@@ -495,6 +489,10 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
             Marker marker = mMap.addMarker(markerOptions);
             markers.add(marker);
+        }
+
+        for (Marker marker : sharedTaskMarkers) {
+            marker.remove();
         }
 
         sharedTaskMarkers = markers;
