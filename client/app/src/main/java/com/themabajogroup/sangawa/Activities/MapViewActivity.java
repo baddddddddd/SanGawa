@@ -215,7 +215,6 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         }
     }
 
-    // TODO: Setup Geofence for Join shared tasks only
     private void setupGeofence(TaskDetails taskDetails, LatLng latLng, float radius) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             checkLocationPermissions();
@@ -493,7 +492,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
     public void refreshNearbyTaskMarkers(List<TaskDetails> taskDetailsList) {
         List<Marker> markers = new ArrayList<>();
-        // TODO: Remove existing geofence for nearby tasks, then proceed to add new ones
+
         for (TaskDetails taskDetails : taskDetailsList) {
             if (taskDetails.getStatus() == TaskStatus.COMPLETED) {
                 continue;
@@ -501,7 +500,8 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
             LatLng location = new LatLng(taskDetails.getLocationLat(), taskDetails.getLocationLon());
 
-            setupGeofence(taskDetails, location, userProfile.getFencingRadius());
+            // Do not setup geofence for shared tasks
+//            setupGeofence(taskDetails, location, userProfile.getFencingRadius());
 
             MarkerOptions markerOptions = new MarkerOptions()
                     .position(location)
