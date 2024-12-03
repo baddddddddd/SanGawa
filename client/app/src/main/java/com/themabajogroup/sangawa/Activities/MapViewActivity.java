@@ -65,6 +65,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class MapViewActivity extends AppCompatActivity implements OnMapReadyCallback, TaskListAdapter.TaskItemClickListener {
 
@@ -318,6 +319,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                 sendCollabRequest(task).thenAccept(isSuccess -> {
                     Toast.makeText(this, "Request for" + task.getTitle() + "Sent", Toast.LENGTH_SHORT).show();
                     refreshPendingCollabList();
+                    refreshJoinedCollabList();
                 });
             } else if (itemId == R.id.menu_done_task) {
                 Toast.makeText(this, "Finished task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
@@ -345,6 +347,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         });
         refreshNearbyTaskList();
         refreshPendingCollabList();
+        refreshJoinedCollabList();
 
     }
 
@@ -410,29 +413,52 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
 
     public void refreshPendingCollabList() {
-        RecyclerView recyclerViewPendingRequests = findViewById(R.id.recyclerViewPendingRequest);
+        RecyclerView recyclerView = findViewById(R.id.recyclerViewPendingRequest);
         LinearLayout pendingLayout = findViewById(R.id.layout_pending);
-        recyclerViewPendingRequests.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         taskController.getRequestHistory(userController.getCurrentUser().getUid()).thenAccept(request -> {
-            if (request != null && !request.isEmpty()) {
-                pendingLayout.setVisibility(View.VISIBLE);
-                TaskListAdapter taskListAdapter = new TaskListAdapter(request, this, false);
-                recyclerViewPendingRequests.setAdapter(taskListAdapter);
+            if (request != null) {
+                List<RequestDetails> pendingRequests = request.stream()
+                        .filter(r -> r.getStatus() == RequestStatus.PENDING)
+                        .peek(r -> currentRequests.put(r.getTaskId(), r))
+                        .collect(Collectors.toList());
 
-                for (RequestDetails requestDetails : request) {
-                    if (requestDetails.getStatus() == RequestStatus.PENDING) {
-                        currentRequests.put(requestDetails.getTaskId(), requestDetails);
-                    }
+                if (!pendingRequests.isEmpty()) {
+                    pendingLayout.setVisibility(View.VISIBLE);
+                    recyclerView.setAdapter(new TaskListAdapter(pendingRequests, this, false));
+                } else {
+                    pendingLayout.setVisibility(View.GONE);
                 }
-
-            } else{
+            } else {
                 pendingLayout.setVisibility(View.GONE);
             }
         });
-
     }
 
+    public void refreshJoinedCollabList() {
+        RecyclerView recyclerView = findViewById(R.id.recyclerViewJoinedTasks);
+        LinearLayout joinedLayout = findViewById(R.id.layout_joined);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        taskController.getRequestHistory(userController.getCurrentUser().getUid()).thenAccept(request -> {
+            if (request != null) {
+                List<RequestDetails> acceptedRequests = request.stream()
+                        .filter(r -> r.getStatus() == RequestStatus.ACCEPTED)
+                        .peek(r -> currentRequests.put(r.getTaskId(), r))
+                        .collect(Collectors.toList());
+
+                if (!acceptedRequests.isEmpty()) {
+                    joinedLayout.setVisibility(View.VISIBLE);
+                    recyclerView.setAdapter(new TaskListAdapter(acceptedRequests, this, false));
+                } else {
+                    joinedLayout.setVisibility(View.GONE);
+                }
+            } else {
+                joinedLayout.setVisibility(View.GONE);
+            }
+        });
+    }
 
     public void refreshUserTaskMarkers(List<TaskDetails> taskDetailsList) {
         // Remove existing task markers
