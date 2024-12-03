@@ -7,13 +7,16 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.themabajogroup.sangawa.Models.CollabRequest;
+import com.themabajogroup.sangawa.Models.RequestDetails;
 import com.themabajogroup.sangawa.Models.RequestStatus;
 import com.themabajogroup.sangawa.Models.TaskDetails;
 import com.themabajogroup.sangawa.Utils.Converter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class TaskController {
@@ -169,18 +172,33 @@ public class TaskController {
         return result;
     }
 
-    public CompletableFuture<Boolean> createJoinRequest(String requesterName, String requesterId, String ownerId, String taskId) {
+    public CompletableFuture<Boolean> createJoinRequest(String ownerId, String taskId, String requesterId, String requesterName) {
         CompletableFuture<Boolean> result = new CompletableFuture<>();
 
-        CollabRequest requestDetails = new CollabRequest(requesterName, RequestStatus.PENDING);
+        CollabRequest collabRequest = new CollabRequest(requesterName, RequestStatus.PENDING);
 
         realtimeDb.child("requests")
                 .child(ownerId)
                 .child(taskId)
                 .child(requesterId)
-                .setValue(requestDetails)
-                .addOnCompleteListener(task -> {
-                    result.complete(task.isSuccessful());
+                .setValue(collabRequest)
+                .addOnCompleteListener(rtdbTask -> {
+                    if (!rtdbTask.isSuccessful()) {
+                        result.complete(false);
+                        return;
+                    }
+
+                    Map<String, Object> requestDetails = new HashMap<>();
+                    requestDetails.put("requesterId", requesterId);
+                    requestDetails.put("ownerId", ownerId);
+                    requestDetails.put("taskId", taskId);
+                    requestDetails.put("status", RequestStatus.PENDING.name());
+
+                    db.collection("requests")
+                            .add(requestDetails)
+                            .addOnCompleteListener(firestoreTask -> {
+                                result.complete(firestoreTask.isSuccessful());
+                            });
                 });
 
         return result;
@@ -195,8 +213,49 @@ public class TaskController {
                 .child(requesterId)
                 .child("status")
                 .setValue(status)
+                .addOnCompleteListener(rtdbTask -> {
+                    if (!rtdbTask.isSuccessful()) {
+                        result.complete(false);
+                        return;
+                    }
+
+                    Map<String, Object> requestDetails = new HashMap<>();
+                    requestDetails.put("requesterId", requesterId);
+                    requestDetails.put("ownerId", ownerId);
+                    requestDetails.put("taskId", taskId);
+                    requestDetails.put("status", status.name());
+
+                    db.collection("requests")
+                            .add(requestDetails)
+                            .addOnCompleteListener(firestoreTask -> {
+                                result.complete(firestoreTask.isSuccessful());
+                            });
+                });
+
+        return result;
+    }
+
+    public CompletableFuture<List<RequestDetails>> getPendingCollabRequests(String userId) {
+        CompletableFuture<List<RequestDetails>> result = new CompletableFuture<>();
+        db.collection("requests")
+                .whereEqualTo("requesterId", userId)
+                .get()
                 .addOnCompleteListener(task -> {
-                    result.complete(task.isSuccessful());
+                    if (!task.isSuccessful()) {
+                        return;
+                    }
+
+                    List<DocumentSnapshot> documents = task.getResult().getDocuments();
+                    ArrayList<RequestDetails> requests = new ArrayList<>();
+
+                    for (DocumentSnapshot document : documents) {
+                        RequestDetails requestDetails = RequestDetails.fromDocumentSnapshot(document);
+                        if (requestDetails.getStatus() == RequestStatus.PENDING) {
+                            requests.add(requestDetails);
+                        }
+                    }
+
+                    result.complete(requests);
                 });
 
         return result;
@@ -204,6 +263,15 @@ public class TaskController {
 
     public void attachJoinRequestListener(String userId, ValueEventListener listener) {
         realtimeDb.child("requests").child(userId)
+                .getRef()
+                .addValueEventListener(listener);
+    }
+
+    public void attachCollabReplyListener(String requesterId, TaskDetails taskDetails, ValueEventListener listener) {
+        realtimeDb.child("requests")
+                .child(taskDetails.getUserId())
+                .child(taskDetails.getTaskId())
+                .child(requesterId)
                 .getRef()
                 .addValueEventListener(listener);
     }

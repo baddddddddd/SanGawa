@@ -45,8 +45,10 @@ import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.themabajogroup.sangawa.Controllers.TaskController;
 import com.themabajogroup.sangawa.Controllers.UserController;
 import com.themabajogroup.sangawa.Models.CollabDetails;
+import com.themabajogroup.sangawa.Models.RequestDetails;
 import com.themabajogroup.sangawa.Models.RequestStatus;
 import com.themabajogroup.sangawa.Models.TaskDetails;
+import com.themabajogroup.sangawa.Models.TaskVisibility;
 import com.themabajogroup.sangawa.Models.TransactionType;
 import com.themabajogroup.sangawa.Overlays.TaskDialog;
 import com.themabajogroup.sangawa.Overlays.TaskListAdapter;
@@ -55,7 +57,9 @@ import com.themabajogroup.sangawa.Utils.GeofenceBroadcastReceiver;
 import com.themabajogroup.sangawa.Utils.NotificationSender;
 import com.themabajogroup.sangawa.databinding.ActivityMapViewBinding;
 
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -124,7 +128,9 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         geofencingClient = LocationServices.getGeofencingClient(this);
 
         checkLocationPermissions();
+
         initializeTaskList();
+        userController.fetchProfile();
     }
 
     private void checkLocationPermissions() {
@@ -284,8 +290,9 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                 BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet));
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             } else if (itemId == R.id.menu_request_task) {
-                // TODO: Add logic here for accepting task
-                Toast.makeText(this, task.getTitle() + " Accepted Successfully", Toast.LENGTH_SHORT).show();
+                sendCollabRequest(task).thenAccept(isSuccess -> {
+                    Toast.makeText(this, task.getTitle() + " Accepted Successfully", Toast.LENGTH_SHORT).show();
+                });
             } else if (itemId == R.id.menu_done_task) {
                 Toast.makeText(this, "Finished task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
             } else if (itemId == R.id.menu_edit_task) {
@@ -308,6 +315,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     public void initializeTaskList() {
         refreshUserTaskList().thenAccept(unused -> {
             setupCollabListener();
+            setupPendingCollabRequests();
         });
     }
 
@@ -470,5 +478,81 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         String title = "Collaboration request for " + task.getTitle();
         String description = collabDetails.getRequesterName() + " wants to join you!";
         sender.sendCollabNotification(title, description, collabDetails.getTaskId(), collabDetails.getRequesterId());
+    }
+
+    public CompletableFuture<Boolean> sendCollabRequest(TaskDetails taskDetails) {
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+
+        String requesterId = userController.getCurrentUser().getUid();
+        String taskId = taskDetails.getTaskId();
+        String ownerId = taskDetails.getUserId();
+        String requesterName = userController.getProfile().getUsername();
+        taskController.createJoinRequest(ownerId, taskId, requesterId, requesterName)
+                .thenAccept(isSuccess -> {
+                    if (!isSuccess) {
+                        result.complete(false);
+                        return;
+                    }
+
+                    addCollabReplyListener(taskDetails);
+                });
+
+        return result;
+    }
+
+    public void addCollabReplyListener(TaskDetails taskDetails) {
+        String requesterId = userController.getCurrentUser().getUid();
+
+        taskController.attachCollabReplyListener(requesterId, taskDetails, new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Map<String, String> data = (Map<String, String>) snapshot.getValue();
+
+                if (data == null) {
+                    return;
+                }
+
+                RequestStatus status = RequestStatus.valueOf(data.get("status"));
+                NotificationSender sender = NotificationSender.getInstance("CollabNotifications", MapViewActivity.this);
+
+                // TODO: (Low Prio) Remove ValueEventListener on ACCEPT/DECLINE
+                if (status == RequestStatus.ACCEPTED) {
+                    String title = "Collaboration request ACCEPTED!";
+                    String description = "Your request to join " + taskDetails.getTitle() + " has been accepted";
+
+                    sender.sendNotification(title, description);
+
+                } else if (status == RequestStatus.DECLINED) {
+                    String title = "Collaboration request DECLINED!";
+                    String description = "Your request to join " + taskDetails.getTitle() + " has been declined";
+
+                    sender.sendNotification(title, description);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void setupPendingCollabRequests() {
+        String userId = userController.getCurrentUser().getUid();
+
+        taskController.getPendingCollabRequests(userId)
+                .thenAccept(requests -> {
+                    for (RequestDetails details : requests) {
+                        String taskId = details.getTaskId();
+
+                        TaskDetails taskDetails = currentTasks.get(taskId);
+
+                        if (taskDetails == null) {
+                            return;
+                        }
+
+                        addCollabReplyListener(taskDetails);
+                    }
+                });
     }
 }
