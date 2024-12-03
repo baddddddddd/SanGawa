@@ -265,7 +265,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         PopupMenu popupMenu = new PopupMenu(wrapper, view);
         MenuInflater inflater = popupMenu.getMenuInflater();
         inflater.inflate(R.menu.menu_task_options, popupMenu.getMenu());
-        MenuItem acceptTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_accept_task);
+        MenuItem acceptTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_request_task);
         MenuItem doneTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_done_task);
         MenuItem editTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_edit_task);
         MenuItem deleteTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_delete_task);
@@ -283,7 +283,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(taskLocation, 16f));
                 BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet));
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-            } else if (itemId == R.id.menu_accept_task) {
+            } else if (itemId == R.id.menu_request_task) {
                 // TODO: Add logic here for accepting task
                 Toast.makeText(this, task.getTitle() + " Accepted Successfully", Toast.LENGTH_SHORT).show();
             } else if (itemId == R.id.menu_done_task) {
