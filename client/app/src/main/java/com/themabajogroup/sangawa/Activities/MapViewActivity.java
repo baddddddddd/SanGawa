@@ -79,7 +79,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     private UserController userController;
     private TaskController taskController;
     private Map<String, Map<String, CollabDetails>> collabRequests;
-    private Map<String, TaskDetails> currentTasks;
+    public static Map<String, TaskDetails> currentTasks;
     private Map<String, RequestDetails> currentRequests;
     private MaterialButtonToggleGroup toggleGroup;
     private MaterialButton userTab, sharedTab;
@@ -87,6 +87,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     private UserProfile userProfile;
     private List<Marker> userTaskMarkers;
     private List<Marker> sharedTaskMarkers;
+    private int geofenceRequestCode = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -212,33 +213,33 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     }
 
     // TODO: Setup Geofence for Join shared tasks only
-    private void setupGeofence(String id, LatLng latLng, float radius) {
+    private void setupGeofence(TaskDetails taskDetails, LatLng latLng, float radius) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             checkLocationPermissions();
             return;
         }
 
         Geofence geofence = new Geofence.Builder()
-                .setRequestId(id)
+                .setRequestId(taskDetails.getTaskId())
                 .setCircularRegion(latLng.latitude, latLng.longitude, radius)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                 .build();
+
+        Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
+        intent.putExtra("TASK_TITLE", taskDetails.getTitle());
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 
         geofencingClient.addGeofences(
                 new GeofencingRequest.Builder()
                         .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
                         .addGeofence(geofence)
                         .build(),
-                getGeofencePendingIntent()
+                pendingIntent
         ).addOnFailureListener(e ->
-                Toast.makeText(this, "Failed to add task geofence: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Failed to add task geofence: " + taskDetails.getTitle(), Toast.LENGTH_SHORT).show()
         );
-    }
-
-    private PendingIntent getGeofencePendingIntent() {
-        Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
-        return PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
     }
 
     @Override
@@ -467,7 +468,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             LatLng location = new LatLng(taskDetails.getLocationLat(), taskDetails.getLocationLon());
 
             // TODO: Do not create new geofence for existing tasks
-            setupGeofence(taskDetails.getTitle(), location, userProfile.getFencingRadius());
+            setupGeofence(taskDetails, location, userProfile.getFencingRadius());
 
             MarkerOptions markerOptions = new MarkerOptions()
                     .position(location)
@@ -491,7 +492,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         for (TaskDetails taskDetails : taskDetailsList) {
             LatLng location = new LatLng(taskDetails.getLocationLat(), taskDetails.getLocationLon());
 
-            setupGeofence(taskDetails.getTitle(), location, userProfile.getFencingRadius());
+            setupGeofence(taskDetails, location, userProfile.getFencingRadius());
 
             MarkerOptions markerOptions = new MarkerOptions()
                     .position(location)

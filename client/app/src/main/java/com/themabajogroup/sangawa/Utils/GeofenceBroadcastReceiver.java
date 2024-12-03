@@ -8,6 +8,8 @@ import android.util.Log;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
+import com.themabajogroup.sangawa.Activities.MapViewActivity;
+import com.themabajogroup.sangawa.Models.TaskDetails;
 
 import java.util.List;
 
@@ -30,14 +32,18 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
             Log.e("GeofenceBroadcast", "Error in geofence event: " + geofencingEvent.getErrorCode());
             return;
         }
-        NotificationSender sender = NotificationSender.getInstance("GeofenceNotifcations", context);
+        NotificationSender sender = NotificationSender.getInstance("GeofenceNotifications", context);
         int geofenceTransition = geofencingEvent.getGeofenceTransition();
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
 
             for (Geofence geofence : triggeringGeofences) {
-                String geofenceId = geofence.getRequestId();
-                sender.sendNotification("Geofence Entered: " + geofenceId, "You have entered the geofence area!");
+                String taskId = geofence.getRequestId();
+                TaskDetails taskDetails = MapViewActivity.currentTasks.get(taskId);
+                String taskTitle = taskDetails.getTitle();
+                String description = taskDetails.getDescription();
+
+                sender.sendNotification("You have a task nearby: " + taskTitle, description);
             }
 
         } else if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
