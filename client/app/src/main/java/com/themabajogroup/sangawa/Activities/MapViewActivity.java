@@ -217,7 +217,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         }
     }
 
-    private void setupGeofence(TaskDetails taskDetails, LatLng latLng, float radius) {
+    private void setupGeofence(TaskDetails taskDetails) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             checkLocationPermissions();
             return;
@@ -227,9 +227,10 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             return;
         }
 
+        float radius = userController.getProfile().getFencingRadius();
         Geofence geofence = new Geofence.Builder()
                 .setRequestId(taskDetails.getTaskId())
-                .setCircularRegion(latLng.latitude, latLng.longitude, radius)
+                .setCircularRegion(taskDetails.getLocationLat(), taskDetails.getLocationLon(), radius)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                 .build();
@@ -494,7 +495,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
             LatLng location = new LatLng(taskDetails.getLocationLat(), taskDetails.getLocationLon());
 
-            setupGeofence(taskDetails, location, userProfile.getFencingRadius());
+            setupGeofence(taskDetails);
 
             MarkerOptions markerOptions = new MarkerOptions()
                     .position(location)
@@ -521,9 +522,6 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             }
 
             LatLng location = new LatLng(taskDetails.getLocationLat(), taskDetails.getLocationLon());
-
-            // Do not setup geofence for shared tasks
-//            setupGeofence(taskDetails, location, userProfile.getFencingRadius());
 
             MarkerOptions markerOptions = new MarkerOptions()
                     .position(location)
@@ -649,6 +647,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                     sender.sendNotification(title, description);
 
                     removeCollabListener(taskDetails);
+                    setupGeofence(taskDetails);
 
                 } else if (status == RequestStatus.DECLINED) {
                     String title = "Collaboration request DECLINED!";
@@ -676,15 +675,12 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                     for (RequestDetails details : requests) {
                         String taskId = details.getTaskId();
 
-                        TaskDetails taskDetails = currentTasks.get(taskId);
-
-                        if (taskDetails != null) {
-                            addCollabReplyListener(taskDetails);
-                            continue;
-                        }
-
                         getTaskByIdForced(taskId).thenAccept(fetchedTaskDetails -> {
                            addCollabReplyListener(fetchedTaskDetails);
+
+                           if (details.getStatus() == RequestStatus.ACCEPTED) {
+                               setupGeofence(fetchedTaskDetails);
+                           }
                         });
                     }
                 });
