@@ -97,95 +97,98 @@
             android:paddingBottom="8dp"
             android:scrollbars="vertical" />
 
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
             android:id="@+id/sharedTabList"
             android:layout_width="match_parent"
             android:layout_height="500dp"
-            android:orientation="vertical"
-            android:scrollbars="vertical"
             android:layout_marginHorizontal="24dp"
             android:visibility="gone"
             android:paddingBottom="8dp">
 
             <LinearLayout
-                android:id="@+id/layout_joined"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:scrollbars="vertical">
 
-                <TextView
+                <LinearLayout
+                    android:id="@+id/layout_joined"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Joined Tasks"
-                    android:textColor="@color/white"
-                    android:fontFamily="@font/konkhmer_sleokchher"
-                    android:textSize="16dp"
-                    tools:ignore="HardcodedText" />
+                    android:visibility="gone"
+                    android:orientation="vertical">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerViewJoinedTasks"
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Joined Tasks"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/konkhmer_sleokchher"
+                        android:textSize="16dp"
+                        tools:ignore="HardcodedText" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerViewJoinedTasks"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clipToPadding="false"
+                        android:layout_marginHorizontal="5dp"
+                        android:scrollbars="none" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_pending"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:clipToPadding="false"
-                    android:layout_marginHorizontal="5dp"
-                    android:scrollbars="none" />
+                    android:visibility="gone"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Pending Requests"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/konkhmer_sleokchher"
+                        android:textSize="16dp"
+                        tools:ignore="HardcodedText" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerViewPendingRequest"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clipToPadding="false"
+                        android:layout_marginHorizontal="5dp"
+                        android:scrollbars="none" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_nearby"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Nearby Tasks"
+                        android:fontFamily="@font/konkhmer_sleokchher"
+                        android:textSize="16dp"
+                        android:textColor="@color/white"
+                        tools:ignore="HardcodedText" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerViewNearbyTasks"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="5dp"
+                        android:clipToPadding="false"
+                        android:scrollbars="none" />
+                </LinearLayout>
 
             </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
-            <LinearLayout
-                android:id="@+id/layout_pending"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Pending Requests"
-                    android:textColor="@color/white"
-                    android:fontFamily="@font/konkhmer_sleokchher"
-                    android:textSize="16dp"
-                    tools:ignore="HardcodedText" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerViewPendingRequest"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clipToPadding="false"
-                    android:layout_marginHorizontal="5dp"
-                    android:scrollbars="none" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/layout_nearby"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Nearby Tasks"
-                    android:fontFamily="@font/konkhmer_sleokchher"
-                    android:textSize="16dp"
-                    android:textColor="@color/white"
-                    tools:ignore="HardcodedText" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerViewNearbyTasks"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="5dp"
-                    android:clipToPadding="false"
-                    android:scrollbars="none" />
-
-            </LinearLayout>
-
-        </LinearLayout>
 
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

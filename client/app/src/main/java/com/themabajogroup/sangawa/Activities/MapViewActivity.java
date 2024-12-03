@@ -3,6 +3,7 @@ package com.themabajogroup.sangawa.Activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -81,7 +82,6 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     private Map<String, Map<String, CollabDetails>> collabRequests;
     public static Map<String, TaskDetails> currentTasks;
     private Map<String, RequestDetails> currentRequests;
-    private MaterialButtonToggleGroup toggleGroup;
     private MaterialButton userTab, sharedTab;
     private RecyclerView recyclerViewUserTasks, recyclerViewNearbyTasks;
     private UserProfile userProfile;
@@ -112,12 +112,12 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         TaskDialog editTaskDialog = new TaskDialog(this, TransactionType.ADD);
         btnAddTask.setOnClickListener(view -> editTaskDialog.show(getSupportFragmentManager(), "MapFragment"));
 
-        toggleGroup = findViewById(R.id.toggleGroup);
+        MaterialButtonToggleGroup toggleGroup = findViewById(R.id.toggleGroup);
         userTab = findViewById(R.id.usertab);
         sharedTab = findViewById(R.id.sharedtab);
         recyclerViewUserTasks = findViewById(R.id.recyclerViewUserTasks);
         recyclerViewNearbyTasks = findViewById(R.id.recyclerViewNearbyTasks);
-        LinearLayout shareTabList = findViewById(R.id.sharedTabList);
+        NestedScrollView shareTabList = findViewById(R.id.sharedTabList);
 
         toggleGroup.check(userTab.getId());
         toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
@@ -319,8 +319,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             } else if (itemId == R.id.menu_request_task) {
                 sendCollabRequest(task).thenAccept(isSuccess -> {
                     Toast.makeText(this, "Request for" + task.getTitle() + "Sent", Toast.LENGTH_SHORT).show();
-                    refreshPendingCollabList();
-                    refreshJoinedCollabList();
+                    refreshCollabLists();
                 });
             } else if (itemId == R.id.menu_done_task) {
                 Toast.makeText(this, "Finished task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
@@ -347,8 +346,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             setupPendingCollabRequests();
         });
         refreshNearbyTaskList();
-        refreshPendingCollabList();
-        refreshJoinedCollabList();
+        refreshCollabLists();
 
     }
 
@@ -412,11 +410,14 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         });
     }
 
-
-    public void refreshPendingCollabList() {
-        RecyclerView recyclerView = findViewById(R.id.recyclerViewPendingRequest);
+    public void refreshCollabLists() {
+        RecyclerView recyclerViewPending = findViewById(R.id.recyclerViewPendingRequest);
         LinearLayout pendingLayout = findViewById(R.id.layout_pending);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewPending.setLayoutManager(new LinearLayoutManager(this));
+
+        RecyclerView recyclerViewJoined = findViewById(R.id.recyclerViewJoinedTasks);
+        LinearLayout joinedLayout = findViewById(R.id.layout_joined);
+        recyclerViewJoined.setLayoutManager(new LinearLayoutManager(this));
 
         taskController.getRequestHistory(userController.getCurrentUser().getUid()).thenAccept(request -> {
             if (request != null) {
@@ -425,37 +426,26 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                         .peek(r -> currentRequests.put(r.getTaskId(), r))
                         .collect(Collectors.toList());
 
-                if (!pendingRequests.isEmpty()) {
-                    pendingLayout.setVisibility(View.VISIBLE);
-                    recyclerView.setAdapter(new TaskListAdapter(pendingRequests, this, false));
-                } else {
-                    pendingLayout.setVisibility(View.GONE);
-                }
-            } else {
-                pendingLayout.setVisibility(View.GONE);
-            }
-        });
-    }
-
-    public void refreshJoinedCollabList() {
-        RecyclerView recyclerView = findViewById(R.id.recyclerViewJoinedTasks);
-        LinearLayout joinedLayout = findViewById(R.id.layout_joined);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        taskController.getRequestHistory(userController.getCurrentUser().getUid()).thenAccept(request -> {
-            if (request != null) {
                 List<RequestDetails> acceptedRequests = request.stream()
                         .filter(r -> r.getStatus() == RequestStatus.ACCEPTED)
                         .peek(r -> currentRequests.put(r.getTaskId(), r))
                         .collect(Collectors.toList());
 
+                if (!pendingRequests.isEmpty()) {
+                    pendingLayout.setVisibility(View.VISIBLE);
+                    recyclerViewPending.setAdapter(new TaskListAdapter(pendingRequests, this, false));
+                } else {
+                    pendingLayout.setVisibility(View.GONE);
+                }
+
                 if (!acceptedRequests.isEmpty()) {
                     joinedLayout.setVisibility(View.VISIBLE);
-                    recyclerView.setAdapter(new TaskListAdapter(acceptedRequests, this, false));
+                    recyclerViewJoined.setAdapter(new TaskListAdapter(acceptedRequests, this, false));
                 } else {
                     joinedLayout.setVisibility(View.GONE);
                 }
             } else {
+                pendingLayout.setVisibility(View.GONE);
                 joinedLayout.setVisibility(View.GONE);
             }
         });
