@@ -50,6 +50,7 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
     private int selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute;
     private UserController userController;
     private LatLng location;
+    private Button btnAdd;
 
     public TaskDialog(MapViewActivity mapViewActivity, TransactionType transactionType) {
         this.mapViewActivity = mapViewActivity;
@@ -72,7 +73,7 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
         descInput = view.findViewById(R.id.description);
         deadlineInput = view.findViewById(R.id.deadline);
         ImageButton deadlinePicker = view.findViewById(R.id.deadline_picker);
-        Button btnAdd = view.findViewById(R.id.add_button);
+        btnAdd = view.findViewById(R.id.add_button);
         Button btnCancel = view.findViewById(R.id.cancel_button);
 
         deadlinePicker.setOnClickListener(v -> showDatePicker());
@@ -163,6 +164,7 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
     }
 
     private void processTaskSubmission(boolean isEditing) {
+        btnAdd.setEnabled(false);
         String title = titleInput.getText().toString().trim();
         String description = descInput.getText().toString().trim();
         String deadlineStr = deadlineInput.getText().toString().trim();
