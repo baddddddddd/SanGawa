@@ -144,4 +144,9 @@ public class UserController {
 
         return result;
     }
+
+    public void signOutUser() {
+        mAuth.signOut();
+        instance = null;
+    }
 }

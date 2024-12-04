@@ -784,4 +784,11 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
         handler.post(runnable);
     }
+
+    public void signOutUser() {
+        userController.signOutUser();
+        Intent intent = new Intent(this, AuthActivity.class);
+        startActivity(intent);
+        finish();
+    }
 }
