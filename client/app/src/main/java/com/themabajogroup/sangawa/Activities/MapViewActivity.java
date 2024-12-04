@@ -56,6 +56,7 @@ import com.themabajogroup.sangawa.Models.TaskStatus;
 import com.themabajogroup.sangawa.Models.TaskType;
 import com.themabajogroup.sangawa.Models.TransactionType;
 import com.themabajogroup.sangawa.Models.UserProfile;
+import com.themabajogroup.sangawa.Overlays.ChatDialog;
 import com.themabajogroup.sangawa.Overlays.TaskDialog;
 import com.themabajogroup.sangawa.Overlays.TaskListAdapter;
 import com.themabajogroup.sangawa.R;
@@ -324,10 +325,11 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         inflater.inflate(R.menu.menu_task_options, popupMenu.getMenu());
         MenuItem requestTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_request_task);
         MenuItem cancelRequestMenuItem = popupMenu.getMenu().findItem(R.id.menu_cancel_request);
+        MenuItem messageMenuItem = popupMenu.getMenu().findItem(R.id.menu_open_chatroom);
         MenuItem doneTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_done_task);
         MenuItem editTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_edit_task);
         MenuItem deleteTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_delete_task);
-        taskType.setVisibilityFor(requestTaskMenuItem, cancelRequestMenuItem, doneTaskMenuItem, editTaskMenuItem, deleteTaskMenuItem);
+        taskType.setVisibilityFor(requestTaskMenuItem, cancelRequestMenuItem, doneTaskMenuItem, editTaskMenuItem, deleteTaskMenuItem, messageMenuItem);
 
         popupMenu.setForceShowIcon(true);
 
@@ -362,7 +364,11 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                 geofencedTasks.remove(task.getTaskId());
                 refreshUserTaskList();
                 Toast.makeText(this, "Deleted " + task.getTitle() + " successfully!", Toast.LENGTH_SHORT).show();
-            } else {
+            } else if (itemId == R.id.menu_open_chatroom){
+                ChatDialog chatDialog = new ChatDialog(this, task.getTaskId(), userController.getCurrentUser().getUid(), task.getTitle());
+                chatDialog.show();
+            }
+            else {
                 return false;
             }
             return true;

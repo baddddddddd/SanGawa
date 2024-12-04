@@ -22,7 +22,7 @@ public class TaskType {
     }
 
     // NOTE: cancelTaskMenuItem.setVisible(false); setted false for all as it won't be needed
-    public void setVisibilityFor(MenuItem requestTaskMenuItem, MenuItem cancelTaskMenuItem, MenuItem doneTaskMenuItem, MenuItem editTaskMenuItem, MenuItem deleteTaskMenuItem) {
+    public void setVisibilityFor(MenuItem requestTaskMenuItem, MenuItem cancelTaskMenuItem, MenuItem doneTaskMenuItem, MenuItem editTaskMenuItem, MenuItem deleteTaskMenuItem, MenuItem messageMenuItem) {
         switch (this.name) {
             case "ACTIVE":
                 requestTaskMenuItem.setVisible(false);
@@ -30,6 +30,7 @@ public class TaskType {
                 doneTaskMenuItem.setVisible(true);
                 editTaskMenuItem.setVisible(true);
                 deleteTaskMenuItem.setVisible(true);
+                messageMenuItem.setVisible(true);
                 break;
 
             case "DUE":
@@ -38,6 +39,7 @@ public class TaskType {
                 doneTaskMenuItem.setVisible(true);
                 editTaskMenuItem.setVisible(true);
                 deleteTaskMenuItem.setVisible(true);
+                messageMenuItem.setVisible(true);
                 break;
 
             case "COMPLETE":
@@ -46,6 +48,7 @@ public class TaskType {
                 doneTaskMenuItem.setVisible(false);
                 editTaskMenuItem.setVisible(false);
                 deleteTaskMenuItem.setVisible(true);
+                messageMenuItem.setVisible(false);
                 break;
 
             case "PENDING":
@@ -54,6 +57,7 @@ public class TaskType {
                 doneTaskMenuItem.setVisible(false);
                 editTaskMenuItem.setVisible(false);
                 deleteTaskMenuItem.setVisible(false);
+                messageMenuItem.setVisible(false);
                 break;
 
             case "JOINED":
@@ -62,6 +66,7 @@ public class TaskType {
                 doneTaskMenuItem.setVisible(true);
                 editTaskMenuItem.setVisible(false);
                 deleteTaskMenuItem.setVisible(true);
+                messageMenuItem.setVisible(true);
                 break;
 
             case "NEARBY":
@@ -70,6 +75,7 @@ public class TaskType {
                 doneTaskMenuItem.setVisible(false);
                 editTaskMenuItem.setVisible(false);
                 deleteTaskMenuItem.setVisible(false);
+                messageMenuItem.setVisible(false);
                 break;
         }
     }
