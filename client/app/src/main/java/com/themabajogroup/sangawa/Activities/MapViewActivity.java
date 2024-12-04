@@ -93,6 +93,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     private List<Marker> userTaskMarkers;
     private List<Marker> sharedTaskMarkers;
     private Set<String> geofencedTasks;
+    private LatLng lastRefreshLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -195,20 +196,23 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                     return;
                 }
 
-                LatLng lastLocation = userController.getCurrentLocation();
                 LatLng newLocation = new LatLng(
                         locationResult.getLastLocation().getLatitude(),
                         locationResult.getLastLocation().getLongitude()
                 );
+
                 userController.setCurrentLocation(newLocation);
 
-                if (lastLocation != null) {
-                    double distance = Converter.getDistance(lastLocation, newLocation);
+                if (lastRefreshLocation != null) {
+                    double distance = Converter.getDistance(lastRefreshLocation, newLocation);
                     final double SCAN_REFRESH_DISTANCE = 1000;
 
                     if (distance >= SCAN_REFRESH_DISTANCE) {
+                        lastRefreshLocation = newLocation;
                         refreshNearbyTaskList();
                     }
+                } else {
+                    lastRefreshLocation = newLocation;
                 }
             }
         };
