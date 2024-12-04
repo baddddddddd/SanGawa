@@ -216,9 +216,9 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
     }
 
     private static void setPrivacyGroupSelection(TaskVisibility visibility, RadioGroup privacyGroup) {
-        privacyGroup.check(visibility == TaskVisibility.OPEN_TO_ALL ? R.id.OPEN_TO_ALL :
-                visibility == TaskVisibility.PRIVATE ? R.id.PRIVATE :
-                        R.id.REQUEST_TO_JOIN);
+        privacyGroup.check(visibility == TaskVisibility.OPEN_TO_ALL
+                ? R.id.OPEN_TO_ALL
+                : R.id.PRIVATE);
     }
 
     private static TaskVisibility getTaskVisibility(int selectedPrivacyId) {
@@ -226,8 +226,6 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
             return TaskVisibility.OPEN_TO_ALL;
         } else if (selectedPrivacyId == R.id.PRIVATE) {
             return TaskVisibility.PRIVATE;
-        } else if (selectedPrivacyId == R.id.REQUEST_TO_JOIN) {
-            return TaskVisibility.REQUEST_TO_JOIN;
         } else {
             throw new IllegalArgumentException("Invalid privacy option selected");
         }
