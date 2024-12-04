@@ -336,6 +336,10 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             } else if (itemId == R.id.menu_done_task) {
                 geofencingClient.removeGeofences(List.of(task.getTaskId()));
                 geofencedTasks.remove(task.getTaskId());
+                taskController.editUserTaskStatus(task.getTaskId(), TaskStatus.COMPLETED).thenAccept(isSuccess -> {
+                    refreshUserTaskList();
+                    Toast.makeText(this, "Finished task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+                });
                 Toast.makeText(this, "Finished task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
             } else if (itemId == R.id.menu_edit_task) {
                 TaskDialog editTaskDialog = new TaskDialog(this, TransactionType.EDIT, task);

@@ -12,6 +12,7 @@ import com.themabajogroup.sangawa.Models.CollabRequest;
 import com.themabajogroup.sangawa.Models.RequestDetails;
 import com.themabajogroup.sangawa.Models.RequestStatus;
 import com.themabajogroup.sangawa.Models.TaskDetails;
+import com.themabajogroup.sangawa.Models.TaskStatus;
 import com.themabajogroup.sangawa.Utils.Converter;
 
 import java.util.ArrayList;
@@ -88,6 +89,26 @@ public class TaskController {
 
         return result;
     }
+
+    public CompletableFuture<Boolean> editUserTaskStatus(String taskId, TaskStatus status) {
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+        Map<String, Object> updateData = new HashMap<>();
+        updateData.put("status", status.name());
+
+        db.collection("tasks")
+                .document(taskId)
+                .update(updateData)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        result.complete(true);
+                    } else {
+                        result.completeExceptionally(task.getException());
+                    }
+                });
+
+        return result;
+    }
+
 
     public CompletableFuture<Boolean> deleteUserTask(String taskId) {
         CompletableFuture<Boolean> result = new CompletableFuture<>();
