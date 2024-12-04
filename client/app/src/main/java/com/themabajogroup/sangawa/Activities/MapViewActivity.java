@@ -13,6 +13,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.MenuInflater;
@@ -54,6 +56,7 @@ import com.themabajogroup.sangawa.Models.TaskStatus;
 import com.themabajogroup.sangawa.Models.TaskType;
 import com.themabajogroup.sangawa.Models.TransactionType;
 import com.themabajogroup.sangawa.Models.UserProfile;
+import com.themabajogroup.sangawa.Overlays.ChatDialog;
 import com.themabajogroup.sangawa.Overlays.TaskDialog;
 import com.themabajogroup.sangawa.Overlays.TaskListAdapter;
 import com.themabajogroup.sangawa.R;
@@ -93,6 +96,8 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     private List<Marker> userTaskMarkers;
     private List<Marker> sharedTaskMarkers;
     private Set<String> geofencedTasks;
+    private LatLng lastRefreshLocation;
+    private final float cameraZoomLevel = 17;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +130,12 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
         TaskDialog editTaskDialog = new TaskDialog(this, TransactionType.ADD);
         btnAddTask.setOnClickListener(view -> editTaskDialog.show(getSupportFragmentManager(), "MapFragment"));
+
+        ImageButton btnSettings = findViewById(R.id.settings_button);
+        btnSettings.setOnClickListener(view -> {
+//            Intent intent = new Intent(MapViewActivity.this, EditProfileActivity.class);
+//            startActivity(intent);
+        });
 
         MaterialButtonToggleGroup toggleGroup = findViewById(R.id.toggleGroup);
         userTab = findViewById(R.id.usertab);
@@ -203,20 +214,24 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                     return;
                 }
 
-                LatLng lastLocation = userController.getCurrentLocation();
                 LatLng newLocation = new LatLng(
                         locationResult.getLastLocation().getLatitude(),
                         locationResult.getLastLocation().getLongitude()
                 );
+
                 userController.setCurrentLocation(newLocation);
 
-                if (lastLocation != null) {
-                    double distance = Converter.getDistance(lastLocation, newLocation);
+                if (lastRefreshLocation != null) {
+                    double distance = Converter.getDistance(lastRefreshLocation, newLocation);
                     final double SCAN_REFRESH_DISTANCE = 1000;
 
                     if (distance >= SCAN_REFRESH_DISTANCE) {
-                        refreshNearbyTaskList();
+                        lastRefreshLocation = newLocation;
+                        refreshSharedTaskLists();
                     }
+                } else {
+                    lastRefreshLocation = newLocation;
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newLocation, cameraZoomLevel));
                 }
             }
         };
@@ -302,7 +317,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
         // Move camera to a default location until the location updates
         LatLng bsuAlangilan = new LatLng(13.7839623, 121.0740536);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bsuAlangilan, 15));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bsuAlangilan, cameraZoomLevel));
         userController.setCurrentLocation(bsuAlangilan);
 
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
@@ -318,10 +333,11 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         inflater.inflate(R.menu.menu_task_options, popupMenu.getMenu());
         MenuItem requestTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_request_task);
         MenuItem cancelRequestMenuItem = popupMenu.getMenu().findItem(R.id.menu_cancel_request);
+        MenuItem messageMenuItem = popupMenu.getMenu().findItem(R.id.menu_open_chatroom);
         MenuItem doneTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_done_task);
         MenuItem editTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_edit_task);
         MenuItem deleteTaskMenuItem = popupMenu.getMenu().findItem(R.id.menu_delete_task);
-        taskType.setVisibilityFor(requestTaskMenuItem, cancelRequestMenuItem, doneTaskMenuItem, editTaskMenuItem, deleteTaskMenuItem);
+        taskType.setVisibilityFor(requestTaskMenuItem, cancelRequestMenuItem, doneTaskMenuItem, editTaskMenuItem, deleteTaskMenuItem, messageMenuItem);
 
         popupMenu.setForceShowIcon(true);
 
@@ -329,17 +345,21 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             int itemId = item.getItemId();
             if (itemId == R.id.menu_view_task) {
                 LatLng taskLocation = new LatLng(task.getLocationLat(), task.getLocationLon());
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(taskLocation, 16f));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(taskLocation, cameraZoomLevel));
                 BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet));
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             } else if (itemId == R.id.menu_request_task) {
                 sendCollabRequest(task).thenAccept(isSuccess -> {
-                    Toast.makeText(this, "Request for" + task.getTitle() + "Sent", Toast.LENGTH_SHORT).show();
-                    refreshCollabLists();
+                    Toast.makeText(this, "Request for " + task.getTitle() + " Sent", Toast.LENGTH_SHORT).show();
+                    refreshSharedTaskLists();
                 });
             } else if (itemId == R.id.menu_done_task) {
                 geofencingClient.removeGeofences(List.of(task.getTaskId()));
                 geofencedTasks.remove(task.getTaskId());
+                taskController.editUserTaskStatus(task.getTaskId(), TaskStatus.COMPLETED).thenAccept(isSuccess -> {
+                    refreshUserTaskList();
+                    Toast.makeText(this, "Finished task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+                });
                 Toast.makeText(this, "Finished task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
             } else if (itemId == R.id.menu_edit_task) {
                 TaskDialog editTaskDialog = new TaskDialog(this, TransactionType.EDIT, task);
@@ -352,7 +372,11 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                 geofencedTasks.remove(task.getTaskId());
                 refreshUserTaskList();
                 Toast.makeText(this, "Deleted " + task.getTitle() + " successfully!", Toast.LENGTH_SHORT).show();
-            } else {
+            } else if (itemId == R.id.menu_open_chatroom){
+                ChatDialog chatDialog = new ChatDialog(this, task.getTaskId(), userController.getCurrentUser().getUid(), task.getTitle());
+                chatDialog.show();
+            }
+            else {
                 return false;
             }
             return true;
@@ -366,9 +390,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             setupCollabListener();
             setupPendingCollabRequests();
         });
-        refreshNearbyTaskList();
-        refreshCollabLists();
-
+        startTaskRefresherLoop();
     }
 
 
@@ -389,20 +411,33 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
         userController.fetchUserTasks().thenAccept(tasks -> {
             if (tasks != null) {
-                List<TaskDetails> activeTask = tasks.stream()
-                        .filter(r -> r.getStatus() == TaskStatus.PENDING)
-                        .peek(r -> currentTasks.put(r.getTaskId(), r))
+                Set<String> processedTaskIds = new HashSet<>();
+
+                List<TaskDetails> completedTask = tasks.stream()
+                        .filter(r -> !processedTaskIds.contains(r.getTaskId()) && r.getStatus() == TaskStatus.COMPLETED)
+                        .peek(r -> {
+                            processedTaskIds.add(r.getTaskId());
+                            currentTasks.put(r.getTaskId(), r);
+                        })
                         .collect(Collectors.toList());
 
                 List<TaskDetails> dueTask = tasks.stream()
-                        .filter(r -> LocalDateTime.ofInstant(r.getDeadline().toInstant(), ZoneId.systemDefault()).isBefore(LocalDateTime.now()))
-                        .peek(r -> currentTasks.put(r.getTaskId(), r))
+                        .filter(r -> !processedTaskIds.contains(r.getTaskId())
+                                && LocalDateTime.ofInstant(r.getDeadline().toInstant(), ZoneId.systemDefault()).isBefore(LocalDateTime.now()))
+                        .peek(r -> {
+                            processedTaskIds.add(r.getTaskId());
+                            currentTasks.put(r.getTaskId(), r);
+                        })
                         .collect(Collectors.toList());
 
-                List<TaskDetails> completedTask = tasks.stream()
-                        .filter(r -> r.getStatus() == TaskStatus.COMPLETED)
-                        .peek(r -> currentTasks.put(r.getTaskId(), r))
+                List<TaskDetails> activeTask = tasks.stream()
+                        .filter(r -> !processedTaskIds.contains(r.getTaskId()) && r.getStatus() == TaskStatus.PENDING)
+                        .peek(r -> {
+                            processedTaskIds.add(r.getTaskId());
+                            currentTasks.put(r.getTaskId(), r);
+                        })
                         .collect(Collectors.toList());
+
 
                 if (!activeTask.isEmpty()) {
                     activeLayout.setVisibility(View.VISIBLE);
@@ -437,42 +472,11 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         return result;
     }
 
-    public void refreshNearbyTaskList() {
-        recyclerViewNearbyTasks.setLayoutManager(new LinearLayoutManager(this));
+    public void refreshSharedTaskLists() {
+        RecyclerView recyclerViewNearby = findViewById(R.id.recyclerViewNearbyTasks);
         LinearLayout nearbyLayout = findViewById(R.id.layout_nearby);
+        recyclerViewNearby.setLayoutManager(new LinearLayoutManager(this));
 
-        userController.fetchNearbyTasks().thenAccept(tasks -> {
-            if (tasks != null && !tasks.isEmpty()) {
-                List<TaskDetails> filteredTasks = new ArrayList<>();
-                Set<String> pendingRequestIds = currentRequests.keySet();
-
-                for (TaskDetails task : tasks) {
-                    if (!pendingRequestIds.contains(task.getTaskId())) {
-                        filteredTasks.add(task);
-                    }
-                }
-
-                if (!filteredTasks.isEmpty()) {
-                    nearbyLayout.setVisibility(View.VISIBLE);
-                    TaskListAdapter taskListAdapter = new TaskListAdapter(filteredTasks, this, TaskType.NEARBY);
-                    recyclerViewNearbyTasks.setAdapter(taskListAdapter);
-
-                    for (TaskDetails taskDetails : filteredTasks) {
-                        currentTasks.put(taskDetails.getTaskId(), taskDetails);
-                    }
-
-                } else {
-                    nearbyLayout.setVisibility(View.GONE);
-                }
-
-                refreshNearbyTaskMarkers(tasks);
-            } else {
-                nearbyLayout.setVisibility(View.GONE);
-            }
-        });
-    }
-
-    public void refreshCollabLists() {
         RecyclerView recyclerViewPending = findViewById(R.id.recyclerViewPendingRequest);
         LinearLayout pendingLayout = findViewById(R.id.layout_pending);
         recyclerViewPending.setLayoutManager(new LinearLayoutManager(this));
@@ -481,37 +485,63 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         LinearLayout joinedLayout = findViewById(R.id.layout_joined);
         recyclerViewJoined.setLayoutManager(new LinearLayoutManager(this));
 
-        taskController.getRequestHistory(userController.getCurrentUser().getUid()).thenAccept(request -> {
-            if (request != null) {
-                List<RequestDetails> pendingRequests = request.stream()
-                        .filter(r -> r.getStatus() == RequestStatus.PENDING)
-                        .peek(r -> currentRequests.put(r.getTaskId(), r))
-                        .collect(Collectors.toList());
+        userController.fetchNearbyTasks().thenAccept(tasks -> {
+            taskController.getRequestHistory(userController.getCurrentUser().getUid()).thenAccept(request -> {
+                if (tasks != null && request != null) {
+                    List<TaskDetails> filteredNearbyTasks = new ArrayList<>();
+                    List<RequestDetails> pendingRequests = new ArrayList<>();
+                    List<RequestDetails> acceptedRequests = new ArrayList<>();
+                    Set<String> excludedTaskIds = new HashSet<>();
 
-                List<RequestDetails> acceptedRequests = request.stream()
-                        .filter(r -> r.getStatus() == RequestStatus.ACCEPTED)
-                        .peek(r -> currentRequests.put(r.getTaskId(), r))
-                        .collect(Collectors.toList());
+                    pendingRequests = request.stream()
+                            .filter(r -> r.getStatus() == RequestStatus.PENDING)
+                            .peek(r -> excludedTaskIds.add(r.getTaskId()))
+                            .collect(Collectors.toList());
 
-                if (!pendingRequests.isEmpty()) {
-                    pendingLayout.setVisibility(View.VISIBLE);
-                    recyclerViewPending.setAdapter(new TaskListAdapter(pendingRequests, this, TaskType.PENDING));
+                    acceptedRequests = request.stream()
+                            .filter(r -> r.getStatus() == RequestStatus.ACCEPTED)
+                            .peek(r -> excludedTaskIds.add(r.getTaskId()))
+                            .collect(Collectors.toList());
+
+                    for (TaskDetails task : tasks) {
+                        if (!excludedTaskIds.contains(task.getTaskId())) {
+                            filteredNearbyTasks.add(task);
+                        }
+                    }
+
+                    if (!filteredNearbyTasks.isEmpty()) {
+                        nearbyLayout.setVisibility(View.VISIBLE);
+                        TaskListAdapter taskListAdapter = new TaskListAdapter(filteredNearbyTasks, this, TaskType.NEARBY);
+                        recyclerViewNearby.setAdapter(taskListAdapter);
+                        filteredNearbyTasks.forEach(task -> currentTasks.put(task.getTaskId(), task));
+                    } else {
+                        nearbyLayout.setVisibility(View.GONE);
+                    }
+
+                    if (!pendingRequests.isEmpty()) {
+                        pendingLayout.setVisibility(View.VISIBLE);
+                        recyclerViewPending.setAdapter(new TaskListAdapter(pendingRequests, this, TaskType.PENDING));
+                    } else {
+                        pendingLayout.setVisibility(View.GONE);
+                    }
+
+                    if (!acceptedRequests.isEmpty()) {
+                        joinedLayout.setVisibility(View.VISIBLE);
+                        recyclerViewJoined.setAdapter(new TaskListAdapter(acceptedRequests, this, TaskType.JOINED));
+                    } else {
+                        joinedLayout.setVisibility(View.GONE);
+                    }
+
+                    refreshNearbyTaskMarkers(filteredNearbyTasks);
                 } else {
+                    nearbyLayout.setVisibility(View.GONE);
                     pendingLayout.setVisibility(View.GONE);
-                }
-
-                if (!acceptedRequests.isEmpty()) {
-                    joinedLayout.setVisibility(View.VISIBLE);
-                    recyclerViewJoined.setAdapter(new TaskListAdapter(acceptedRequests, this, TaskType.JOINED));
-                } else {
                     joinedLayout.setVisibility(View.GONE);
                 }
-            } else {
-                pendingLayout.setVisibility(View.GONE);
-                joinedLayout.setVisibility(View.GONE);
-            }
+            });
         });
     }
+
 
     public void refreshUserTaskMarkers(List<TaskDetails> taskDetailsList) {
         List<Marker> markers = new ArrayList<>();
@@ -644,10 +674,10 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                 .thenAccept(isSuccess -> {
                     if (!isSuccess) {
                         result.complete(false);
-                        return;
+                    } else {
+                        addCollabReplyListener(taskDetails);
+                        result.complete(true);
                     }
-
-                    addCollabReplyListener(taskDetails);
                 });
 
         return result;
@@ -741,5 +771,17 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         return result;
     }
 
+    public void startTaskRefresherLoop() {
+        Handler handler = new Handler(Looper.getMainLooper());
 
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                refreshSharedTaskLists();
+                handler.postDelayed(this, 60000);
+            }
+        };
+
+        handler.post(runnable);
+    }
 }
