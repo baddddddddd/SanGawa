@@ -209,7 +209,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
                     if (distance >= SCAN_REFRESH_DISTANCE) {
                         lastRefreshLocation = newLocation;
-                        refreshNearbyTaskList();
+                        refreshSharedTaskLists();
                     }
                 } else {
                     lastRefreshLocation = newLocation;
@@ -331,7 +331,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             } else if (itemId == R.id.menu_request_task) {
                 sendCollabRequest(task).thenAccept(isSuccess -> {
                     Toast.makeText(this, "Request for" + task.getTitle() + "Sent", Toast.LENGTH_SHORT).show();
-                    refreshCollabLists();
+                    refreshSharedTaskLists();
                 });
             } else if (itemId == R.id.menu_done_task) {
                 geofencingClient.removeGeofences(List.of(task.getTaskId()));
@@ -366,8 +366,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             setupCollabListener();
             setupPendingCollabRequests();
         });
-        refreshNearbyTaskList();
-        refreshCollabLists();
+        refreshSharedTaskLists();
 
     }
 
@@ -388,20 +387,33 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
         userController.fetchUserTasks().thenAccept(tasks -> {
             if (tasks != null) {
-                List<TaskDetails> activeTask = tasks.stream()
-                        .filter(r -> r.getStatus() == TaskStatus.PENDING)
-                        .peek(r -> currentTasks.put(r.getTaskId(), r))
+                Set<String> processedTaskIds = new HashSet<>();
+
+                List<TaskDetails> completedTask = tasks.stream()
+                        .filter(r -> !processedTaskIds.contains(r.getTaskId()) && r.getStatus() == TaskStatus.COMPLETED)
+                        .peek(r -> {
+                            processedTaskIds.add(r.getTaskId());
+                            currentTasks.put(r.getTaskId(), r);
+                        })
                         .collect(Collectors.toList());
 
                 List<TaskDetails> dueTask = tasks.stream()
-                        .filter(r -> LocalDateTime.ofInstant(r.getDeadline().toInstant(), ZoneId.systemDefault()).isBefore(LocalDateTime.now()))
-                        .peek(r -> currentTasks.put(r.getTaskId(), r))
+                        .filter(r -> !processedTaskIds.contains(r.getTaskId())
+                                && LocalDateTime.ofInstant(r.getDeadline().toInstant(), ZoneId.systemDefault()).isBefore(LocalDateTime.now()))
+                        .peek(r -> {
+                            processedTaskIds.add(r.getTaskId());
+                            currentTasks.put(r.getTaskId(), r);
+                        })
                         .collect(Collectors.toList());
 
-                List<TaskDetails> completedTask = tasks.stream()
-                        .filter(r -> r.getStatus() == TaskStatus.COMPLETED)
-                        .peek(r -> currentTasks.put(r.getTaskId(), r))
+                List<TaskDetails> activeTask = tasks.stream()
+                        .filter(r -> !processedTaskIds.contains(r.getTaskId()) && r.getStatus() == TaskStatus.PENDING)
+                        .peek(r -> {
+                            processedTaskIds.add(r.getTaskId());
+                            currentTasks.put(r.getTaskId(), r);
+                        })
                         .collect(Collectors.toList());
+
 
                 if (!activeTask.isEmpty()) {
                     activeLayout.setVisibility(View.VISIBLE);
@@ -436,42 +448,11 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         return result;
     }
 
-    public void refreshNearbyTaskList() {
-        recyclerViewNearbyTasks.setLayoutManager(new LinearLayoutManager(this));
+    public void refreshSharedTaskLists() {
+        RecyclerView recyclerViewNearby = findViewById(R.id.recyclerViewNearbyTasks);
         LinearLayout nearbyLayout = findViewById(R.id.layout_nearby);
+        recyclerViewNearby.setLayoutManager(new LinearLayoutManager(this));
 
-        userController.fetchNearbyTasks().thenAccept(tasks -> {
-            if (tasks != null && !tasks.isEmpty()) {
-                List<TaskDetails> filteredTasks = new ArrayList<>();
-                Set<String> pendingRequestIds = currentRequests.keySet();
-
-                for (TaskDetails task : tasks) {
-                    if (!pendingRequestIds.contains(task.getTaskId())) {
-                        filteredTasks.add(task);
-                    }
-                }
-
-                if (!filteredTasks.isEmpty()) {
-                    nearbyLayout.setVisibility(View.VISIBLE);
-                    TaskListAdapter taskListAdapter = new TaskListAdapter(filteredTasks, this, TaskType.NEARBY);
-                    recyclerViewNearbyTasks.setAdapter(taskListAdapter);
-
-                    for (TaskDetails taskDetails : filteredTasks) {
-                        currentTasks.put(taskDetails.getTaskId(), taskDetails);
-                    }
-
-                } else {
-                    nearbyLayout.setVisibility(View.GONE);
-                }
-
-                refreshNearbyTaskMarkers(tasks);
-            } else {
-                nearbyLayout.setVisibility(View.GONE);
-            }
-        });
-    }
-
-    public void refreshCollabLists() {
         RecyclerView recyclerViewPending = findViewById(R.id.recyclerViewPendingRequest);
         LinearLayout pendingLayout = findViewById(R.id.layout_pending);
         recyclerViewPending.setLayoutManager(new LinearLayoutManager(this));
@@ -480,37 +461,63 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         LinearLayout joinedLayout = findViewById(R.id.layout_joined);
         recyclerViewJoined.setLayoutManager(new LinearLayoutManager(this));
 
-        taskController.getRequestHistory(userController.getCurrentUser().getUid()).thenAccept(request -> {
-            if (request != null) {
-                List<RequestDetails> pendingRequests = request.stream()
-                        .filter(r -> r.getStatus() == RequestStatus.PENDING)
-                        .peek(r -> currentRequests.put(r.getTaskId(), r))
-                        .collect(Collectors.toList());
+        userController.fetchNearbyTasks().thenAccept(tasks -> {
+            taskController.getRequestHistory(userController.getCurrentUser().getUid()).thenAccept(request -> {
+                if (tasks != null && request != null) {
+                    List<TaskDetails> filteredNearbyTasks = new ArrayList<>();
+                    List<RequestDetails> pendingRequests = new ArrayList<>();
+                    List<RequestDetails> acceptedRequests = new ArrayList<>();
+                    Set<String> excludedTaskIds = new HashSet<>();
 
-                List<RequestDetails> acceptedRequests = request.stream()
-                        .filter(r -> r.getStatus() == RequestStatus.ACCEPTED)
-                        .peek(r -> currentRequests.put(r.getTaskId(), r))
-                        .collect(Collectors.toList());
+                    pendingRequests = request.stream()
+                            .filter(r -> r.getStatus() == RequestStatus.PENDING)
+                            .peek(r -> excludedTaskIds.add(r.getTaskId()))
+                            .collect(Collectors.toList());
 
-                if (!pendingRequests.isEmpty()) {
-                    pendingLayout.setVisibility(View.VISIBLE);
-                    recyclerViewPending.setAdapter(new TaskListAdapter(pendingRequests, this, TaskType.PENDING));
+                    acceptedRequests = request.stream()
+                            .filter(r -> r.getStatus() == RequestStatus.ACCEPTED)
+                            .peek(r -> excludedTaskIds.add(r.getTaskId()))
+                            .collect(Collectors.toList());
+
+                    for (TaskDetails task : tasks) {
+                        if (!excludedTaskIds.contains(task.getTaskId())) {
+                            filteredNearbyTasks.add(task);
+                        }
+                    }
+
+                    if (!filteredNearbyTasks.isEmpty()) {
+                        nearbyLayout.setVisibility(View.VISIBLE);
+                        TaskListAdapter taskListAdapter = new TaskListAdapter(filteredNearbyTasks, this, TaskType.NEARBY);
+                        recyclerViewNearby.setAdapter(taskListAdapter);
+                        filteredNearbyTasks.forEach(task -> currentTasks.put(task.getTaskId(), task));
+                    } else {
+                        nearbyLayout.setVisibility(View.GONE);
+                    }
+
+                    if (!pendingRequests.isEmpty()) {
+                        pendingLayout.setVisibility(View.VISIBLE);
+                        recyclerViewPending.setAdapter(new TaskListAdapter(pendingRequests, this, TaskType.PENDING));
+                    } else {
+                        pendingLayout.setVisibility(View.GONE);
+                    }
+
+                    if (!acceptedRequests.isEmpty()) {
+                        joinedLayout.setVisibility(View.VISIBLE);
+                        recyclerViewJoined.setAdapter(new TaskListAdapter(acceptedRequests, this, TaskType.JOINED));
+                    } else {
+                        joinedLayout.setVisibility(View.GONE);
+                    }
+
+                    refreshNearbyTaskMarkers(filteredNearbyTasks);
                 } else {
+                    nearbyLayout.setVisibility(View.GONE);
                     pendingLayout.setVisibility(View.GONE);
-                }
-
-                if (!acceptedRequests.isEmpty()) {
-                    joinedLayout.setVisibility(View.VISIBLE);
-                    recyclerViewJoined.setAdapter(new TaskListAdapter(acceptedRequests, this, TaskType.JOINED));
-                } else {
                     joinedLayout.setVisibility(View.GONE);
                 }
-            } else {
-                pendingLayout.setVisibility(View.GONE);
-                joinedLayout.setVisibility(View.GONE);
-            }
+            });
         });
     }
+
 
     public void refreshUserTaskMarkers(List<TaskDetails> taskDetailsList) {
         List<Marker> markers = new ArrayList<>();

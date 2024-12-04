@@ -37,7 +37,7 @@ public class TaskType {
                 cancelTaskMenuItem.setVisible(false);
                 doneTaskMenuItem.setVisible(true);
                 editTaskMenuItem.setVisible(true);
-                deleteTaskMenuItem.setVisible(false);
+                deleteTaskMenuItem.setVisible(true);
                 break;
 
             case "COMPLETE":
