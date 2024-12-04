@@ -26,6 +26,7 @@ public class ChatDialog extends Dialog {
     private final String taskId;
     private final ChatController chatController = ChatController.getInstance();
     private final String title;
+    private final TextInputEditText inputMessage = findViewById(R.id.message);
 
     public ChatDialog(Context context, String taskId, String currentUserId, String title) {
         super(context);
@@ -45,7 +46,6 @@ public class ChatDialog extends Dialog {
         taskTitle.setText(title);
         RecyclerView recyclerViewMessages = findViewById(R.id.recyclerViewMessages);
         recyclerViewMessages.setLayoutManager(new LinearLayoutManager(getContext()));
-        TextInputEditText inputMessage = findViewById(R.id.message);
         List<MessageDetails> messageDetailsList = new ArrayList<>();
 
         ChatListAdapter adapter = new ChatListAdapter(messageDetailsList, currentUserId);
@@ -86,6 +86,7 @@ public class ChatDialog extends Dialog {
                 .thenAccept(success -> {
                     if (success) {
                         Toast.makeText(getContext(), "Message sent", Toast.LENGTH_SHORT).show();
+                        inputMessage.setText("");
                     } else {
                         Toast.makeText(getContext(), "Failed to send message", Toast.LENGTH_SHORT).show();
                     }
