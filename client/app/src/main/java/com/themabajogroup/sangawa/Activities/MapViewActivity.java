@@ -119,6 +119,12 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         TaskDialog editTaskDialog = new TaskDialog(this, TransactionType.ADD);
         btnAddTask.setOnClickListener(view -> editTaskDialog.show(getSupportFragmentManager(), "MapFragment"));
 
+        ImageButton btnSettings = findViewById(R.id.settings_button);
+        btnSettings.setOnClickListener(view -> {
+//            Intent intent = new Intent(MapViewActivity.this, EditProfileActivity.class);
+//            startActivity(intent);
+        });
+
         MaterialButtonToggleGroup toggleGroup = findViewById(R.id.toggleGroup);
         userTab = findViewById(R.id.usertab);
         sharedTab = findViewById(R.id.sharedtab);

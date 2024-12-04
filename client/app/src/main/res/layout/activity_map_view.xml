@@ -52,8 +52,18 @@
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Add Task"
-                android:paddingHorizontal="10dp"
+                android:paddingHorizontal="15dp"
                 android:src="@drawable/baseline_add_24"
+                tools:ignore="HardcodedText,TouchTargetSizeCheck" />
+
+            <ImageButton
+                android:id="@+id/settings_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Edit Profile"
+                android:paddingHorizontal="15dp"
+                android:src="@drawable/baseline_settings_24"
                 tools:ignore="HardcodedText,TouchTargetSizeCheck" />
 
         </LinearLayout>
