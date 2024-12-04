@@ -120,6 +120,14 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         ImageButton btnAddTask = findViewById(R.id.add_task_button);
+
+        ImageButton editProfileButton = findViewById(R.id.edit_profile_button);
+
+        editProfileButton.setOnClickListener(view -> {
+            Intent intent = new Intent(MapViewActivity.this, EditProfileActivity.class);
+            startActivity(intent);
+        });
+
         TaskDialog editTaskDialog = new TaskDialog(this, TransactionType.ADD);
         btnAddTask.setOnClickListener(view -> editTaskDialog.show(getSupportFragmentManager(), "MapFragment"));
 
@@ -384,6 +392,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         });
         startTaskRefresherLoop();
     }
+
 
     public CompletableFuture<Void> refreshUserTaskList() {
         CompletableFuture<Void> result = new CompletableFuture<>();
