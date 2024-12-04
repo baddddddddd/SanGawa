@@ -12,6 +12,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.themabajogroup.sangawa.Models.MessageDetails;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +56,7 @@ public class ChatController {
                         }
                     }
 
+                    messages.sort(Comparator.comparing(MessageDetails::getDateSent));
                     result.complete(messages);
                 })
                 .addOnFailureListener(runnable -> {
