@@ -13,6 +13,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.MenuInflater;
@@ -336,7 +338,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             } else if (itemId == R.id.menu_request_task) {
                 sendCollabRequest(task).thenAccept(isSuccess -> {
-                    Toast.makeText(this, "Request for" + task.getTitle() + "Sent", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Request for " + task.getTitle() + " Sent", Toast.LENGTH_SHORT).show();
                     refreshSharedTaskLists();
                 });
             } else if (itemId == R.id.menu_done_task) {
@@ -372,8 +374,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             setupCollabListener();
             setupPendingCollabRequests();
         });
-        refreshSharedTaskLists();
-
+        startTaskRefresherLoop();
     }
 
     public CompletableFuture<Void> refreshUserTaskList() {
@@ -656,11 +657,10 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                 .thenAccept(isSuccess -> {
                     if (!isSuccess) {
                         result.complete(false);
-                        return;
+                    } else {
+                        addCollabReplyListener(taskDetails);
+                        result.complete(true);
                     }
-
-                    addCollabReplyListener(taskDetails);
-                    result.complete(true);
                 });
 
         return result;
@@ -752,5 +752,19 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         taskController.removeJoinRequest(ownerId, taskId, requesterId).thenAccept(result::complete);
 
         return result;
+    }
+
+    public void startTaskRefresherLoop() {
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                refreshSharedTaskLists();
+                handler.postDelayed(this, 60000);
+            }
+        };
+
+        handler.post(runnable);
     }
 }
