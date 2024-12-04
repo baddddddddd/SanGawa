@@ -251,6 +251,10 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             return;
         }
 
+        if (!currentTasks.containsKey(taskDetails.getTaskId())) {
+            currentTasks.put(taskDetails.getTaskId(), taskDetails);
+        }
+
         float radius = userController.getProfile().getFencingRadius();
         Geofence geofence = new Geofence.Builder()
                 .setRequestId(taskDetails.getTaskId())
@@ -735,10 +739,6 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
                         getTaskByIdForced(taskId).thenAccept(fetchedTaskDetails -> {
                            addCollabReplyListener(fetchedTaskDetails);
-
-                           if (details.getStatus() == RequestStatus.ACCEPTED) {
-                               setupGeofence(fetchedTaskDetails);
-                           }
                         });
                     }
                 });
