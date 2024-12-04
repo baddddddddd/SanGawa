@@ -643,6 +643,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                     }
 
                     addCollabReplyListener(taskDetails);
+                    result.complete(true);
                 });
 
         return result;
