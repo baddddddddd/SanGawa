@@ -96,6 +96,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
     private List<Marker> sharedTaskMarkers;
     private Set<String> geofencedTasks;
     private LatLng lastRefreshLocation;
+    private final float cameraZoomLevel = 17;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -221,6 +222,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                     }
                 } else {
                     lastRefreshLocation = newLocation;
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newLocation, cameraZoomLevel));
                 }
             }
         };
@@ -306,7 +308,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
         // Move camera to a default location until the location updates
         LatLng bsuAlangilan = new LatLng(13.7839623, 121.0740536);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bsuAlangilan, 15));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bsuAlangilan, cameraZoomLevel));
         userController.setCurrentLocation(bsuAlangilan);
 
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
@@ -333,7 +335,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
             int itemId = item.getItemId();
             if (itemId == R.id.menu_view_task) {
                 LatLng taskLocation = new LatLng(task.getLocationLat(), task.getLocationLon());
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(taskLocation, 16f));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(taskLocation, cameraZoomLevel));
                 BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet));
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             } else if (itemId == R.id.menu_request_task) {
