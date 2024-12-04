@@ -57,6 +57,7 @@ import com.themabajogroup.sangawa.Models.TaskType;
 import com.themabajogroup.sangawa.Models.TransactionType;
 import com.themabajogroup.sangawa.Models.UserProfile;
 import com.themabajogroup.sangawa.Overlays.ChatDialog;
+import com.themabajogroup.sangawa.Overlays.SettingsDialog;
 import com.themabajogroup.sangawa.Overlays.TaskDialog;
 import com.themabajogroup.sangawa.Overlays.TaskListAdapter;
 import com.themabajogroup.sangawa.R;
@@ -121,21 +122,13 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
 
         ImageButton btnAddTask = findViewById(R.id.add_task_button);
 
-        ImageButton editProfileButton = findViewById(R.id.edit_profile_button);
-
-        editProfileButton.setOnClickListener(view -> {
-            Intent intent = new Intent(MapViewActivity.this, EditProfileActivity.class);
-            startActivity(intent);
-        });
+        ImageButton editProfileButton = findViewById(R.id.settings_button);
 
         TaskDialog editTaskDialog = new TaskDialog(this, TransactionType.ADD);
         btnAddTask.setOnClickListener(view -> editTaskDialog.show(getSupportFragmentManager(), "MapFragment"));
 
-        ImageButton btnSettings = findViewById(R.id.settings_button);
-        btnSettings.setOnClickListener(view -> {
-//            Intent intent = new Intent(MapViewActivity.this, EditProfileActivity.class);
-//            startActivity(intent);
-        });
+        SettingsDialog settingProfile = new SettingsDialog(this);
+        editProfileButton.setOnClickListener(view -> settingProfile.show());
 
         MaterialButtonToggleGroup toggleGroup = findViewById(R.id.toggleGroup);
         userTab = findViewById(R.id.usertab);

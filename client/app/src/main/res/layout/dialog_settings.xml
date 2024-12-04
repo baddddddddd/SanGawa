@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    app:cardCornerRadius="16dp"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent">
+
+    <ImageButton
+        android:id="@+id/cancel_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="10dp"
+        android:src="@drawable/baseline_close_24"
+        android:contentDescription="Close"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        tools:ignore="HardcodedText" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:fontFamily="@font/konkhmer_sleokchher"
+            android:text="Profile Settings"
+            android:textSize="34sp"
+            android:textColor="@color/fun_orange"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="5dp"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/email_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="16dp"
+            android:text="Display Name:"
+            android:textColor="@color/deep_blue"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/dname_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:boxBackgroundColor="@color/white"
+                app:boxCornerRadiusBottomEnd="20dp"
+                app:boxCornerRadiusBottomStart="20dp"
+                app:boxCornerRadiusTopEnd="20dp"
+                app:boxCornerRadiusTopStart="20dp"
+                app:hintEnabled="false"
+                app:boxStrokeColor="@color/amazing_green"
+                app:cursorColor="@color/amazing_green"
+                app:boxBackgroundMode="outline">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/setting_dname"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Display Name"
+                    android:inputType="textEmailAddress"
+                    android:textColor="@color/deep_blue"
+                    android:textSize="16sp"
+                    android:enabled="false"
+                    tools:ignore="HardcodedText,TextContrastCheck" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <ImageButton
+                android:id="@+id/edit_email"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/baseline_edit_24"
+                android:contentDescription="Pick Date"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_gravity="center_vertical"
+                tools:ignore="HardcodedText" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/fencing_radius_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="How close should you be to a task to be notified?"
+            android:textColor="@color/deep_blue"
+            android:textSize="16sp"
+            tools:ignore="HardcodedText" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/fencing_radius_slider"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:valueFrom="10"
+                android:valueTo="3000"
+                style="@style/CustomSlider"
+                android:stepSize="10" />
+
+            <TextView
+                android:id="@+id/fencing_radius_value"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"
+                android:gravity="center"
+                android:text="100 m"
+                tools:ignore="HardcodedText" />
+
+        </LinearLayout>
+
+
+
+        <TextView
+            android:id="@+id/scan_radius_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="How far should we scan for nearby public tasks?"
+            android:textColor="@color/deep_blue"
+            android:textSize="16sp"
+            tools:ignore="HardcodedText" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/scan_radius_slider"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:valueFrom="10"
+                android:valueTo="5000"
+                style="@style/CustomSlider"
+                android:stepSize="10" />
+
+            <TextView
+                android:id="@+id/scan_radius_value"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"
+                android:gravity="center"
+                android:text="100 m"
+                tools:ignore="HardcodedText" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/logout_button"
+                android:layout_width="150dp"
+                android:layout_height="60dp"
+                android:backgroundTint="#CA4848"
+                android:text="Logout"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <Space
+                android:layout_width="16dp"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/save_button"
+                android:layout_width="150dp"
+                android:layout_height="60dp"
+                android:backgroundTint="@color/amazing_green"
+                android:text="Save"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

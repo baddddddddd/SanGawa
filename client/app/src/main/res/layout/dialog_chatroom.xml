@@ -34,7 +34,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="5dp"
             android:fontFamily="@font/konkhmer_sleokchher"
-            android:text="Task Title"
+            android:text="Chatroom"
             android:textAlignment="center"
             android:textColor="@color/fun_orange"
             android:textSize="34sp"
