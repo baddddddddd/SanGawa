@@ -43,7 +43,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewMessages"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="250dp"
             android:clipToPadding="false"
             android:layout_marginHorizontal="5dp"
             android:scrollbars="none" />
@@ -74,12 +74,12 @@
                     android:id="@+id/message"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Enter you message here..."
+                    android:hint="Enter your message here..."
                     android:inputType="textMultiLine"
                     android:lines="1"
+                    android:scrollbars="vertical"
                     android:textColor="@color/deep_blue"
                     android:textSize="16sp"
-                    android:scrollbars="vertical"
                     tools:ignore="HardcodedText,TextContrastCheck" />
             </com.google.android.material.textfield.TextInputLayout>
 
