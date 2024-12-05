@@ -92,7 +92,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Shared Tasks"
+                android:text="Public Tasks"
                 style="@style/TabButtonStyle"
                 tools:ignore="HardcodedText" />
         </com.google.android.material.button.MaterialButtonToggleGroup>
