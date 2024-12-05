@@ -40,7 +40,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Task Management"
+                android:text="Tasks"
                 android:fontFamily="@font/konkhmer_sleokchher"
                 android:textColor="@color/white"
                 android:textSize="24sp"
