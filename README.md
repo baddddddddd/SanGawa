@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://raw.githubusercontent.com/baddddddddd/SanGawa/main/static/logo.svg">
-    <img src="images/logo.png" alt="Logo" width="240" height="240">
+    <img src="static/logo.svg" alt="Logo" width="240" height="240">
   </a>
 
   <h1 align="center">SanGawa</h1>
