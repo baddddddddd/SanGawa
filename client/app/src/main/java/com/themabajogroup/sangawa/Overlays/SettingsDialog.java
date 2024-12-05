@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -24,7 +25,7 @@ public class SettingsDialog extends Dialog {
     private Slider scanRadiusSlider;
     private TextView fencingRadiusValue;
     private TextView scanRadiusValue;
-    private Button cancelButton, saveButton;
+    private Button cancelButton, saveButton, logoutButton;
 
     private UserProfile profile;
     private final UserController userManager;
@@ -49,12 +50,17 @@ public class SettingsDialog extends Dialog {
         scanRadiusValue = findViewById(R.id.scan_radius_value);
         cancelButton = findViewById(R.id.cancel_button);
         saveButton = findViewById(R.id.save_button);
+        logoutButton = findViewById(R.id.logout_button);
 
         fetchAndPopulateProfile();
 
         editDisplayNameButton.setOnClickListener(v -> {
             displayNameInput.setEnabled(true);
             displayNameInput.requestFocus();
+        });
+
+        logoutButton.setOnClickListener(v -> {
+            // TODO: add logic to logout
         });
 
         cancelButton.setOnClickListener(v -> dismiss());
