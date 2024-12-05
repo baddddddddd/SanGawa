@@ -1,8 +1,31 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <style name="CustomSlider" parent="Widget.MaterialComponents.Slider">
+        <item name="thumbTint">@color/amazing_green</item>
+        <item name="tickColorActive">@color/amazing_green</item>
+        <item name="tickColorInactive">#A9A9A9</item>
+        <item name="thumbRadius">100dp</item>
+        <item name="thumbHeight">15dp</item>
+        <item name="thumbWidth">15dp</item>
+        <item name="thumbColor">@color/amazing_green</item>
+        <item name="trackColorInactive">#EBEBEB</item>
+        <item name="trackColorActive">@color/amazing_green</item>
+    </style>
+
+    <style name="popupMenuStyle" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:textColor">@color/deep_blue</item>
+        <item name="android:itemBackground">@color/white</item>
+    </style>
+
+    <style name="TabButtonStyle" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:backgroundTint">@color/tab_button_tint</item>
+        <item name="android:textColor">@color/button_text_tint</item>
+    </style>
+
     <style name="Base.Theme.SanGawa" parent="Theme.Material3.Light.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:colorControlActivated">@color/deep_blue</item>
+        <item name="android:navigationBarColor">@color/deep_blue</item>
+        <item name="android:statusBarColor">@color/deep_blue</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
     <style name="Theme.SanGawa" parent="Base.Theme.SanGawa" />

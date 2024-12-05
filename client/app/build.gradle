@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
 }
 
 android {
@@ -12,7 +13,7 @@ android {
         minSdk 30
         targetSdk 34
         versionCode 1
-        versionName "1.0"
+        versionName "0.1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -27,6 +28,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
@@ -37,7 +41,11 @@ dependencies {
     implementation libs.constraintlayout
     implementation libs.firebase.auth
     implementation libs.firebase.firestore
+    implementation libs.play.services.location
+    implementation libs.firebase.database
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+
+    implementation libs.play.services.maps
 }

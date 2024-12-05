@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="4dp"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textViewTaskTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Task Title"
+                android:fontFamily="@font/konkhmer_sleokchher"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:layout_marginBottom="-4dp"
+                android:textColor="@color/fun_orange"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:id="@+id/textViewTaskDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Task description preview goes here..."
+                android:textSize="14sp"
+                android:textColor="#757575"
+                android:ellipsize="end"
+                android:maxLines="1"
+                tools:ignore="HardcodedText" />
+
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/buttonMoreOptions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_more_horiz_24"
+            android:contentDescription="More Options"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="10dp"
+            tools:ignore="HardcodedText" />
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

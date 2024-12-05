@@ -1,8 +1,5 @@
 package com.themabajogroup.sangawa.Controllers;
 
-import android.util.Log;
-
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -12,8 +9,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class AuthController {
-    private FirebaseAuth mAuth;
-    private FirebaseFirestore db;
+    private final FirebaseAuth mAuth;
+    private final FirebaseFirestore db;
     private static AuthController instance;
 
 
@@ -35,6 +32,10 @@ public class AuthController {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task ->  {
                     result.complete(task.isSuccessful());
+
+                    // TODO: Potentially bad coupling
+                    UserController userController = UserController.getInstance();
+                    userController.setCurrentUser(mAuth.getCurrentUser());
                 });
 
         return result;
@@ -50,12 +51,18 @@ public class AuthController {
                         Map<String, Object> user = new HashMap<>();
                         user.put("email", email);
                         user.put("username", username);
+                        user.put("fencingRadius", 1000);
+                        user.put("scanRadius", 3000);
 
                         db.collection("users")
                                 .document(userId)
                                 .set(user)
                                 .addOnSuccessListener(unused -> {
                                     result.complete(true);
+
+                                    // TODO: Potentially bad coupling
+                                    UserController userController = UserController.getInstance();
+                                    userController.setCurrentUser(mAuth.getCurrentUser());
                                 });
 
                     } else {
@@ -66,5 +73,17 @@ public class AuthController {
                 });
 
         return result;
+    }
+
+    public boolean isLoggedIn() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        if (currentUser == null) {
+            return false;
+        }
+
+        UserController userController = UserController.getInstance();
+        userController.setCurrentUser(currentUser);
+        return true;
     }
 }

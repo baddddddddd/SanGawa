@@ -1,6 +1,7 @@
-package com.themabajogroup.sangawa;
+package com.themabajogroup.sangawa.Activities;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -8,12 +9,14 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.themabajogroup.sangawa.Controllers.AuthController;
+import com.themabajogroup.sangawa.R;
 
 import java.util.Objects;
 
@@ -40,12 +43,17 @@ public class AuthActivity extends AppCompatActivity {
         confirmPasswordEditText = findViewById(R.id.confirm_password);
         usernameLayout = findViewById(R.id.username_layout);
         confirmPasswordLayout = findViewById(R.id.confirm_password_layout);
-        TextInputLayout emailLayout = findViewById(R.id.email_layout);
-        TextInputLayout passwordLayout = findViewById(R.id.password_layout);
         actionButton = findViewById(R.id.action_button);
         swapTextView = findViewById(R.id.swap);
 
         updateUIForLogin();
+
+        // Check if user session is valid
+        if (authController.isLoggedIn()) {
+            Intent intent = new Intent(this, MapViewActivity.class);
+            startActivity(intent);
+            finish();
+        }
 
         swapTextView.setOnClickListener(v -> {
             if (isLogin) {
@@ -60,20 +68,25 @@ public class AuthActivity extends AppCompatActivity {
                 String email = Objects.requireNonNull(emailEditText.getText()).toString();
                 String password = Objects.requireNonNull(passwordEditText.getText()).toString();
 
-                if (validateLogin(email, password)) {
-                    // TK: Add UI feedback while waiting for response
+                if (validateLogin(AuthActivity.this, email, password)) {
+                    actionButton.setVisibility(View.GONE);
+                    findViewById(R.id.progress_bar).setVisibility(View.VISIBLE);
+
                     authController.verifyCredentials(email, password)
-                            .thenAccept(isSuccess -> {
+                            .thenAccept(isSuccess -> runOnUiThread(() -> {
+                                findViewById(R.id.progress_bar).setVisibility(View.GONE);
+                                actionButton.setVisibility(View.VISIBLE);
+
                                 if (isSuccess) {
                                     Intent intent = new Intent(AuthActivity.this, MapViewActivity.class);
                                     startActivity(intent);
                                     finish();
                                 } else {
-                                    // TK: Add UI feedback for unsuccessful login
-
+                                    showToast(AuthActivity.this, "Incorrect email or password");
                                 }
-                            });
+                            }));
                 } else {
+                    showToast(AuthActivity.this, "Please check the entered details and try again.");
                 }
             } else {
                 String username = Objects.requireNonNull(usernameEditText.getText()).toString();
@@ -81,20 +94,25 @@ public class AuthActivity extends AppCompatActivity {
                 String password = Objects.requireNonNull(passwordEditText.getText()).toString();
                 String confirmPassword = Objects.requireNonNull(confirmPasswordEditText.getText()).toString();
 
-                if (validateSignup(username, email, password, confirmPassword)) {
-                    // TK: Add UI feedback while waiting for response
+                if (validateSignup(AuthActivity.this, username, email, password, confirmPassword)) {
+                    actionButton.setVisibility(View.GONE);
+                    findViewById(R.id.progress_bar).setVisibility(View.VISIBLE);
+
                     authController.registerCredentials(username, email, password)
-                            .thenAccept(isSuccess -> {
+                            .thenAccept(isSuccess -> runOnUiThread(() -> {
+                                findViewById(R.id.progress_bar).setVisibility(View.GONE);
+                                actionButton.setVisibility(View.VISIBLE);
 
                                 if (isSuccess) {
                                     Intent intent = new Intent(AuthActivity.this, MapViewActivity.class);
                                     startActivity(intent);
                                     finish();
                                 } else {
-                                    // TK: Add UI feedback for unsuccessful registration
+                                    showToast(AuthActivity.this, "Registration failed. Please try again.");
                                 }
-                            });
+                            }));
                 } else {
+                    showToast(AuthActivity.this, "Please check the entered details and try again.");
                 }
             }
         });
@@ -122,12 +140,60 @@ public class AuthActivity extends AppCompatActivity {
         confirmPasswordLayout.setVisibility(View.VISIBLE);
     }
 
-    private boolean validateLogin(String email, String password) {
-        return !email.isEmpty() && !password.isEmpty();
+    private boolean validateLogin(Context context, String email, String password) {
+        if (email.isEmpty()) {
+            showToast(context, "Email cannot be empty");
+            return false;
+        }
+        if (isNotValidEmail(email)) {
+            showToast(context, "Please enter a valid email address");
+            return false;
+        }
+        if (password.isEmpty()) {
+            showToast(context, "Password cannot be empty");
+            return false;
+        }
+        if (password.length() < 6) {
+            showToast(context, "Password must be at least 6 characters long");
+            return false;
+        }
+        return true;
     }
 
-    private boolean validateSignup(String username, String email, String password, String confirmPassword) {
-        return !username.isEmpty() && !email.isEmpty() && !password.isEmpty() && !confirmPassword.isEmpty();
+    private boolean validateSignup(Context context, String username, String email, String password, String confirmPassword) {
+        if (username.isEmpty()) {
+            showToast(context, "Username cannot be empty");
+            return false;
+        }
+        if (email.isEmpty()) {
+            showToast(context, "Email cannot be empty");
+            return false;
+        }
+        if (isNotValidEmail(email)) {
+            showToast(context, "Enter a valid email address");
+            return false;
+        }
+        if (password.isEmpty()) {
+            showToast(context, "Password cannot be empty");
+            return false;
+        }
+        if (!password.equals(confirmPassword)) {
+            showToast(context, "Passwords do not match");
+            return false;
+        }
+        if (password.length() < 6) {
+            showToast(context, "Password must be at least 6 characters");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isNotValidEmail(String email) {
+        return !email.matches("[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}");
+    }
+
+    private void showToast(Context context, String message) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
     private boolean onTouch(View v, MotionEvent event) {
