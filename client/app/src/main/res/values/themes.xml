@@ -2,12 +2,13 @@
     <style name="CustomSlider" parent="Widget.MaterialComponents.Slider">
         <item name="thumbTint">@color/amazing_green</item>
         <item name="tickColorActive">@color/amazing_green</item>
-        <item name="tickColorInactive">#CECECE</item>
+        <item name="tickColorInactive">#A9A9A9</item>
         <item name="thumbRadius">100dp</item>
         <item name="thumbHeight">15dp</item>
         <item name="thumbWidth">15dp</item>
         <item name="thumbColor">@color/amazing_green</item>
-        <item name="trackColorInactive">@color/amazing_green</item>
+        <item name="trackColorInactive">#EBEBEB</item>
+        <item name="trackColorActive">@color/amazing_green</item>
     </style>
 
     <style name="popupMenuStyle" parent="Theme.Material3.Light.NoActionBar">
