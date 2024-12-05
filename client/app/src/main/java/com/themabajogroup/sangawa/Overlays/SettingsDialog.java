@@ -1,8 +1,11 @@
 package com.themabajogroup.sangawa.Overlays;
 
+import static androidx.core.content.ContextCompat.startActivity;
+
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +15,8 @@ import android.widget.TextView;
 
 import com.google.android.material.slider.Slider;
 import com.google.android.material.textfield.TextInputEditText;
+import com.themabajogroup.sangawa.Activities.AuthActivity;
+import com.themabajogroup.sangawa.Activities.MapViewActivity;
 import com.themabajogroup.sangawa.Controllers.UserController;
 import com.themabajogroup.sangawa.Models.UserProfile;
 import com.themabajogroup.sangawa.R;
@@ -19,19 +24,22 @@ import com.themabajogroup.sangawa.R;
 import java.util.Objects;
 
 public class SettingsDialog extends Dialog {
+    private final Context context;
     private TextInputEditText displayNameInput;
     private ImageButton editDisplayNameButton;
     private Slider fencingRadiusSlider;
     private Slider scanRadiusSlider;
     private TextView fencingRadiusValue;
     private TextView scanRadiusValue;
-    private Button cancelButton, saveButton, logoutButton;
+    private Button saveButton, logoutButton;
+    private ImageButton cancelButton;
 
     private UserProfile profile;
     private final UserController userManager;
 
     public SettingsDialog(Context context) {
         super(context);
+        this.context = context;
         this.userManager = UserController.getInstance();
     }
 
@@ -59,15 +67,20 @@ public class SettingsDialog extends Dialog {
             displayNameInput.requestFocus();
         });
 
-        logoutButton.setOnClickListener(v -> {
-            // TODO: add logic to logout
-        });
+        logoutButton.setOnClickListener(v -> signOutUser());
 
         cancelButton.setOnClickListener(v -> dismiss());
 
         saveButton.setOnClickListener(v -> {
             saveSettings();
         });
+    }
+
+    void signOutUser() {
+        UserController.getInstance().signOutUser();
+        Intent intent = new Intent(context, AuthActivity.class);
+        context.startActivity(intent);
+        ((MapViewActivity) context).finish();
     }
 
     @SuppressLint("DefaultLocale")

@@ -7,6 +7,7 @@
         <item name="thumbHeight">15dp</item>
         <item name="thumbWidth">15dp</item>
         <item name="thumbColor">@color/amazing_green</item>
+        <item name="trackColorInactive">@color/amazing_green</item>
     </style>
 
     <style name="popupMenuStyle" parent="Theme.Material3.Light.NoActionBar">
