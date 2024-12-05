@@ -31,7 +31,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp"
+            android:padding="6dp"
             android:background="#D7D7D7"
             android:gravity="start">
 
@@ -40,9 +40,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Message content goes here..."
-                android:textSize="14sp"
                 android:textColor="#757575"
-                android:layout_marginHorizontal="10dp"
+                android:textSize="18sp"
+                android:layout_marginHorizontal="5dp"
                 android:scrollbars="vertical"
                 tools:ignore="HardcodedText" />
 
