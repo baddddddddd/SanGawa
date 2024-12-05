@@ -85,8 +85,7 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
         if (transactionType == TransactionType.EDIT) {
             fillPastInputs(view, btnAdd);
             btnAdd.setOnClickListener(v -> saveChanges());
-        }
-        else {
+        } else {
             btnAdd.setOnClickListener(v -> submitCreatedTask());
         }
         btnCancel.setOnClickListener(v -> dismiss());
@@ -172,6 +171,7 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
 
         if (TextUtils.isEmpty(title) || TextUtils.isEmpty(description) || TextUtils.isEmpty(deadlineStr) || selectedPrivacyId == -1) {
             Toast.makeText(getContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
+            btnAdd.setEnabled(true);
             return;
         }
 
@@ -187,6 +187,7 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
             if (currentUser == null) {
                 Toast.makeText(getContext(), "User is not logged in.", Toast.LENGTH_SHORT).show();
+                btnAdd.setEnabled(true);
                 return;
             }
 
@@ -207,12 +208,21 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
 
     private void handleTaskResult(boolean success, String action) {
         if (success) {
+            clearInputs();
             mapViewActivity.refreshUserTaskList();
             Toast.makeText(getContext(), "Task " + action + " successfully!", Toast.LENGTH_SHORT).show();
             dismiss();
         } else {
             Toast.makeText(getContext(), "Failed to " + action + " task. Please try again.", Toast.LENGTH_SHORT).show();
         }
+        btnAdd.setEnabled(true);
+    }
+
+    private void clearInputs() {
+        titleInput.setText("");
+        descInput.setText("");
+        deadlineInput.setText("");
+        ((RadioGroup) requireView().findViewById(R.id.privacy_group)).clearCheck();
     }
 
     private static void setPrivacyGroupSelection(TaskVisibility visibility, RadioGroup privacyGroup) {
@@ -224,10 +234,8 @@ public class TaskDialog extends DialogFragment implements OnMapReadyCallback {
     private static TaskVisibility getTaskVisibility(int selectedPrivacyId) {
         if (selectedPrivacyId == R.id.OPEN_TO_ALL) {
             return TaskVisibility.OPEN_TO_ALL;
-        } else if (selectedPrivacyId == R.id.PRIVATE) {
-            return TaskVisibility.PRIVATE;
         } else {
-            throw new IllegalArgumentException("Invalid privacy option selected");
+            return TaskVisibility.PRIVATE;
         }
     }
 }
