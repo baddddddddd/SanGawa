@@ -1,4 +1,14 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="CustomSlider" parent="Widget.MaterialComponents.Slider">
+        <item name="thumbTint">@color/amazing_green</item>
+        <item name="tickColorActive">@color/amazing_green</item>
+        <item name="tickColorInactive">#CECECE</item>
+        <item name="thumbRadius">100dp</item>
+        <item name="thumbHeight">15dp</item>
+        <item name="thumbWidth">15dp</item>
+        <item name="thumbColor">@color/amazing_green</item>
+    </style>
+
     <style name="popupMenuStyle" parent="Theme.Material3.Light.NoActionBar">
         <item name="android:textColor">@color/deep_blue</item>
         <item name="android:itemBackground">@color/white</item>

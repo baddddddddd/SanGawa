@@ -47,16 +47,6 @@
                 tools:ignore="HardcodedText" />
 
             <ImageButton
-                android:id="@+id/edit_profile_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Edit Profile"
-                android:paddingHorizontal="10dp"
-                android:src="@drawable/baseline_person_24"
-                tools:ignore="HardcodedText,TouchTargetSizeCheck" />
-
-            <ImageButton
                 android:id="@+id/add_task_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
