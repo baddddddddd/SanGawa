@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -121,11 +122,19 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         ImageButton btnAddTask = findViewById(R.id.add_task_button);
-
+        ImageButton refreshTasks = findViewById(R.id.refresh_task_button);
         ImageButton editProfileButton = findViewById(R.id.settings_button);
 
         TaskDialog editTaskDialog = new TaskDialog(this, TransactionType.ADD);
         btnAddTask.setOnClickListener(view -> editTaskDialog.show(getSupportFragmentManager(), "MapFragment"));
+
+        refreshTasks.setOnClickListener(view -> {
+            ObjectAnimator rotationAnimator = ObjectAnimator.ofFloat(refreshTasks, "rotation", 0f, 360f);
+            rotationAnimator.setDuration(500);
+            rotationAnimator.start();
+
+            refreshSharedTaskLists();
+        });
 
         SettingsDialog settingProfile = new SettingsDialog(this);
         editProfileButton.setOnClickListener(view -> settingProfile.show());

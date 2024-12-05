@@ -57,6 +57,16 @@
                 tools:ignore="HardcodedText,TouchTargetSizeCheck" />
 
             <ImageButton
+                android:id="@+id/refresh_task_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Refresh Taks"
+                android:paddingHorizontal="15dp"
+                android:src="@drawable/baseline_refresh_24"
+                tools:ignore="HardcodedText,TouchTargetSizeCheck" />
+
+            <ImageButton
                 android:id="@+id/settings_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
