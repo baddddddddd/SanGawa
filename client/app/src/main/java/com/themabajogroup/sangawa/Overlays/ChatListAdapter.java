@@ -66,11 +66,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return messageDetailsList.size();
     }
 
-    public void addMessage(MessageDetails messageDetails) {
-        messageDetailsList.add(messageDetails);
-        notifyItemInserted(messageDetailsList.size() - 1);
-    }
-
     public static class CurrentUserViewHolder extends RecyclerView.ViewHolder {
         private TextView messageTextView;
 

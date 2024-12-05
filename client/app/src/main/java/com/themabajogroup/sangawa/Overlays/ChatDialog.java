@@ -24,9 +24,10 @@ public class ChatDialog extends Dialog {
 
     private final String currentUserId;
     private final String taskId;
-    private final ChatController chatController = ChatController.getInstance();
     private final String title;
-    private final TextInputEditText inputMessage = findViewById(R.id.message);
+    private ChatController chatController;
+    private RecyclerView recyclerViewMessages;
+    private TextInputEditText inputMessage;
 
     public ChatDialog(Context context, String taskId, String currentUserId, String title) {
         super(context);
@@ -41,12 +42,15 @@ public class ChatDialog extends Dialog {
         setContentView(R.layout.dialog_chatroom);
         Objects.requireNonNull(getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        chatController = ChatController.getInstance();
         
         TextView taskTitle = findViewById(R.id.task_name);
         taskTitle.setText(title);
-        RecyclerView recyclerViewMessages = findViewById(R.id.recyclerViewMessages);
+        recyclerViewMessages = findViewById(R.id.recyclerViewMessages);
         recyclerViewMessages.setLayoutManager(new LinearLayoutManager(getContext()));
         List<MessageDetails> messageDetailsList = new ArrayList<>();
+
+        inputMessage = findViewById(R.id.message);
 
         ChatListAdapter adapter = new ChatListAdapter(messageDetailsList, currentUserId);
         recyclerViewMessages.setAdapter(adapter);
@@ -58,7 +62,7 @@ public class ChatDialog extends Dialog {
 
         ImageButton sendButton = findViewById(R.id.send);
         sendButton.setOnClickListener(v -> {
-            String messageContent = inputMessage.getText().toString().trim();
+            String messageContent = Objects.requireNonNull(inputMessage.getText()).toString().trim();
             if (!messageContent.isEmpty()) sendMessage(messageContent);
             else Toast.makeText(getContext(), "Message cannot be empty!", Toast.LENGTH_SHORT).show();
         });
@@ -71,11 +75,13 @@ public class ChatDialog extends Dialog {
                 .thenAccept(messages -> {
                     messageDetailsList.addAll(messages);
                     adapter.notifyDataSetChanged();
+                    recyclerViewMessages.scrollToPosition(messageDetailsList.size() - 1);
                 });
 
         chatController.onMessageReceived(taskId, message -> {
             messageDetailsList.add(message);
             adapter.notifyItemInserted(messageDetailsList.size() - 1);
+            recyclerViewMessages.scrollToPosition(messageDetailsList.size() - 1);
         });
     }
 
