@@ -43,9 +43,7 @@ public class ChatDialog extends Dialog {
         Objects.requireNonNull(getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         chatController = ChatController.getInstance();
-        
-        TextView taskTitle = findViewById(R.id.task_name);
-        taskTitle.setText(title);
+
         recyclerViewMessages = findViewById(R.id.recyclerViewMessages);
         recyclerViewMessages.setLayoutManager(new LinearLayoutManager(getContext()));
         List<MessageDetails> messageDetailsList = new ArrayList<>();

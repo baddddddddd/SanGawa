@@ -13,7 +13,7 @@
         tools:ignore="HardcodedText" />
     <item
         android:id="@+id/menu_open_chatroom"
-        android:title="Message"
+        android:title="Open Chatroom"
         android:icon="@drawable/baseline_message_24"
         tools:ignore="HardcodedText" />
     <item
