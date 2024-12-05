@@ -20,7 +20,7 @@
 
     <androidx.cardview.widget.CardView
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         app:cardCornerRadius="25dp"
@@ -37,6 +37,7 @@
 
             <TextView
                 android:id="@+id/others_message"
+                android:maxWidth="200dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Message content goes here..."
