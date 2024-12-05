@@ -43,6 +43,7 @@ public class SettingsDialog extends Dialog {
         this.userManager = UserController.getInstance();
     }
 
+    @SuppressLint("DefaultLocale")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +63,14 @@ public class SettingsDialog extends Dialog {
 
         fetchAndPopulateProfile();
 
+        fencingRadiusSlider.addOnChangeListener((slider, value, fromUser) -> {
+            fencingRadiusValue.setText(String.format("%d m", (int) value));
+        });
+
+        scanRadiusSlider.addOnChangeListener((slider, value, fromUser) -> {
+            scanRadiusValue.setText(String.format("%d m", (int) value));
+        });
+
         editDisplayNameButton.setOnClickListener(v -> {
             displayNameInput.setEnabled(true);
             displayNameInput.requestFocus();
@@ -71,10 +80,9 @@ public class SettingsDialog extends Dialog {
 
         cancelButton.setOnClickListener(v -> dismiss());
 
-        saveButton.setOnClickListener(v -> {
-            saveSettings();
-        });
+        saveButton.setOnClickListener(v -> saveSettings());
     }
+
 
     void signOutUser() {
         UserController.getInstance().signOutUser();
