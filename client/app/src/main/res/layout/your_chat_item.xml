@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        app:cardCornerRadius="10dp"
+        app:cardCornerRadius="25dp"
         app:cardElevation="0dp"
         android:foreground="?attr/selectableItemBackground">
 
@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="6dp"
+            android:padding="8dp"
             android:background="@color/amazing_green"
             android:gravity="start">
 
@@ -29,8 +29,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Message content goes here..."
-                android:textSize="18sp"
-                android:layout_marginHorizontal="5dp"
+                android:textSize="16sp"
+                android:layout_marginHorizontal="10dp"
                 android:textColor="#FFFFFF"
                 android:scrollbars="vertical"
                 tools:ignore="HardcodedText" />
