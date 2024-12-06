@@ -42,7 +42,7 @@
 - **Firebase Realtime Database** 📡: Ensures that updates to tasks, collaborations, and chatrooms are reflected in real time.
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/baddddddddd/SanGawa/main/static/sample.png" alt="sample" width="600">
+  <img src="https://raw.githubusercontent.com/baddddddddd/SanGawa/readme-edits/static/sample.png" alt="sample" width="600">
 </div>
 
 ## Installation Instructions ⚙️
