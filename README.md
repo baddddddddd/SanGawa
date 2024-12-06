@@ -28,8 +28,8 @@
 5. 📞 [Contact](#contact) 
 
 ## Features 🌟
-- 📍 **Location-Based Task Management**: Assign and view tasks based on your geographical location 🌏, making it easy to manage tasks in specific areas.
-- 🔒 **User Authentication**: Secure user login via Firebase Authentication 🛡️, ensuring that only authorized users can access tasks and data.
+- 📍 **Location-Based Task Management**: Assign and view tasks based on your geographical location, making it easy to manage tasks in specific areas.
+- 🔒 **User Authentication**: Secure user login via Firebase Authentication, ensuring that only authorized users can access tasks and data.
 - 🧭 **Realtime Location-Tracking**: Track the real-time location of users, helping them to keep track of where they are.
 - 🚧 **Task Geofencing**: Notify users when they are near a task's location, ensuring tasks are relevant to the user's location.
 - 🤝 **Realtime Task Collaboration**: Collaborate on tasks in real-time, enabling multiple users to work on a task simultaneously.
