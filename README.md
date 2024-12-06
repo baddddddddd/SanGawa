@@ -18,7 +18,7 @@
 </div>
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/baddddddddd/SanGawa/readme-edits/static/sample.png" alt="sample" width="200">
+  <img src="https://raw.githubusercontent.com/baddddddddd/SanGawa/main/static/sample.png" alt="sample" width="200">
 </div>
 
 ## 🌏 Description 
