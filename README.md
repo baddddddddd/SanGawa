@@ -35,11 +35,14 @@
 - **Realtime Task Collaboration**: Collaborate on tasks in real-time, enabling multiple users to work on a task at the same time.
 - **Realtime Chatrooms**: Chat with your collaborators in real-time, making communication seamless while working on tasks.
 
-## Technology
-- **Android Studio with Java**: The project is built using Android Studio, with Java serving as the main programming language for app development.
-- **Firebase Authentication**: Used for secure user authentication and login.
-- **Firebase Firestore**: A flexible, scalable database used to store task, user, and collaboration data.
-- **Firebase Realtime Database**: Ensures that updates to tasks, collaborations, and chatrooms are reflected in real time.
+## Technology  
+- **Android Studio with Java**: The app is developed using Android Studio, leveraging Java as the primary programming language for robust and scalable mobile application development.  
+- **Firebase Authentication**: Provides secure and reliable user authentication, supporting email/password login and ensuring only authorized access to app features.  
+- **Firebase Firestore**: A flexible, NoSQL cloud database used to store and manage task data, user information, and collaboration details efficiently.  
+- **Firebase Realtime Database**: Enables instant data synchronization, ensuring that updates to tasks, collaborations, and chatrooms are reflected across all devices in real time.  
+- **Google Maps SDK**: Integrates interactive maps into the app, enabling users to view tasks on a map and plan their activities based on geographic locations.  
+- **Google Geofencing API**: Implements geofencing functionality, triggering location-based notifications and reminders when users are near task locations.  
+- **Android Location Services (API)**: Provides GPS capabilities to track users’ real-time locations and enable location-based notifications seamlessly.  
 
 ## Installation Instructions
 
