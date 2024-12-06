@@ -48,7 +48,7 @@
 
 To install and run **SanGawa**, you have two options:
 
-### Option 1: Clone the repository and build the app
+### Option 1: Clone the repository and build the app 🛠️
 1. **Clone the repository**:
    ```bash
    git clone https://github.com/baddddddddd/SanGawa.git
@@ -72,16 +72,16 @@ To install and run **SanGawa**, you have two options:
    - Connect an Android device or use an emulator.
    - Click **Run** in Android Studio to launch the app.
 
-### Option 2: Download the APK from Releases
+### Option 2: Download the APK from Releases📦
 Alternatively, you can choose to **download the APK** directly from our GitHub Releases page and install it on your Android device:
 1. Go to the [Releases](https://github.com/baddddddddd/SanGawa/releases) section of this repository.
 2. Download the latest APK file.
 3. On your Android device, enable **installing from unknown sources** in your settings (if not already enabled).
 4. Open the APK file and follow the installation instructions on your device.
 
-## License
+## License📜
 This project is licensed under the [**GNU General Public License (GPL)**](https://github.com/baddddddddd/SanGawa/blob/main/LICENSE).
 
-## Contact
+## Contact📞
 For inquiries, please contact any of the developers through the contact details displayed in their GitHub profiles.
 
