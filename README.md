@@ -3,22 +3,26 @@
     <img src="static/logo.svg" alt="Logo" width="240" height="240">
   </a>
 
-  <h1 align="center">SanGawa ✨📍</h1>
+  <h1 align="center">SanGawa</h1>
 
   <h3 align="center">
-    📋 A to-do app with geolocation that is definitely not a dating app ❤️
+    📋 A to-do app with geolocation that is definitely not a dating app 😉
   </h3>
   <p align="center">
-    <b>CS-3102 💻</b> <br>
-    <a href="https://github.com/JonBabao">🧑‍💻Babao, Jon Endrick</a> <br>
-    <a href="https://github.com/baddddddddd">🧑‍💻Jocson, Vladimir</a> <br>
-    <a href="https://github.com/DeogenesMaranan">🧑‍💻Maranan, Deogenes Gregorio</a> <br>
+    <b>CS-3102</b> <br>
+    <a href="https://github.com/JonBabao">Babao, Jon Endrick</a> <br>
+    <a href="https://github.com/baddddddddd">Jocson, Vladimir</a> <br>
+    <a href="https://github.com/DeogenesMaranan">Maranan, Deogenes Gregorio</a> <br>
   </p>
   <br>
 </div>
 
+<div align="center">
+  <img src="https://raw.githubusercontent.com/baddddddddd/SanGawa/readme-edits/static/sample.png" alt="sample" width="200">
+</div>
+
 ## 🌏 Description 
-**SanGawa** is a location-based task management app 🗺️ designed to help users organize their to-dos 📋 with a unique twist 🎉. While it offers powerful features like location tracking 🧭, real-time task collaboration 🤝, and chatrooms 💬, it's **definitely not a dating app** ❤️. Users can create tasks ✅, collaborate with others 👫, and manage their work efficiently ⚙️, all based on their geographical location 🌐.
+**SanGawa** is a location-based task management app designed to help users organize their to-dos with a unique twist. While it offers powerful features like location tracking, real-time task collaboration, and chatrooms, it's **definitely not a dating app**. Users can create tasks, collaborate with others, and manage their work efficiently, all based on their geographical location.
 
 ## 📚 Table of Contents 
 1. ⭐ [Features](#features) 
@@ -27,23 +31,19 @@
 4. 📜 [License](#license) 
 5. 📞 [Contact](#contact) 
 
-## Features 🌟
-- 📍 **Location-Based Task Management**: Assign and view tasks based on your geographical location, making it easy to manage tasks in specific areas.
+## 🌟 Features 
+- 📌 **Location-Based Task Management**: Assign and view tasks based on your geographical location, making it easy to manage tasks in specific areas.
 - 🔒 **User Authentication**: Secure user login via Firebase Authentication, ensuring that only authorized users can access tasks and data.
 - 🧭 **Realtime Location-Tracking**: Track the real-time location of users, helping them to keep track of where they are.
 - 🚧 **Task Geofencing**: Notify users when they are near a task's location, ensuring tasks are relevant to the user's location.
 - 🤝 **Realtime Task Collaboration**: Collaborate on tasks in real-time, enabling multiple users to work on a task simultaneously.
 - 💬 **Realtime Chatrooms**: Chat with your collaborators in real-time, making communication seamless while working on tasks.
 
-## Technology 🛠️
+## 🛠️ Technology
 - 📱 **Android Studio with Java**: The project is built using Android Studio, with Java serving as the main programming language for app development.
 - 🔐 **Firebase Authentication**: Used for secure user authentication and login.
 - 🗄️ **Firebase Firestore**: A flexible, scalable database used to store task, user, and collaboration data.
 - 📡 **Firebase Realtime Database**: Ensures that updates to tasks, collaborations, and chatrooms are reflected in real time.
-
-<div align="center">
-  <img src="https://raw.githubusercontent.com/baddddddddd/SanGawa/readme-edits/static/sample.png" alt="sample" width="200">
-</div>
 
 ## ⚙️ Installation Instructions
 
