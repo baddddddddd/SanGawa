@@ -6,7 +6,7 @@
   <h1 align="center">SanGawa</h1>
 
   <h3 align="center">
-    📋 A to-do app with geolocation that is definitely not a dating app ❤️
+    📋 A to-do app with geolocation that is definitely not a dating app 😉
   </h3>
   <p align="center">
     <b>CS-3102</b> <br>
@@ -17,39 +17,42 @@
   <br>
 </div>
 
-## Description
+<div align="center">
+  <img src="https://raw.githubusercontent.com/baddddddddd/SanGawa/readme-edits/static/sample.png" alt="sample" width="200">
+</div>
+
+## 🌏 Description 
 **SanGawa** is a location-based task management app designed to help users organize their to-dos with a unique twist. While it offers powerful features like location tracking, real-time task collaboration, and chatrooms, it's **definitely not a dating app**. Users can create tasks, collaborate with others, and manage their work efficiently, all based on their geographical location.
 
-## Table of Contents
-1. [Features](#features)
-2. [Technology](#technology)
-3. [Installation Instructions](#installation-instructions)
-4. [License](#license)
-5. [Contact](#contact)
+## 📚 Table of Contents 
+1. ⭐ [Features](#features) 
+2. 🛠️ [Technology](#technology) 
+3. ⚙️ [Installation Instructions](#installation-instructions) 
+4. 📜 [License](#license) 
+5. 📞 [Contact](#contact) 
 
-## Features
-- **Location-Based Task Management**: Assign and view tasks based on your geographical location, making it easy to manage tasks in specific areas.
-- **User Authentication**: Secure user login via Firebase Authentication, ensuring that only authorized users can access tasks and data.
-- **Realtime Location-Tracking**: Track the real-time location of users, helping them to keep track of where they are.
-- **Task Geofencing**: Notify users when they are near to a task's location, ensuring tasks are relevant to the user's location.
-- **Realtime Task Collaboration**: Collaborate on tasks in real-time, enabling multiple users to work on a task at the same time.
-- **Realtime Chatrooms**: Chat with your collaborators in real-time, making communication seamless while working on tasks.
+## 🌟 Features 
+- 📌 **Location-Based Task Management**: Assign and view tasks based on your geographical location, making it easy to manage tasks in specific areas.
+- 🔒 **User Authentication**: Secure user login via Firebase Authentication, ensuring that only authorized users can access tasks and data.
+- 🧭 **Realtime Location-Tracking**: Track the real-time location of users, helping them to keep track of where they are.
+- 🚧 **Task Geofencing**: Notify users when they are near a task's location, ensuring tasks are relevant to the user's location.
+- 🤝 **Realtime Task Collaboration**: Collaborate on tasks in real-time, enabling multiple users to work on a task simultaneously.
+- 💬 **Realtime Chatrooms**: Chat with your collaborators in real-time, making communication seamless while working on tasks.
 
-## Technology
-- **Android Studio with Java**: The project is built using Android Studio, with Java serving as the main programming language for app development.
-- **Firebase Authentication**: Used for secure user authentication and login.
-- **Firebase Firestore**: A flexible, scalable database used to store task, user, and collaboration data.
-- **Firebase Realtime Database**: Ensures that updates to tasks, collaborations, and chatrooms are reflected in real time.
+## 🛠️ Technology
+- 📱 **Android Studio with Java**: The project is built using Android Studio, with Java serving as the main programming language for app development.
+- 🔐 **Firebase Authentication**: Used for secure user authentication and login.
+- 🗄️ **Firebase Firestore**: A flexible, scalable database used to store task, user, and collaboration data.
+- 📡 **Firebase Realtime Database**: Ensures that updates to tasks, collaborations, and chatrooms are reflected in real time.
 
-## Installation Instructions
+## ⚙️ Installation Instructions
 
 To install and run **SanGawa**, you have two options:
 
-### Option 1: Clone the repository and build the app
+### 🛠️ Option 1: Clone the repository and build the app 
 1. **Clone the repository**:
    ```bash
    git clone https://github.com/baddddddddd/SanGawa.git
-   ```
 
 2. **Open the project in Android Studio**:
    - Launch Android Studio.
@@ -69,16 +72,16 @@ To install and run **SanGawa**, you have two options:
    - Connect an Android device or use an emulator.
    - Click **Run** in Android Studio to launch the app.
 
-### Option 2: Download the APK from Releases
+### 📦 Option 2: Download the APK from Releases
 Alternatively, you can choose to **download the APK** directly from our GitHub Releases page and install it on your Android device:
 1. Go to the [Releases](https://github.com/baddddddddd/SanGawa/releases) section of this repository.
 2. Download the latest APK file.
 3. On your Android device, enable **installing from unknown sources** in your settings (if not already enabled).
 4. Open the APK file and follow the installation instructions on your device.
 
-## License
+## 📜 License
 This project is licensed under the [**GNU General Public License (GPL)**](https://github.com/baddddddddd/SanGawa/blob/main/LICENSE).
 
-## Contact
+## 📞 Contact
 For inquiries, please contact any of the developers through the contact details displayed in their GitHub profiles.
 
