@@ -1,5 +1,5 @@
 <div align="center">
-  <a href="https://raw.githubusercontent.com/baddddddddd/SanGawa/main/static/logo.svg">
+  <a href="./static/logo.svg">
     <img src="static/logo.svg" alt="Logo" width="240" height="240">
   </a>
 
@@ -18,7 +18,7 @@
 </div>
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/baddddddddd/SanGawa/main/static/sample.png" alt="sample" width="200">
+  <img src="./static/sample.png" alt="sample" width="200">
 </div>
 
 ## 🌏 Description 
@@ -79,10 +79,18 @@ Chat with your collaborators in real-time, making communication seamless while w
 </div>
 
 ## 🛠️ Technology
+
 - 📱 **Android Studio with Java**: The project is built using Android Studio, with Java serving as the main programming language for app development.
 - 🔐 **Firebase Authentication**: Used for secure user authentication and login.
 - 🗄️ **Firebase Firestore**: A flexible, scalable database used to store task, user, and collaboration data.
 - 📡 **Firebase Realtime Database**: Ensures that updates to tasks, collaborations, and chatrooms are reflected in real time.
+- 🗺️ **Google Maps SDK**: Provides mapping functionality, enabling users to visualize locations and navigate seamlessly within the app.
+- 🚧 **Google Geofencing API**: Utilized for location-based triggers, enabling task reminders and notifications when users are near a task's location.
+- 📍 **Android Location Services (API)**: Ensures accurate real-time location tracking to enhance task management and collaboration features.
+
+<div align="center">
+  <img src="./static/diagram-architecture.png" alt="Chatrooms Demo" width="600">
+</div>
 
 ## ⚙️ Installation Instructions
 
