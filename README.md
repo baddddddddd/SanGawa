@@ -32,12 +32,49 @@
 5. 📞 [Contact](#contact) 
 
 ## 🌟 Features 
-- 📌 **Location-Based Task Management**: Assign and view tasks based on your geographical location, making it easy to manage tasks in specific areas.
-- 🔒 **User Authentication**: Secure user login via Firebase Authentication, ensuring that only authorized users can access tasks and data.
-- 🧭 **Realtime Location-Tracking**: Track the real-time location of users, helping them to keep track of where they are.
-- 🚧 **Task Geofencing**: Notify users when they are near a task's location, ensuring tasks are relevant to the user's location.
-- 🤝 **Realtime Task Collaboration**: Collaborate on tasks in real-time, enabling multiple users to work on a task simultaneously.
-- 💬 **Realtime Chatrooms**: Chat with your collaborators in real-time, making communication seamless while working on tasks.
+#### 📌 Location-Based Task Management
+Assign and view tasks based on your geographical location, making it easy to manage tasks in specific 
+areas.
+
+<div align="center">
+  <img src="./static/demo-todo.gif" alt="Todo Demo" width="200">
+</div>
+
+#### 🔒 User Authentication
+Secure user login via Firebase Authentication, ensuring that only authorized users can access tasks and data.
+
+<div align="center">
+  <img src="./static/demo-auth.gif" alt="User Authentication Demo" width="200">
+</div>
+
+#### 🧭 Realtime Location-Tracking
+Track the real-time location of users, helping them to keep track of where they are.
+
+<div align="center">
+  <img src="./static/demo-geofencing.gif" alt="Location Tracking Demo" width="200">
+</div>
+
+#### 🚧 Task Geofencing
+Notify users when they are near a task's location, ensuring tasks are relevant to the user's location.
+
+<div align="center">
+  <img src="./static/demo-geofencing.gif" alt="Geofencing Demo" width="200">
+</div>
+
+#### 🤝 Realtime Task Collaboration
+Collaborate on tasks in real-time, enabling multiple users to work on a task simultaneously.
+
+<div style="display: flex; justify-content: center; gap: 10px;">
+  <img src="./static/demo-collab-left.gif" alt="Task Collaboration Demo" width="200">
+  <img src="./static/demo-collab-right.gif" alt="Another Demo" width="200">
+</div>
+
+#### 💬 **Realtime Chatrooms**
+Chat with your collaborators in real-time, making communication seamless while working on tasks.
+
+<div align="center">
+  <img src="./static/demo-chat.gif" alt="Chatrooms Demo" width="200">
+</div>
 
 ## 🛠️ Technology
 - 📱 **Android Studio with Java**: The project is built using Android Studio, with Java serving as the main programming language for app development.
