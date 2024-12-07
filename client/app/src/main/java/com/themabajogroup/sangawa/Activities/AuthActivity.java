@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.themabajogroup.sangawa.Controllers.AuthController;
+import com.themabajogroup.sangawa.Overlays.DialogTerms;
 import com.themabajogroup.sangawa.R;
 
 import java.util.Objects;
@@ -48,7 +49,6 @@ public class AuthActivity extends AppCompatActivity {
 
         updateUIForLogin();
 
-        // Check if user session is valid
         if (authController.isLoggedIn()) {
             Intent intent = new Intent(this, MapViewActivity.class);
             startActivity(intent);
@@ -65,59 +65,77 @@ public class AuthActivity extends AppCompatActivity {
 
         actionButton.setOnClickListener(v -> {
             if (isLogin) {
-                String email = Objects.requireNonNull(emailEditText.getText()).toString();
-                String password = Objects.requireNonNull(passwordEditText.getText()).toString();
-
-                if (validateLogin(AuthActivity.this, email, password)) {
-                    actionButton.setVisibility(View.GONE);
-                    findViewById(R.id.progress_bar).setVisibility(View.VISIBLE);
-
-                    authController.verifyCredentials(email, password)
-                            .thenAccept(isSuccess -> runOnUiThread(() -> {
-                                findViewById(R.id.progress_bar).setVisibility(View.GONE);
-                                actionButton.setVisibility(View.VISIBLE);
-
-                                if (isSuccess) {
-                                    Intent intent = new Intent(AuthActivity.this, MapViewActivity.class);
-                                    startActivity(intent);
-                                    finish();
-                                } else {
-                                    showToast(AuthActivity.this, "Incorrect email or password");
-                                }
-                            }));
-                } else {
-                    showToast(AuthActivity.this, "Please check the entered details and try again.");
-                }
+                handleLogin();
             } else {
-                String username = Objects.requireNonNull(usernameEditText.getText()).toString();
-                String email = Objects.requireNonNull(emailEditText.getText()).toString();
-                String password = Objects.requireNonNull(passwordEditText.getText()).toString();
-                String confirmPassword = Objects.requireNonNull(confirmPasswordEditText.getText()).toString();
-
-                if (validateSignup(AuthActivity.this, username, email, password, confirmPassword)) {
-                    actionButton.setVisibility(View.GONE);
-                    findViewById(R.id.progress_bar).setVisibility(View.VISIBLE);
-
-                    authController.registerCredentials(username, email, password)
-                            .thenAccept(isSuccess -> runOnUiThread(() -> {
-                                findViewById(R.id.progress_bar).setVisibility(View.GONE);
-                                actionButton.setVisibility(View.VISIBLE);
-
-                                if (isSuccess) {
-                                    Intent intent = new Intent(AuthActivity.this, MapViewActivity.class);
-                                    startActivity(intent);
-                                    finish();
-                                } else {
-                                    showToast(AuthActivity.this, "Registration failed. Please try again.");
-                                }
-                            }));
-                } else {
-                    showToast(AuthActivity.this, "Please check the entered details and try again.");
-                }
+                handleSignup();
             }
         });
 
         findViewById(R.id.main).setOnTouchListener(this::onTouch);
+    }
+
+    private void handleLogin() {
+        String email = Objects.requireNonNull(emailEditText.getText()).toString();
+        String password = Objects.requireNonNull(passwordEditText.getText()).toString();
+
+        if (validateLogin(AuthActivity.this, email, password)) {
+            actionButton.setVisibility(View.GONE);
+            findViewById(R.id.progress_bar).setVisibility(View.VISIBLE);
+
+            authController.verifyCredentials(email, password)
+                    .thenAccept(isSuccess -> runOnUiThread(() -> {
+                        findViewById(R.id.progress_bar).setVisibility(View.GONE);
+                        actionButton.setVisibility(View.VISIBLE);
+
+                        if (isSuccess) {
+                            Intent intent = new Intent(AuthActivity.this, MapViewActivity.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            showToast(AuthActivity.this, "Incorrect email or password");
+                        }
+                    }));
+        } else {
+            showToast(AuthActivity.this, "Please check the entered details and try again.");
+        }
+    }
+
+    private void handleSignup() {
+        String username = Objects.requireNonNull(usernameEditText.getText()).toString();
+        String email = Objects.requireNonNull(emailEditText.getText()).toString();
+        String password = Objects.requireNonNull(passwordEditText.getText()).toString();
+        String confirmPassword = Objects.requireNonNull(confirmPasswordEditText.getText()).toString();
+
+        if (validateSignup(AuthActivity.this, username, email, password, confirmPassword)) {
+            DialogTerms dialogTerms = new DialogTerms(AuthActivity.this);
+            dialogTerms.setCancelable(false);
+
+            dialogTerms.show();
+
+            dialogTerms.findViewById(R.id.agree).setOnClickListener(v -> {
+                dialogTerms.dismiss();
+                actionButton.setVisibility(View.GONE);
+                findViewById(R.id.progress_bar).setVisibility(View.VISIBLE);
+
+                authController.registerCredentials(username, email, password)
+                        .thenAccept(isSuccess -> runOnUiThread(() -> {
+                            findViewById(R.id.progress_bar).setVisibility(View.GONE);
+                            actionButton.setVisibility(View.VISIBLE);
+
+                            if (isSuccess) {
+                                Intent intent = new Intent(AuthActivity.this, MapViewActivity.class);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                showToast(AuthActivity.this, "Registration failed. Please try again.");
+                            }
+                        }));
+            });
+
+            dialogTerms.findViewById(R.id.cancel_button).setOnClickListener(v -> dialogTerms.dismiss());
+        } else {
+            showToast(AuthActivity.this, "Please check the entered details and try again.");
+        }
     }
 
     @SuppressLint("SetTextI18n")

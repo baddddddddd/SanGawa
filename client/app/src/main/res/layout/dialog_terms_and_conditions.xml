@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginHorizontal="24dp"
+    android:layout_marginVertical="24dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp"
+    app:layout_constraintTop_toBottomOf="@id/logo"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/head"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:fontFamily="@font/konkhmer_sleokchher"
+            android:text="Terms and Conditions"
+            android:textColor="@color/fun_orange"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            tools:ignore="HardcodedText,TextContrastCheck" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Introduction"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/konkhmer_sleokchher"
+                    android:layout_marginBottom="8dp"
+                    android:textColor="@color/deep_blue"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Welcome to SanGawa, a location-based task management app designed to enhance productivity and collaboration. By using SanGawa, you agree to the following terms and conditions. Please read them carefully before using the app. If you do not agree with these terms, you must not use the app."
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="4dp"
+                    android:fontFamily="sans-serif"
+                    android:textColor="@color/black"
+                    android:layout_marginBottom="16dp"
+                    android:justificationMode="inter_word"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="General Usage"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/konkhmer_sleokchher"
+                    android:layout_marginBottom="8dp"
+                    android:textColor="@color/deep_blue"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="1. Eligibility: SanGawa is available to users aged 13 and above. By using this app, you affirm that you meet the minimum age requirement.\n\n2. Purpose: SanGawa is designed for task management and collaboration. Despite features like chatrooms and location tracking, the app is not a dating platform. Misusing the app for purposes other than task organization may result in account suspension or termination.\n\n3. Account Responsibility: Users are responsible for maintaining the confidentiality of their login credentials. Any activity conducted through your account is your responsibility.\n\n4. Geolocation: By using SanGawa, you consent to the app collecting and using your location data for task management purposes, such as geofencing and real-time collaboration."
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="4dp"
+                    android:fontFamily="sans-serif"
+                    android:textColor="@color/black"
+                    android:layout_marginBottom="16dp"
+                    android:justificationMode="inter_word"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Privacy and Data"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/konkhmer_sleokchher"
+                    android:layout_marginBottom="8dp"
+                    android:textColor="@color/deep_blue"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="1. Data Collection: SanGawa collects minimal personal data necessary for the app's core functionality. This includes geolocation, task data, and user information for authentication.\n\n2. Data Sharing: SanGawa does not share user data with third parties except as required by law or to ensure the app's functionality (e.g., Firebase services).\n\n3. Data Security: We take reasonable measures to secure user data. However, we cannot guarantee complete security, and users are responsible for safeguarding their devices and login credentials."
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="4dp"
+                    android:fontFamily="sans-serif"
+                    android:textColor="@color/black"
+                    android:layout_marginBottom="16dp"
+                    android:justificationMode="inter_word"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Chatrooms and User Conduct"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/konkhmer_sleokchher"
+                    android:layout_marginBottom="8dp"
+                    android:textColor="@color/deep_blue"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="1. Unmoderated Chats: SanGawa's chatrooms are not moderated by the developers. It is the responsibility of users to moderate their conversations and report inappropriate behavior to their group administrators.\n\n2. Prohibited Activities: Users must not:\n   - Post offensive, abusive, or illegal content.\n   - Engage in harassment or discrimination.\n   - Share false or misleading information. Violations of these rules may result in account suspension or termination.\n\n3. Reporting Misconduct: If you encounter issues within a chatroom, report them to the group administrator. The app developers are not liable for content shared in chatrooms."
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="4dp"
+                    android:fontFamily="sans-serif"
+                    android:textColor="@color/black"
+                    android:layout_marginBottom="16dp"
+                    android:justificationMode="inter_word"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Location Tracking and Task Geofencing"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/konkhmer_sleokchher"
+                    android:layout_marginBottom="8dp"
+                    android:textColor="@color/deep_blue"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="1. Accuracy: The accuracy of location-based features depends on your device and the services provided by Google APIs. SanGawa is not liable for inaccuracies caused by external factors.\n\n2. Consent: By enabling location services, you agree to allow the app to access your location for task notifications and geofencing features."
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="4dp"
+                    android:fontFamily="sans-serif"
+                    android:textColor="@color/black"
+                    android:layout_marginBottom="16dp"
+                    android:justificationMode="inter_word"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Limitation of Liability"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/konkhmer_sleokchher"
+                    android:layout_marginBottom="8dp"
+                    android:textColor="@color/deep_blue"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="1. SanGawa is provided 'as is' without warranties of any kind.\n2. The developers are not responsible for:\n   - Loss of data due to user error or technical issues.\n   - Misuse of location or chatroom features by other users.\n   - Any damages arising from the use or inability to use the app."
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="4dp"
+                    android:fontFamily="sans-serif"
+                    android:textColor="@color/black"
+                    android:layout_marginBottom="16dp"
+                    android:justificationMode="inter_word"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="License and Intellectual Property"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/konkhmer_sleokchher"
+                    android:layout_marginBottom="8dp"
+                    android:textColor="@color/deep_blue"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SanGawa is licensed under the GNU General Public License (GPL). You may use, modify, and distribute the app in compliance with this license."
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="4dp"
+                    android:fontFamily="sans-serif"
+                    android:textColor="@color/black"
+                    android:layout_marginBottom="16dp"
+                    android:justificationMode="inter_word"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Contact and Support"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/konkhmer_sleokchher"
+                    android:layout_marginBottom="8dp"
+                    android:textColor="@color/deep_blue"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="For support or inquiries, please contact the developers through their GitHub profiles:\n\n- https://github.com/JonBabao\n- https://github.com/baddddddddd\n- https://github.com/DeogenesMaranan"
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="4dp"
+                    android:fontFamily="sans-serif"
+                    android:textColor="@color/black"
+                    android:layout_marginBottom="16dp"
+                    android:justificationMode="inter_word"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Updates to Terms and Conditions"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/konkhmer_sleokchher"
+                    android:layout_marginBottom="8dp"
+                    android:textColor="@color/deep_blue"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="These terms may be updated periodically. Continued use of the app following updates signifies your acceptance of the revised terms. It is your responsibility to review the terms regularly."
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="4dp"
+                    android:fontFamily="sans-serif"
+                    android:textColor="@color/black"
+                    android:layout_marginBottom="16dp"
+                    android:justificationMode="inter_word"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="By using SanGawa, you agree to these terms and conditions. Thank you for choosing SanGawa to organize and collaborate on your tasks."
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="4dp"
+                    android:fontFamily="sans-serif"
+                    android:textColor="@color/black"
+                    android:layout_marginBottom="16dp"
+                    android:justificationMode="inter_word"
+                    tools:ignore="HardcodedText" />
+
+            </LinearLayout>
+        </ScrollView>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="25dp">
+
+            <Button
+                android:id="@+id/cancel_button"
+                android:layout_width="150dp"
+                android:layout_height="60dp"
+                android:backgroundTint="#B6B6B6"
+                android:fontFamily="@font/konkhmer_sleokchher"
+                android:text="CANCEL"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                tools:ignore="HardcodedText,TextContrastCheck" />
+
+            <Space
+                android:layout_width="16dp"
+                android:layout_height="match_parent" />
+
+            <Button
+                android:id="@+id/agree"
+                android:layout_width="150dp"
+                android:layout_height="60dp"
+                android:backgroundTint="@color/amazing_green"
+                android:fontFamily="@font/konkhmer_sleokchher"
+                android:text="AGREE"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                tools:ignore="HardcodedText" />
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
