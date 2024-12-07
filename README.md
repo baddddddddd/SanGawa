@@ -64,9 +64,11 @@ Notify users when they are near a task's location, ensuring tasks are relevant t
 #### 🤝 Realtime Task Collaboration
 Collaborate on tasks in real-time, enabling multiple users to work on a task simultaneously.
 
-<div style="display: flex; justify-content: center; gap: 10px;">
-  <img src="./static/demo-collab-left.gif" alt="Task Collaboration Demo" width="200">
-  <img src="./static/demo-collab-right.gif" alt="Another Demo" width="200">
+<div align="center">
+    <div style="display: flex; justify-content: center; gap: 10px;">
+    <img src="./static/demo-collab-left.gif" alt="Task Collaboration Demo" width="200">
+    <img src="./static/demo-collab-right.gif" alt="Another Demo" width="200">
+    </div>
 </div>
 
 #### 💬 **Realtime Chatrooms**
